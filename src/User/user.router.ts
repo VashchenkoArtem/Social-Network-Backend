@@ -3,7 +3,7 @@ import { userController } from "./user.controller";
 
 const router = Router();
 
-router.post("/register", userController.registration);
-router.post("/verify", userController.verify);
+router.post("/registration", userController.registration);
+router.post("/send-code", userController.sendCode);
 
 export default router;

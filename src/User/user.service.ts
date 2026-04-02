@@ -1,24 +1,30 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
-import { UserRepository } from "./user.repository";
 import { IUserServiceContract, AuthToken, CreateUser, VerifyPayload } from "./user.types";
-
+import { cleanEnv, str } from "envalid";
+import { UserRepository } from "./user.repository";
+const verificationCodes = new Map<string, string>();
+const ENV = cleanEnv(process.env, {
+    MAIL_USER: str(),
+    MAIL_PASS: str()
+})
 const JWT_SECRET = process.env.JWT_SECRET || "secret_key";
 
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS
+        user: ENV.MAIL_USER,
+        pass: ENV.MAIL_PASS
     }
 });
 
 export const UserService: IUserServiceContract = {
-    registration: async (data: CreateUser) => {
+    sendCode: async (data) => {
         const code = Math.floor(100000 + Math.random() * 900000).toString();
-        await UserRepository.upsertOtp(data.email, code);
+
+        verificationCodes.set(data.email, code);
 
         await transporter.sendMail({
             from: 'mobileteamsocial@gmail.com',
@@ -27,44 +33,25 @@ export const UserService: IUserServiceContract = {
             html: `<h1>Ваш код: ${code}</h1>`
         });
 
-        console.log(`Sent to: ${data.email}`);
-
         return { message: "Verification code sent to email" };
     },
+    registration: async (data) => {
+        const savedCode = verificationCodes.get(data.email);
 
-    verifyCode: async (payload: VerifyPayload): Promise<AuthToken> => {
-        const { email, code, userData } = payload;
-        const otpRecord = await UserRepository.getOtpByEmail(email);
-
-        if (!otpRecord || otpRecord.code !== code) {
+        if (!savedCode || savedCode !== data.code) {
             throw new Error("Invalid or expired verification code");
         }
 
-        const hashedPassword = await bcrypt.hash(userData.password, 10);
-        
-        const createdUser = await UserRepository.createUser({
-            ...userData,
-            password: hashedPassword
-        });
+        verificationCodes.delete(data.email);
+        const hashedPassword = await bcrypt.hash(data.password, 10);
+        const foundedUser = await UserRepository.findUserByEmail(data.email);
 
-        const updatedUser = await UserRepository.updateNickname(
-            createdUser.id, 
-            `User${createdUser.id}`
-        );
+        if (foundedUser) {
+            throw new Error("User already exists");
+        }
 
-        await UserRepository.deleteOtp(email);
+        const createdUser = await UserRepository.createUser({...data, password: hashedPassword });
 
-        const token = jwt.sign({ id: updatedUser.id }, JWT_SECRET, {
-            expiresIn: '7d'
-        });
-
-        return { 
-            token,
-            user: {
-                id: updatedUser.id,
-                nickname: updatedUser.nickname,
-                email: updatedUser.email
-            }
-        };
+        return createdUser ;
     }
 };

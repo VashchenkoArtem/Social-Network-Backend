@@ -4,29 +4,14 @@ import { UserService } from "./user.service";
 
 
 export const userController: IUserControllerContract = {
-    registration: async (
-        req: Request<object, { message: string }, CreateUser>, 
-        res: Response<{ message: string }>
-    ): Promise<void> => {
-        try {
-            const response = await UserService.registration(req.body);
-            res.status(200).json(response);
-        } catch (error: unknown) {
-            const message = error instanceof Error ? error.message : "Registration failed";
-            res.status(400).json({ message });
-        }
+    registration: async (req, res) => {
+        const body = req.body;
+        const response = await UserService.registration(body);
+        res.status(400).json(response);
     },
-
-    verify: async (
-        req: Request<object, AuthToken, VerifyPayload>, 
-        res: Response<AuthToken | { message: string }>
-    ): Promise<void> => {
-        try {
-            const response = await UserService.verifyCode(req.body);
-            res.status(201).json(response);
-        } catch (error: unknown) {
-            const message = error instanceof Error ? error.message : "Verification failed";
-            res.status(400).json({ message });
-        }
+    sendCode: async (req, res) => {
+        const body = req.body;
+        const response = await UserService.sendCode(body);
+        res.status(200).json(response);
     }
 };
