@@ -1,5 +1,5 @@
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import bcrypt, { compare } from "bcrypt";
+import jwt, { sign } from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import { IUserServiceContract, AuthToken, CreateUser, VerifyPayload } from "./user.types";
 import { cleanEnv, str } from "envalid";
@@ -7,9 +7,9 @@ import { UserRepository } from "./user.repository";
 const verificationCodes = new Map<string, string>();
 const ENV = cleanEnv(process.env, {
     MAIL_USER: str(),
-    MAIL_PASS: str()
+    MAIL_PASS: str(),
+    JWT_SECRET: str()
 })
-const JWT_SECRET = process.env.JWT_SECRET || "secret_key";
 
 
 const transporter = nodemailer.createTransport({
@@ -53,5 +53,28 @@ export const UserService: IUserServiceContract = {
         const createdUser = await UserRepository.createUser({...data, password: hashedPassword });
 
         return createdUser ;
+    },
+    login: async (data) => {
+        const user = await UserRepository.findUserByEmail(data.email)
+
+        if (!user) {
+            return 'User was not found. Try again, please'
+        }
+        
+        if (typeof user === "string") {
+            return user
+        }
+
+        const userConfirmation = await compare(data.password, user.password)
+        if (!userConfirmation) {
+            return 'You entered wrong credentionals. Try again, please'
+        }
+
+        const token = sign(
+            { id: user.id },
+            ENV.JWT_SECRET,
+            { expiresIn: '7d' }
+        )
+        return { token }
     }
 };

@@ -1,3 +1,4 @@
+import { compare } from "bcrypt";
 import { client } from "../client/client";
 import { IUserRepositoryContract } from "./user.types";
 
@@ -15,32 +16,20 @@ export const UserRepository: IUserRepositoryContract = {
         });
         return user
     },
+    login: async (data) => {
+        const user = await client.user.findUnique({
+            where: { email: data.email },
+        })
 
-    // updateNickname: async (id: number, nickname: string): Promise<User> => {
-    //     return await client.user.update({
-    //         where: { id },
-    //         data: { nickname }
-    //     });
-    // },
-
-    // upsertOtp: async (email: string, code: string): Promise<void> => {
-    //     await client.otp.upsert({
-    //         where: { email },
-    //         update: { code, createdAt: new Date() },
-    //         create: { email, code }
-    //     });
-    // },
-
-    // getOtpByEmail: async (email: string) => {
-    //     return await client.otp.findUnique({
-    //         where: { email },
-    //         select: { code: true }
-    //     });
-    // },
-
-    // deleteOtp: async (email: string): Promise<void> => {
-    //     await client.otp.delete({
-    //         where: { email }
-    //     });
-    // }
+        if (!user) {
+            return "User doesn't exists. Tqry again, please"
+        }
+        
+        const isPasswordCorrect = await compare(data.password, user.password);
+        if (!isPasswordCorrect) {
+            return "Password not correct. Try again, please"
+        }
+        
+        return user
+    },
 };
