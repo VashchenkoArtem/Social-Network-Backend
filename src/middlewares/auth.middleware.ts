@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { verify } from "jsonwebtoken";
-import { AuthenticatedUser } from "../user/user.types";
+
 import { cleanEnv, str } from "envalid";
+
 const ENV = cleanEnv(process.env, {
     MAIL_USER: str(),
     MAIL_PASS: str(),
