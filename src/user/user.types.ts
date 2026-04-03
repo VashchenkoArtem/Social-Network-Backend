@@ -37,13 +37,19 @@ export interface IUserControllerContract {
     sendCode: (
         req: Request<object, ErrorMessage, RegistrationData>,
         res: Response<ErrorMessage>
-    ) => void
+    ) => void,
+    login: (
+		req: Request<object, {token: string} | string, CreateUser, object>,
+		res: Response<{token: string} | string>,
+	) => Promise<void>
 }
 export interface IUserServiceContract {
     registration: (data: RegistrationData) => Promise<User>;
     sendCode: (data: CreateUser) => Promise<ErrorMessage>;
+    login: (data: CreateUser) => Promise<{token: string} | string>
 }
 export interface IUserRepositoryContract {
+    login: (data: CreateUser) => Promise<User | string>
     findUserByEmail: (email: string) => Promise<User | null>;
     createUser: (data: CreateUser) => Promise<User>;
 }

@@ -5,3 +5,4 @@ export const userRouter = Router();
 
 userRouter.post("/registration", userController.registration);
 userRouter.post("/send-code", userController.sendCode);
+userRouter.post('/login', userController.login);
