@@ -1,15 +1,18 @@
-import type { Express } from "express"
-import express from "express"
-import cors from "cors"
-import { userRouter } from "./user"
+import "dotenv/config";
+import express from "express";
+import type { Express } from "express";
+import cors from "cors";
+import { userRouter } from "./user/user.router";
 
-const HOST: string = "127.0.0.1"
-const PORT: number = 8000
-const app: Express = express()
+const HOST = "0.0.0.0";
+const PORT = 8000;
+const app: Express = express();
 
 app.use(cors());
-app.use(express.json())
-app.use(userRouter)
+app.use(express.json());
+app.use(userRouter);
+
 app.listen(PORT, HOST, () => {
-    console.log(`Server is running at http://${HOST}:${PORT}`)
-})
+    console.log(`Сервер запущено`);
+    console.log(`Локально: http://localhost:${PORT}`);
+});
