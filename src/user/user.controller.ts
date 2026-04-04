@@ -7,7 +7,11 @@ export const userController: IUserControllerContract = {
     registration: async (req, res) => {
         const body = req.body;
         const response = await UserService.registration(body);
-        res.status(400).json(response);
+        if (response instanceof Error) {
+            res.status(400).json(response.message);
+            return
+        }
+        res.status(200).json(response);
     },
     sendCode: async (req, res) => {
         const body = req.body;

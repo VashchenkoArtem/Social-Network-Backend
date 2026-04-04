@@ -12,16 +12,11 @@ export type RegistrationData = {
     email: string,
     password: string
 }
-export type ErrorMessage = {
+export type  Message = {
     message: string
 }
 export interface AuthToken {
     token: string;
-    user: {
-        id: number;
-        nickname: string | null | undefined;
-        email: string;
-    };
 }
 
 export interface VerifyPayload {
@@ -31,12 +26,12 @@ export interface VerifyPayload {
 }
 export interface IUserControllerContract {
     registration: (
-        req: Request<object, CreateUser, RegistrationData>,
-        res: Response<CreateUser>
+        req: Request<object, AuthToken | string, RegistrationData>,
+        res: Response<AuthToken | string>
     ) => void,
     sendCode: (
-        req: Request<object, ErrorMessage, RegistrationData>,
-        res: Response<ErrorMessage>
+        req: Request<object, Message, RegistrationData>,
+        res: Response<Message>
     ) => void,
     login: (
 		req: Request<object, {token: string} | string, CreateUser, object>,
@@ -44,8 +39,8 @@ export interface IUserControllerContract {
 	) => Promise<void>
 }
 export interface IUserServiceContract {
-    registration: (data: RegistrationData) => Promise<User>;
-    sendCode: (data: CreateUser) => Promise<ErrorMessage>;
+    registration: (data: RegistrationData) => Promise<AuthToken>;
+    sendCode: (data: CreateUser) => Promise<Message>;
     login: (data: CreateUser) => Promise<{token: string} | string>
 }
 export interface IUserRepositoryContract {

@@ -52,7 +52,12 @@ export const UserService: IUserServiceContract = {
 
         const createdUser = await UserRepository.createUser({...data, password: hashedPassword });
 
-        return createdUser ;
+        const token = sign(
+            { id: createdUser.id },
+            ENV.JWT_SECRET,
+            { expiresIn: '7d' }
+        )
+        return { token }
     },
     login: async (data) => {
         const user = await UserRepository.findUserByEmail(data.email)
