@@ -49,9 +49,11 @@ export const UserService: IUserServiceContract = {
         if (foundedUser) {
             throw new Error("User already exists");
         }
-
-        const createdUser = await UserRepository.createUser({...data, password: hashedPassword });
-
+        const dataWithoutCode = {...data, code: undefined}
+        const createdUser = await UserRepository.createUser({...dataWithoutCode, password: hashedPassword });
+        if (typeof createdUser === "string") {
+            throw new Error("User was not created")
+        }
         const token = sign(
             { id: createdUser.id },
             ENV.JWT_SECRET,
@@ -81,5 +83,21 @@ export const UserService: IUserServiceContract = {
             { expiresIn: '7d' }
         )
         return { token }
+    },
+    me: async (id) => {
+        const user = await UserRepository.me(id)
+
+        if (typeof user === "string") {
+            return user
+        }
+        return user
+    },
+    updateUser(data, userId) {
+        const userData = UserRepository.updateUser(data, userId)
+        if (typeof userData === "string") {
+            return userData
+        }
+        return userData
     }
+    
 };

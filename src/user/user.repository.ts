@@ -5,31 +5,75 @@ import { IUserRepositoryContract } from "./user.types";
 
 export const UserRepository: IUserRepositoryContract = {
     findUserByEmail: async (email: string) => {
-        return await client.user.findUnique({
-            where: { email }
-        })
+        try {
+            const user = await client.user.findUnique({
+                where: { email },
+            });
+            return user;
+        } catch (error) {
+            throw new Error("Could not find user by email");
+        }
+        
     },
     createUser: async (data) => {
-        const dataWithoutCode = {...data, code: undefined}
-        const user = await client.user.create({
-            data: dataWithoutCode
-        });
-        return user
+        try {
+            const user = await client.user.create({
+                data: data,
+                omit: { password: true }
+            });
+            if (!user) {
+                return "User was not created"
+            }
+            return user;
+        } catch (error) {
+            throw error
+        }
     },
     login: async (data) => {
-        const user = await client.user.findUnique({
-            where: { email: data.email },
-        })
+        try {
+            const user = await client.user.findUnique({
+                where: { email: data.email },
+            });
+            if (!user) {
+                return "User was not found"
+            }
+            const isPasswordValid = await compare(data.password, user.password);
+            if (!isPasswordValid) {
+                return "Invalid password"
+            }
+            return user;
+        } catch (error) {
+            throw new Error("Could not login user");
+        }
 
-        if (!user) {
-            return "User doesn't exists. Tqry again, please"
-        }
-        
-        const isPasswordCorrect = await compare(data.password, user.password);
-        if (!isPasswordCorrect) {
-            return "Password not correct. Try again, please"
-        }
-        
-        return user
     },
+    me: async (id) => {
+        try {
+            const user = await client.user.findUnique({
+                where: { id: id },
+                omit: { password: true }
+            })
+            if (!user) {
+                return "User was not found"
+            }
+            return user
+        } catch (error) {
+            throw new Error("Could not get user");
+        }
+    },
+    updateUser: async (data, userId) => {
+        try {
+            const user = await client.user.update({
+                where: { id: userId },
+                data: data,
+                omit: { password: true }
+            })
+            if (!user) {
+                return "User was not found"
+            }
+            return user
+        } catch (error) {
+            throw error
+        }
+    }
 };

@@ -1,8 +1,11 @@
 import { Router } from "express";
 import { userController } from "./user.controller";
+import { authMiddleware } from "../middlewares/auth.middleware";
 
 export const userRouter = Router();
 
 userRouter.post("/registration", userController.registration);
 userRouter.post("/send-code", userController.sendCode);
 userRouter.post('/login', userController.login);
+userRouter.get("/me", authMiddleware, userController.me);
+userRouter.patch("/update-user", authMiddleware, userController.updateUser);

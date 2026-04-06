@@ -27,5 +27,24 @@ export const userController: IUserControllerContract = {
             return
         }
         res.status(200).json(authUser)
-    }
+    },
+    me: async(req, res) => {
+        const userId = res.locals.userId
+        const response = await UserService.me(userId)
+        if (typeof response === "string"){
+            res.status(400).json(response)
+            return
+        }
+        res.status(200).json(response)
+    },
+    updateUser: async (req, res) => {
+        const userId = res.locals.userId
+        const updatedData = req.body
+        const response = await UserService.updateUser(updatedData, userId)
+        if (typeof response === "string"){
+            res.status(400).json(response)
+            return
+        }
+        res.status(200).json(response)
+    },
 };
