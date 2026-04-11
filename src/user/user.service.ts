@@ -4,6 +4,10 @@ import nodemailer from "nodemailer";
 import { IUserServiceContract, AuthToken, CreateUser, VerifyPayload } from "./user.types";
 import { cleanEnv, str } from "envalid";
 import { UserRepository } from "./user.repository";
+type VerificationRecord = {
+    code: string;
+    expiresAt: number;
+};
 const verificationCodes = new Map<string, string>();
 const ENV = cleanEnv(process.env, {
     MAIL_USER: str(),
@@ -25,11 +29,11 @@ export const UserService: IUserServiceContract = {
         const code = Math.floor(100000 + Math.random() * 900000).toString();
 
         verificationCodes.set(data.email, code);
-
+        console.log(verificationCodes)
         await transporter.sendMail({
             from: 'mobileteamsocial@gmail.com',
             to: data.email,
-            subject: "Код підтвердження",
+            subject: data.message,
             html: `<h1>Ваш код: ${code}</h1>`
         });
 
@@ -92,12 +96,24 @@ export const UserService: IUserServiceContract = {
         }
         return user
     },
-    updateUser(data, userId) {
+    updateUser : async(data, userId) =>{
         const userData = UserRepository.updateUser(data, userId)
         if (typeof userData === "string") {
             return userData
         }
         return userData
+    },
+    getCode: async (email: string)=> {
+        const record = verificationCodes.get(email);
+
+        if (!record) {
+            return "Code not found";
+        }
+        return record;
+    },
+    updatePassword: async(password, userId)=>{
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const userData = await UserRepository.updateUser({password: hashedPassword}, userId)
+        return userData
     }
-    
 };

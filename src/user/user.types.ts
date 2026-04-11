@@ -12,9 +12,13 @@ export type AuthenticatedUser = {
 export type RegistrationData = {
     code: string,
     email: string,
-    password: string
+    password: string,
+    message: string
 }
 export type  Message = {
+    message: string
+}
+export type ISendCode = {
     message: string
 }
 export interface AuthToken {
@@ -26,6 +30,15 @@ export interface VerifyPayload {
     code: string;
     userData: CreateUser;
 }
+export type VerificationCode = {
+    email: string;
+    code: string;
+    expiresAt: number;
+};
+export type CodeStore = Map<string, VerificationCode>;
+export type GetCodePayload = {
+    email: string;
+};
 export interface IUserControllerContract {
     registration: (
         req: Request<object, AuthToken | string, RegistrationData>,
@@ -47,14 +60,23 @@ export interface IUserControllerContract {
         req: Request<object, UserWithoutPassword | string, UpdateUser, object>,
         res: Response<UserWithoutPassword | string>
     ) => Promise<void>
-    
+    getCode: (
+        req: Request<object, VerificationCode | string, GetCodePayload>,
+        res: Response<VerificationCode | string>
+    ) => Promise<void>
+    updatePassword: (
+        req: Request<object, UserWithoutPassword | string, {password: string}, object>,
+        res: Response<UserWithoutPassword | string>
+    ) => Promise<void>
 }
 export interface IUserServiceContract {
     registration: (data: RegistrationData) => Promise<AuthToken>;
-    sendCode: (data: CreateUser) => Promise<Message>;
+    sendCode: (data: RegistrationData) => Promise<Message>;
     login: (data: CreateUser) => Promise<{token: string} | string>;
     me: (id: number) => Promise<UserWithoutPassword | string>;
     updateUser: (data: UpdateUser, userId: number) => Promise<UserWithoutPassword | string>;
+    getCode: (email: string) => Promise<VerificationCode | string>;
+    updatePassword: (password: string, userId: number) => Promise<UserWithoutPassword | string>
 }
 export interface IUserRepositoryContract {
     login: (data: CreateUser) => Promise<User | string>

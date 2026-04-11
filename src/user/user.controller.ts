@@ -47,4 +47,32 @@ export const userController: IUserControllerContract = {
         }
         res.status(200).json(response)
     },
+    getCode: async (req, res) => {
+        const { email } = req.body;
+
+        if (!email) {
+            res.status(400).json("Email and code are required");
+            return;
+        }
+
+        const response = await UserService.getCode(email);
+
+        if (typeof response === "string") {
+            res.status(400).json(response);
+            return;
+        }
+
+        res.status(200).json(response);
+    },
+    updatePassword: async (req, res) => {
+        const userId = res.locals.userId
+        console.log(userId)
+        const updatedPassword = req.body.password
+        const response = await UserService.updatePassword(updatedPassword, userId)
+        if (typeof response === "string"){
+            res.status(500).json("Server error")
+            return
+        }
+        res.status(200).json(response)
+    }
 };

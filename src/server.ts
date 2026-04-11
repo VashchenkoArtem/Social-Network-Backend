@@ -4,7 +4,7 @@ import type { Express } from "express";
 import cors from "cors";
 import { userRouter } from "./user/user.router";
 
-const HOST = "0.0.0.0";
+const HOST = "192.168.0.104";
 const PORT = 8000;
 const app: Express = express();
 
@@ -14,5 +14,5 @@ app.use(userRouter);
 
 app.listen(PORT, HOST, () => {
     console.log(`Сервер запущено`);
-    console.log(`Локально: http://localhost:${PORT}`);
+    console.log(`Локально: http://${HOST}:${PORT}`);
 });
