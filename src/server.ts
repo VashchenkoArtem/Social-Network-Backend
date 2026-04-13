@@ -4,7 +4,7 @@ import type { Express } from "express";
 import cors from "cors";
 import { userRouter } from "./user/user.router";
 
-const HOST = "192.168.0.104";
+const HOST = "192.168.0.107";
 const PORT = 8000;
 const app: Express = express();
 
