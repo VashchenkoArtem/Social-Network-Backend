@@ -24,11 +24,35 @@ model User{
     avatar      String?
     signature   String?
     birthDate   DateTime?
+    albums      Album[]
 }
 
-model Otp {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  code      String
-  createdAt DateTime @default(now())
+model Album {
+  id          Int         @id @default(autoincrement())
+  isVisible   Boolean     
+  author      User @relation(fields: [authorId], references: [id])
+  authorId    Int
+  topic       Tag @relation(fields: [topicId], references: [id])
+  topicId     Int
+  createdAt   CreatedAt @relation(fields: [dateId], references: [id])
+  dateId      Int
+  photos      Photo[]
+}
+model Photo{
+  id          Int         @id @default(autoincrement())
+  filename    String
+  file        String
+  album       Album @relation(fields: [albumId], references: [id])
+  albumId     Int
+}
+model Tag {
+  id          Int         @id @default(autoincrement())
+  name        String
+  albums      Album[]
+}
+
+model CreatedAt{
+  id          Int         @id @default(autoincrement())
+  createdAt DateTime
+  albums      Album[]
 }
