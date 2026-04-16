@@ -1,5 +1,5 @@
 import { client } from "../client/client";
-import { IAlbumRepositoryContract, CreatePhotoInput, CreateAlbumInput } from "./album.types";
+import { IAlbumRepositoryContract } from "./album.types";
 
 export const AlbumRepository: IAlbumRepositoryContract = {
     createAlbum: async (data) => {
@@ -12,23 +12,23 @@ export const AlbumRepository: IAlbumRepositoryContract = {
             })
             return album
         } catch (error) {
-            throw new Error("Не вдаллся створити альбом. Спробуйте ще раз.")
+            throw new Error("Не вдался створити альбом. Спробуйте ще раз.")
         }
     },
 
-    addPhoto: async (data) => {
+    addPhoto: async (data, albumId) => {
         try {
             const photo = await client.photo.create({
                 data: {
-                    filename: data.image,
-                    file: data.image,
+                    filename: data.filename,
                     album: {
-                        connect: { id: data.albumId },
+                        connect: { id: albumId },
                     }
                 }
             })
             return photo
         } catch (error) {
+            console.log(error)
             throw new Error("Не вдаллся додати фото до альбому. Спробуйте ще раз.")
         }
     },

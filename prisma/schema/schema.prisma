@@ -29,6 +29,7 @@ model User{
 
 model Album {
   id          Int         @id @default(autoincrement())
+  title       String
   isVisible   Boolean     @default(true)
   author      User @relation(fields: [authorId], references: [id])
   authorId    Int
@@ -41,7 +42,6 @@ model Album {
 model Photo{
   id          Int         @id @default(autoincrement())
   filename    String
-  file        String
   album       Album @relation(fields: [albumId], references: [id])
   albumId     Int
 }
