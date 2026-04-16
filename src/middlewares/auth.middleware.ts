@@ -1,7 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import { verify } from "jsonwebtoken";
-import { AuthenticatedUser } from "../User/user.types";
 
+import { cleanEnv, str } from "envalid";
+import { AuthenticatedUser } from "../user/user.types";
+
+const ENV = cleanEnv(process.env, {
+    MAIL_USER: str(),
+    MAIL_PASS: str(),
+    JWT_SECRET: str()
+})
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
     const authorizationHeaders = req.headers.authorization;
     
@@ -19,7 +26,6 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
 
     try {
         const secret = process.env.JWT_SECRET || "fallback_secret";
-        
         const decodedToken = verify(token, secret) as unknown as AuthenticatedUser;
         
         res.locals.userId = decodedToken.id;

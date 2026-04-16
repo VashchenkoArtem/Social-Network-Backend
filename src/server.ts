@@ -2,19 +2,19 @@ import "dotenv/config";
 import express from "express";
 import type { Express } from "express";
 import cors from "cors";
-import userRouter from "./User/user.router"; 
+import { userRouter } from "./user/user.router";
+import { uploadDir } from "./config";
 
-
-
-const HOST = "0.0.0.0";
+const HOST = "192.168.0.104";
 const PORT = 8000;
 const app: Express = express();
 
-
-app.use(express.json());
 app.use(cors());
+app.use("/media/", express.static(uploadDir));
+app.use(express.json());
 app.use(userRouter);
+
 app.listen(PORT, HOST, () => {
     console.log(`Сервер запущено`);
-    console.log(`Локально: http://localhost:${PORT}`);
+    console.log(`Локально: http://${HOST}:${PORT}`);
 });
