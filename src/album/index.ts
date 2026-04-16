@@ -1,0 +1,1 @@
+export { albumRouter } from "./album.router"

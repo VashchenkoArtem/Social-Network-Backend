@@ -29,7 +29,7 @@ model User{
 
 model Album {
   id          Int         @id @default(autoincrement())
-  isVisible   Boolean     
+  isVisible   Boolean     @default(true)
   author      User @relation(fields: [authorId], references: [id])
   authorId    Int
   topic       Tag @relation(fields: [topicId], references: [id])
