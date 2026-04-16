@@ -29,6 +29,7 @@ model User{
 
 model Album {
   id          Int         @id @default(autoincrement())
+  title       String
   isVisible   Boolean     
   author      User @relation(fields: [authorId], references: [id])
   authorId    Int
@@ -56,3 +57,4 @@ model CreatedAt{
   createdAt DateTime
   albums      Album[]
 }
+
