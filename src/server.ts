@@ -4,6 +4,7 @@ import type { Express } from "express";
 import cors from "cors";
 import { userRouter } from "./user/user.router";
 import { uploadDir } from "./config";
+import { albumRouter } from "./album/album.router";
 
 const HOST = "192.168.0.104";
 const PORT = 8000;
@@ -13,6 +14,7 @@ app.use(cors());
 app.use("/media/", express.static(uploadDir));
 app.use(express.json());
 app.use(userRouter);
+app.use(albumRouter);
 
 app.listen(PORT, HOST, () => {
     console.log(`Сервер запущено`);
