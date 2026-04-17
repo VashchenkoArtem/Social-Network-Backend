@@ -1,8 +1,21 @@
 import { Request, Response } from "express";
 import { AlbumService } from "./album.service";
 import { IAlbumControllerContract } from "./album.types";
+import { AppError, AuthenticationError } from "../errors";
 
 export const albumController: IAlbumControllerContract = {
+    createAlbum: async (req, res) => {
+        try {
+            const userId = res.locals.userId
+            if (!userId) {
+                throw new AuthenticationError("Користувач не авторизований");   
+            }
+            const album = await AlbumService.createAlbum(req.body, userId);
+            res.status(201).json(album);
+        } catch (error: unknown) {
+            console.log(error)
+        }
+    },
     uploadPhoto: async (req, res) => {
         try {
             const albumId = req.params.albumId
@@ -38,5 +51,21 @@ export const albumController: IAlbumControllerContract = {
         } catch (error) {
             res.status(400).json((error as Error).message)
         }
+    },
+    updateAlbum: async (req, res) => {
+        try {
+            const id = parseInt(String(req.params.id), 10);
+
+            if (isNaN(id)) {
+                throw new AppError("ID альбому має бути числом", 400);
+            }
+            if (!req.body || Object.keys(req.body).length === 0) {
+                throw new AppError("Відсутні дані для оновлення", 400);
+            }
+            const album = await AlbumService.updateAlbum(id, req.body);
+            res.status(200).json(album);
+        } catch (error: unknown) {
+            console.log(error)
+        }
     }
-}
+};

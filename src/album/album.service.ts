@@ -2,6 +2,8 @@ import { client } from "../client/client";
 import { Multer } from "multer";
 import { IAlbumServiceContract } from "./album.types";
 import { AlbumRepository } from "./album.repository";
+import { ValidationError, AppError, BadRequestError } from "../errors";
+
 
 export const AlbumService: IAlbumServiceContract = {
     uploadPhoto: async (file, albumId) => {
@@ -37,5 +39,21 @@ export const AlbumService: IAlbumServiceContract = {
     getUserAlbums: async (userId) => {
         const albums = await AlbumRepository.getUserAlbums(userId)
         return albums
-    }
-}
+    },
+    createAlbum: async (data, userId) => {
+        const album =  await AlbumRepository.createAlbum(data, userId);
+        if (typeof album === "string"){
+            throw new BadRequestError("Request error");
+        }
+        return album
+    },
+
+    updateAlbum: async (albumId, data) => {
+            const album = await AlbumRepository.updateAlbum(albumId, data);
+            if (typeof album === "string"){
+                throw new BadRequestError("Request error")
+            }
+            return album
+        }
+    
+};

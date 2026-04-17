@@ -1,20 +1,9 @@
 import { client } from "../client/client";
 import { IAlbumRepositoryContract } from "./album.types";
+import { Prisma } from "@prisma/client";
+import { NotFoundError, AppError } from "../errors";
 
 export const AlbumRepository: IAlbumRepositoryContract = {
-    createAlbum: async (data) => {
-        try {
-            const album = await client.album.create({
-                data,
-                include: {
-                    photos: true,
-                },
-            })
-            return album
-        } catch (error) {
-            throw new Error("Не вдался створити альбом. Спробуйте ще раз.")
-        }
-    },
 
     addPhoto: async (data, albumId) => {
         try {
@@ -29,7 +18,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
             return photo
         } catch (error) {
             console.log(error)
-            throw new Error("Не вдаллся додати фото до альбому. Спробуйте ще раз.")
+            throw new Error("Не вдалoся додати фото до альбому. Спробуйте ще раз.")
         }
     },
 
@@ -78,4 +67,44 @@ export const AlbumRepository: IAlbumRepositoryContract = {
             throw new Error("Не вдалося отримати альбоми")
         }
     },
+    createAlbum: async (data, userId) => {
+        const tag = await client.tag.findFirst({
+            where: { id: data.topicId }
+        });
+
+        if (!tag) throw new NotFoundError(`Theme`);
+
+        const album = await client.album.create({
+            data: {
+                title: data.title,
+                isVisible: data.isVisible ?? true,
+                author: { connect: { id: userId } },
+                topic: { connect: { id: tag.id } },
+                createdAt: { connect: {id: data.dateId}}
+            },
+            include: {
+                photos: true,
+                topic: true,
+                createdAt: true
+            }
+        });
+        return album
+    },
+    updateAlbum: async (albumId, data) => {
+        try {
+            return await client.album.update({
+                where: { id: albumId },
+                data: data,
+                include: {
+                    photos: true
+                }
+            });
+        } catch (error: unknown) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+                throw new NotFoundError("Album");
+            }
+            throw new AppError("Could not update album", 500);
+        }
+    }
 }
+

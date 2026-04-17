@@ -6,6 +6,7 @@ export type Album = Prisma.AlbumGetPayload<{
 }>
 
 export type CreateAlbumInput = Prisma.AlbumUncheckedCreateInput
+export type UpdateAlbumInput = Prisma.AlbumUpdateInput
 
 export type Photo = Prisma.PhotoGetPayload<{}>
 export type PhotoWithoutAlbumId = Prisma.PhotoGetPayload<{
@@ -39,19 +40,42 @@ export interface IAlbumControllerContract {
     getUserAlbums: (
         req: Request,
         res: Response<Album[] | string>
-    ) => Promise<void>
+    ) => Promise<void>,
+    createAlbum: (
+        req: Request<object, Album | ErrorResponse, CreateAlbumInput>,
+        res: Response<Album | ErrorResponse>
+    ) => Promise<void>;
+
+    updateAlbum: (
+        req: AuthenticatedRequest, 
+        res: Response<Album | ErrorResponse>
+    ) => Promise<void>;
 }
 
 export interface IAlbumServiceContract {
     uploadPhoto: (file: Express.Multer.File, albumId: number) => Promise<Photo>
     albumVisibility: (albumId: number, userId: number) => Promise<Album | string>
     getUserAlbums: (userId: number) => Promise<Album[]>
+    createAlbum: (data: CreateAlbumInput, userId: number) => Promise<Album>;
+    updateAlbum: (albumId: number, data: UpdateAlbumInput) => Promise<Album>;
 }
 
 export interface IAlbumRepositoryContract {
-    createAlbum: (data: CreateAlbumInput) => Promise<Album | string>
+    createAlbum: (data: CreateAlbumInput, userId: number) => Promise<Album | string>
     addPhoto: (data: PhotoWithoutAlbumId, albumId: number) => Promise<Photo>
     findAlbumById: (id: number) => Promise<Album | null>
     albumVisibility: (id: number, isVisible: boolean) => Promise<Album | string>
     getUserAlbums: (userId: number) => Promise<Album[]>
+    updateAlbum: (albumId: number, data: UpdateAlbumInput) => Promise<Album | string>
+}
+
+export type ErrorResponse = {
+    message: string;
+};
+
+export interface AuthenticatedRequest extends Request {
+    user?: {
+        id: number;
+        email?: string;
+    };
 }
