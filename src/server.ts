@@ -7,7 +7,7 @@ import { uploadDir } from "./config";
 import { tagRouter } from "./tag/tag.router";
 import { albumRouter } from "./album/album.router";
 
-const HOST = "0.0.0.0";
+const HOST = "192.168.0.104";
 const PORT = 8000;
 const app: Express = express();
 

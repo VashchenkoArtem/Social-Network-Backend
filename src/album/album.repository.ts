@@ -61,6 +61,8 @@ export const AlbumRepository: IAlbumRepositoryContract = {
                 },
                 include: {
                     photos: true,
+                    createdAt: true,
+                    topic: true
                 },
             })
         } catch (error) {
