@@ -13,16 +13,7 @@ export const AlbumService: IAlbumServiceContract = {
     },
     
     create: async (data, userId) => {
-        try {
-            if (!data.title) throw new ValidationError("Title is required");
-            if (!data.theme) throw new ValidationError("Theme is required");
-            if (!data.year) throw new ValidationError("Year is required");
-
-            return await AlbumRepository.create(data, userId);
-        } catch (error: unknown) {
-            if (error instanceof AppError) throw error;
-            throw new AppError("Error during album creation", 500);
-        }
+        return await AlbumRepository.create(data, userId);
     },
 
     update: async (albumId, data) => {

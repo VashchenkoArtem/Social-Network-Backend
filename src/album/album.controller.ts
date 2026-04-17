@@ -23,18 +23,10 @@ export const albumController: IAlbumControllerContract = {
         }
     },
 
-    createAlbum: async (req: AuthenticatedRequest, res: Response<AlbumWithRelations | ErrorResponse>) => {
-        try {
-            const userId = 1; //
-            if (!userId) {
-                throw new AuthenticationError("Користувач не авторизований");
-            }
-
-            const album = await AlbumService.create(req.body, userId);
-            res.status(201).json(album);
-        } catch (error: unknown) {
-            handleError(error, res);
-        }
+    createAlbum: async (req, res) => {
+        const userId = res.locals.userId
+        const album = await AlbumService.create(req.body, userId);
+        res.status(201).json(album);
     },
 
     updateAlbum: async (req: AuthenticatedRequest, res: Response<AlbumWithRelations | ErrorResponse>) => {

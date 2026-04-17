@@ -6,5 +6,5 @@ export const albumRouter = Router();
 
 
 albumRouter.get("/albums",  albumController.getAlbums);
-albumRouter.post("/albums",  albumController.createAlbum);
+albumRouter.post("/albums", authMiddleware,  albumController.createAlbum);
 albumRouter.patch("/albums/:id",  albumController.updateAlbum);
