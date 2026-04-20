@@ -63,18 +63,21 @@ export const UserRepository: IUserRepositoryContract = {
     },
     updateUser: async (data, userId) => {
         try {
-            if (data.birthDate && typeof data.birthDate === "string") {
-            const [day, month, year] = data.birthDate.split(".");
-            console.log(day, month, year)
-            data.birthDate = new Date(
-                Number(year),
-                Number(month),
-                Number(day)
-            );
-            }
+            // if (typeof data.birthDate === "string" && data.birthDate.trim()) {
+            // const [day, month, year] = data.birthDate.split(".");
+
+            // data.birthDate = new Date(
+            //     Number(year),
+            //     Number(month) - 1,
+            //     Number(day)
+            // );
+            // } else {
+            // delete data.birthDate;
+            // }
+            console.log(data)
             const user = await client.user.update({
                 where: { id: userId },
-                data: data,
+                data: {...data},
                 omit: { password: true }
             })
             if (!user) {

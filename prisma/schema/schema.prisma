@@ -28,16 +28,20 @@ model User{
 }
 
 model Album {
-  id          Int         @id @default(autoincrement())
-  title       String
-  isVisible   Boolean     @default(true)
-  author      User @relation(fields: [authorId], references: [id])
-  authorId    Int
-  topic       Tag @relation(fields: [topicId], references: [id])
-  topicId     Int
-  createdAt   CreatedAt @relation(fields: [dateId], references: [id])
-  dateId      Int
-  photos      Photo[]
+  id        Int      @id @default(autoincrement())
+  title     String
+  isVisible Boolean  @default(true)
+
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+
+  topic     Tag      @relation(fields: [topicId], references: [id])
+  topicId   Int
+
+  year      AlbumYear @relation(fields: [yearId], references: [id])
+  yearId    Int
+
+  photos    Photo[]
 }
 model Photo{
   id          Int         @id @default(autoincrement())
@@ -51,9 +55,10 @@ model Tag {
   albums      Album[]
 }
 
-model CreatedAt{
-  id          Int         @id @default(autoincrement())
-  createdAt   Int
-  albums      Album[]
+model AlbumYear {
+  id    Int @id @default(autoincrement())
+  year  Int @unique
+
+  albums Album[]
 }
 

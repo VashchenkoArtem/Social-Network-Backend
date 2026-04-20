@@ -61,7 +61,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
                 },
                 include: {
                     photos: true,
-                    createdAt: true,
+                    year: true,
                     topic: true
                 },
             })
@@ -73,21 +73,25 @@ export const AlbumRepository: IAlbumRepositoryContract = {
         const tag = await client.tag.findFirst({
             where: { id: data.topicId }
         });
-
+        const year = await client.albumYear.findFirst({
+            where: { id: data.yearId }
+        });
+        console.log(data)
+        if (!year) throw new NotFoundError("Year");
         if (!tag) throw new NotFoundError(`Theme`);
-
+        console.log(data.yearId)
         const album = await client.album.create({
             data: {
                 title: data.title,
                 isVisible: data.isVisible ?? true,
                 author: { connect: { id: userId } },
                 topic: { connect: { id: tag.id } },
-                createdAt: { connect: {id: data.dateId}}
+                year: { connect: {id: year.id}}
             },
             include: {
                 photos: true,
                 topic: true,
-                createdAt: true
+                year: true
             }
         });
         return album

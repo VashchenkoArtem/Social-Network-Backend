@@ -13,6 +13,7 @@ export function procImgMiddleware(width: number, quality:number){
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
             if (!req.file){
+                console.log(req.file)
                 next(new ValidationError("file validation error"))
                 return
             }

@@ -10,3 +10,4 @@ albumRouter.patch("/:id", authMiddleware, albumController.albumVisibility)
 albumRouter.get("/albums", authMiddleware, albumController.getUserAlbums)
 albumRouter.post("/albums", authMiddleware,  albumController.createAlbum);
 albumRouter.patch("/albums/:id", authMiddleware,  albumController.updateAlbum); 
+0

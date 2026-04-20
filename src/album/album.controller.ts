@@ -7,10 +7,11 @@ export const albumController: IAlbumControllerContract = {
     createAlbum: async (req, res) => {
         try {
             const userId = res.locals.userId
-            if (!userId) {
-                throw new AuthenticationError("Користувач не авторизований");   
-            }
             const album = await AlbumService.createAlbum(req.body, userId);
+            if (typeof album === "string"){
+                res.status(401).json({message: "Error"})
+                return
+            }
             res.status(201).json(album);
         } catch (error: unknown) {
             console.log(error)

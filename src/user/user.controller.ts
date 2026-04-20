@@ -40,6 +40,7 @@ export const userController: IUserControllerContract = {
     updateUser: async (req, res) => {
         const userId = res.locals.userId
         const updatedData = req.body
+        console.log(updatedData)
         const response = await UserService.updateUser(updatedData, userId)
         if (typeof response === "string"){
             res.status(400).json(response)

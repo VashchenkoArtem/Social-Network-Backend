@@ -10,6 +10,6 @@ userRouter.post("/registration", userController.registration);
 userRouter.post("/send-code", userController.sendCode);
 userRouter.post('/login', userController.login);
 userRouter.get("/me", authMiddleware, userController.me);
-userRouter.patch("/update-user", uploadMiddleware.single('file'), procImgMiddleware(300, 100), authMiddleware, userController.updateUser);
+userRouter.patch("/update-user", authMiddleware, userController.updateUser);
 userRouter.post("/find-code", userController.getCode)
 userRouter.patch("/update-password", authMiddleware, userController.updatePassword)

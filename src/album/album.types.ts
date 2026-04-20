@@ -56,7 +56,7 @@ export interface IAlbumServiceContract {
     uploadPhoto: (file: Express.Multer.File, albumId: number) => Promise<Photo>
     albumVisibility: (albumId: number, userId: number) => Promise<Album | string>
     getUserAlbums: (userId: number) => Promise<Album[]>
-    createAlbum: (data: CreateAlbumInput, userId: number) => Promise<Album>;
+    createAlbum: (data: CreateAlbumInput, userId: number) => Promise<Album | string>;
     updateAlbum: (albumId: number, data: UpdateAlbumInput) => Promise<Album>;
 }
 
