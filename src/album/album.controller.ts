@@ -45,13 +45,10 @@ export const albumController: IAlbumControllerContract = {
     },
 
     getUserAlbums: async (req, res) => {
-        try {
             const userId = res.locals.userId
             const albums = await AlbumService.getUserAlbums(userId)
             res.status(200).json(albums)
-        } catch (error) {
-            res.status(400).json((error as Error).message)
-        }
+            
     },
     updateAlbum: async (req, res) => {
         try {
@@ -68,5 +65,10 @@ export const albumController: IAlbumControllerContract = {
         } catch (error: unknown) {
             console.log(error)
         }
+    },
+    deleteAlbum: async (req, res) => {
+        const albumId = req.params.albumId
+        const album = await AlbumService.deleteAlbum(Number(albumId))
+        res.status(200).json(album)
     }
 };

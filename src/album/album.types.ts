@@ -50,6 +50,10 @@ export interface IAlbumControllerContract {
         req: AuthenticatedRequest, 
         res: Response<Album | ErrorResponse>
     ) => Promise<void>;
+    deleteAlbum: (
+        req: Request<{albumId: string}, Album | string, object>,
+        res: Response<Album | string>
+    ) => Promise<void>
 }
 
 export interface IAlbumServiceContract {
@@ -58,6 +62,7 @@ export interface IAlbumServiceContract {
     getUserAlbums: (userId: number) => Promise<Album[]>
     createAlbum: (data: CreateAlbumInput, userId: number) => Promise<Album | string>;
     updateAlbum: (albumId: number, data: UpdateAlbumInput) => Promise<Album>;
+    deleteAlbum: (albumId: number) => Promise<Album | string>
 }
 
 export interface IAlbumRepositoryContract {
@@ -67,6 +72,7 @@ export interface IAlbumRepositoryContract {
     albumVisibility: (id: number, isVisible: boolean) => Promise<Album | string>
     getUserAlbums: (userId: number) => Promise<Album[]>
     updateAlbum: (albumId: number, data: UpdateAlbumInput) => Promise<Album | string>
+    deleteAlbum: (albumId: number) => Promise<Album | string>
 }
 
 export type ErrorResponse = {

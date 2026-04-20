@@ -109,7 +109,25 @@ export const AlbumRepository: IAlbumRepositoryContract = {
             if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
                 throw new NotFoundError("Album");
             }
+            console.log(error)
             throw new AppError("Could not update album", 500);
+        }
+    },
+    deleteAlbum: async (albumId) => {
+        try {
+            const deletedAlbum = await client.album.delete({
+                where: { id: albumId },
+                include: {
+                    photos: true,
+                    topic: true,
+                    year: true,
+                    author: true
+                }
+            })
+            return deletedAlbum
+        } catch (error) {
+            console.log(error)
+            throw new AppError("Could not delete album", 500);
         }
     }
 }

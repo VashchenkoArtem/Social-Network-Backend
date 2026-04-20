@@ -49,11 +49,14 @@ export const AlbumService: IAlbumServiceContract = {
     },
 
     updateAlbum: async (albumId, data) => {
-            const album = await AlbumRepository.updateAlbum(albumId, data);
-            if (typeof album === "string"){
-                throw new BadRequestError("Request error")
-            }
-            return album
+        const album = await AlbumRepository.updateAlbum(albumId, data);
+        if (typeof album === "string"){
+            throw new BadRequestError("Request error")
         }
-    
+        return album
+    },
+    deleteAlbum: async (albumId) => {
+        const deletedAlbum = await AlbumRepository.deleteAlbum(albumId);
+        return deletedAlbum
+    }
 };
