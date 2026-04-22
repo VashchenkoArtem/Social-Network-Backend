@@ -80,21 +80,25 @@ export const AlbumRepository: IAlbumRepositoryContract = {
         if (!year) throw new NotFoundError("Year");
         if (!tag) throw new NotFoundError(`Theme`);
         console.log(data.yearId)
-        const album = await client.album.create({
-            data: {
-                title: data.title,
-                isVisible: data.isVisible ?? true,
-                author: { connect: { id: userId } },
-                topic: { connect: { id: tag.id } },
-                year: { connect: {id: year.id}}
-            },
-            include: {
-                photos: true,
-                topic: true,
-                year: true
-            }
-        });
-        return album
+        try {
+            const album = await client.album.create({
+                data: {
+                    title: data.title,
+                    isVisible: data.isVisible ?? true,
+                    author: { connect: { id: userId } },
+                    topic: { connect: { id: tag.id } },
+                    year: { connect: {id: year.id}}
+                },
+                include: {
+                    photos: true,
+                    topic: true,
+                    year: true
+                }
+            });
+            return album
+        } catch (error) {
+            throw new AppError("Could not create album", 500);
+        }
     },
     updateAlbum: async (albumId, data) => {
         try {
@@ -128,6 +132,21 @@ export const AlbumRepository: IAlbumRepositoryContract = {
         } catch (error) {
             console.log(error)
             throw new AppError("Could not delete album", 500);
+        }
+    },
+    findPhotoById: async (photoId: number) => {
+        return await client.photo.findUnique({
+            where: { id: photoId }
+        });
+    },
+
+    deletePhoto: async (photoId: number) => {
+        try {
+            await client.photo.delete({
+                where: { id: photoId }
+            });
+        } catch (error) {
+            throw new AppError("Не вдалося видалити фото з бази даних", 500);
         }
     }
 }

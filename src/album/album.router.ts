@@ -10,4 +10,5 @@ albumRouter.patch("/:id", authMiddleware, albumController.albumVisibility)
 albumRouter.get("/albums", authMiddleware, albumController.getUserAlbums)
 albumRouter.post("/albums", authMiddleware,  albumController.createAlbum);
 albumRouter.patch("/albums/:id", authMiddleware,  albumController.updateAlbum); 
-albumRouter.delete("/albums/:id", authMiddleware,  albumController.deleteAlbum)
+albumRouter.delete("/albums/:id", authMiddleware, albumController.deleteAlbum);
+albumRouter.delete("/photo/:photoId", authMiddleware, albumController.deletePhoto);

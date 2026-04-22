@@ -67,8 +67,30 @@ export const albumController: IAlbumControllerContract = {
         }
     },
     deleteAlbum: async (req, res) => {
-        const albumId = req.params.albumId
-        const album = await AlbumService.deleteAlbum(Number(albumId))
-        res.status(200).json(album)
+        try {
+            const albumId = Number(req.params.id);
+            if (isNaN(albumId)) {
+                res.status(400).json("Некоректний ID альбому");
+                return;
+            }
+            const album = await AlbumService.deleteAlbum(albumId);
+            res.status(200).json(album);
+        } catch (error) {
+            res.status(400).json((error as Error).message);
+        }
+    },
+    deletePhoto: async (req, res) => {
+        try {
+            const photoId = Number(req.params.photoId);
+            if (isNaN(photoId)) {
+                res.status(400).json("Некоректний ID фото");
+                return;
+            }
+
+            const result = await AlbumService.deletePhoto(photoId);
+            res.status(200).json(result);
+        } catch (error) {
+            res.status(400).json((error as Error).message);
+        }
     }
 };
