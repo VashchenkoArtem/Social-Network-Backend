@@ -74,7 +74,7 @@ export interface IUserServiceContract {
     sendCode: (data: RegistrationData) => Promise<Message>;
     login: (data: CreateUser) => Promise<{token: string} | string>;
     me: (id: number) => Promise<UserWithoutPassword | string>;
-    updateUser: (data: UpdateUser, userId: number) => Promise<UserWithoutPassword | string>;
+    updateUser: (data: UpdateUser, userId: number, filename?: string) => Promise<UserWithoutPassword | string>;
     getCode: (email: string) => Promise<VerificationCode | string>;
     updatePassword: (password: string, userId: number) => Promise<UserWithoutPassword | string>
 }
@@ -83,5 +83,5 @@ export interface IUserRepositoryContract {
     findUserByEmail: (email: string) => Promise<User | null>;
     createUser: (data: CreateUser) => Promise<UserWithoutPassword | string>;
     me: (id: number) => Promise<UserWithoutPassword | string>;
-    updateUser: (data: UpdateUser, userId: number) => Promise<UserWithoutPassword | string>;
+    updateUser: (data: UpdateUser, userId: number, filename?: string) => Promise<UserWithoutPassword | string>;
 }

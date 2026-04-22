@@ -51,7 +51,10 @@ export const UserRepository: IUserRepositoryContract = {
         try {
             const user = await client.user.findUnique({
                 where: { id: id },
-                omit: { password: true }
+                omit: { password: true },
+                include: {
+                    avatars: true
+                }
             })
             if (!user) {
                 return "User was not found"
@@ -61,31 +64,30 @@ export const UserRepository: IUserRepositoryContract = {
             throw new Error("Could not get user");
         }
     },
-    updateUser: async (data, userId) => {
+    updateUser: async (data, userId, filename) => {
         try {
-            // if (typeof data.birthDate === "string" && data.birthDate.trim()) {
-            // const [day, month, year] = data.birthDate.split(".");
-
-            // data.birthDate = new Date(
-            //     Number(year),
-            //     Number(month) - 1,
-            //     Number(day)
-            // );
-            // } else {
-            // delete data.birthDate;
-            // }
-            console.log(data)
-            const user = await client.user.update({
-                where: { id: userId },
-                data: {...data},
-                omit: { password: true }
-            })
-            if (!user) {
-                return "User was not found"
+            const { ...userData } = data;
+            if (typeof data.birthDate === "string") {
+                data.birthDate = new Date(data.birthDate);
             }
-            return user
+            const user = await client.user.update({
+            where: { id: userId },
+            data: userData,
+            omit: { password: true }
+            });
+
+            if (filename) {
+            await client.photo.create({
+            data: {
+                filename,
+                avatarForId: userId // 🔥 ВАЖНО
+            }
+            });
+            }
+
+            return user;
         } catch (error) {
-            throw error
+            throw error;
         }
     }
 };

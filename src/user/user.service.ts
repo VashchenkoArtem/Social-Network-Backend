@@ -96,8 +96,8 @@ export const UserService: IUserServiceContract = {
         }
         return user
     },
-    updateUser : async(data, userId) =>{
-        const userData = UserRepository.updateUser(data, userId)
+    updateUser : async(data, userId, filename) =>{
+        const userData = UserRepository.updateUser(data, userId, filename)
         if (typeof userData === "string") {
             return userData
         }
