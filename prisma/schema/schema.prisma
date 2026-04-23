@@ -38,10 +38,10 @@ model Album {
   author    User     @relation(fields: [authorId], references: [id])
   authorId  Int
 
-  topic     Tag      @relation(fields: [topicId], references: [id])
+  topic     Tag      @relation(fields: [topicId], references: [id]) 
   topicId   Int
 
-  year      AlbumYear @relation(fields: [yearId], references: [id])
+  year      AlbumYear @relation(fields: [yearId], references: [id]) 
   yearId    Int
 
   photos    Photo[]
@@ -58,16 +58,18 @@ model Photo {
 
   avatarFor User?   @relation("UserAvatars", fields: [avatarForId], references: [id])
   avatarForId Int?
+
+  isVisible Boolean @default(true)
 }
 model Tag {
   id          Int         @id @default(autoincrement())
-  name        String
+  name        String      @default("Nature")
   albums      Album[]
 }
 
 model AlbumYear {
   id    Int @id @default(autoincrement())
-  year  Int @unique
+  year  Int @unique @default(2024)
 
   albums Album[]
 }

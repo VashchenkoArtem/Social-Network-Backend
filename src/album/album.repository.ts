@@ -96,6 +96,9 @@ export const AlbumRepository: IAlbumRepositoryContract = {
                     year: true
                 }
             });
+            if (!data.topicId || !data.yearId) {
+                throw new NotFoundError('Topic or Year not found');
+            }
             return album
         } catch (error) {
             throw new AppError("Could not create album", 500);
@@ -149,6 +152,17 @@ export const AlbumRepository: IAlbumRepositoryContract = {
         } catch (error) {
             throw new AppError("Не вдалося видалити фото з бази даних", 500);
         }
-    }
+    },
+
+    togglePhotoVisibility: async (photoId: number, isVisible: boolean) => {
+        try {
+            return await client.photo.update({
+                where: { id: photoId },
+                data: { isVisible },
+            });
+        } catch (error) {
+            throw new AppError("Не вдалося змінити видимість фото", 500)
+        }
+    },
 }
 
