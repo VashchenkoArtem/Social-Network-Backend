@@ -71,4 +71,3 @@ model AlbumYear {
 
   albums Album[]
 }
-

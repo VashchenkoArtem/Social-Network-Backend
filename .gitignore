@@ -3,5 +3,6 @@ node_modules/
 .env
 
 src/generated/prisma/
+src/prisma/schema/databases
 media/
 package-lock.json
