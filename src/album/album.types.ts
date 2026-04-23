@@ -59,6 +59,11 @@ export interface IAlbumControllerContract {
         req: Request<{ photoId: string }, { message: string } | string>,
         res: Response<{ message: string } | string>
     ) => Promise<void>;
+
+    togglePhotoVisibility: (
+        req: Request<{ photoId: string }, Photo | string, object>,
+        res: Response<Photo | string>
+    ) => Promise<void>;
 }
 
 export interface IAlbumServiceContract {
@@ -69,6 +74,7 @@ export interface IAlbumServiceContract {
     updateAlbum: (albumId: number, data: UpdateAlbumInput) => Promise<Album>;
     deleteAlbum: (albumId: number) => Promise<Album | string>
     deletePhoto: (photoId: number) => Promise<{ message: string }>;
+    togglePhotoVisibility: (photoId: number) => Promise<Photo | string>;
 }
 
 export interface IAlbumRepositoryContract {
@@ -81,6 +87,7 @@ export interface IAlbumRepositoryContract {
     deleteAlbum: (albumId: number) => Promise<Album | string>
     deletePhoto: (photoId: number) => Promise<void>;
     findPhotoById: (photoId: number) => Promise<Photo | null>;
+    togglePhotoVisibility: (photoId: number, isVisible: boolean) => Promise<Photo | string>;
 }
 
 export type ErrorResponse = {

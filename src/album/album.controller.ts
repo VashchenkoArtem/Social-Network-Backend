@@ -93,5 +93,15 @@ export const albumController: IAlbumControllerContract = {
         } catch (error) {
             res.status(400).json((error as Error).message);
         }
-    }
+    },
+
+    togglePhotoVisibility: async (req, res) => {
+        try {
+            const photoId = Number(req.params.photoId)
+            const result = await AlbumService.togglePhotoVisibility(photoId)
+            res.status(200).json(result)
+        } catch (error) {
+            res.status(400).json((error as Error).message)
+        }
+    },
 };

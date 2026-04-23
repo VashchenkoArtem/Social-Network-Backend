@@ -16,7 +16,8 @@ export const AlbumService: IAlbumServiceContract = {
         const imagePhoto = {
             filename: file.filename,
             userId: userId,
-            avatarForId: null
+            avatarForId: null,
+            isVisible: true
         }
         const photo = await AlbumRepository.addPhoto(imagePhoto, albumId)
         if (typeof photo === "string"){
@@ -26,18 +27,12 @@ export const AlbumService: IAlbumServiceContract = {
     },
 
     albumVisibility: async (albumId, userId) => {
-        const visibleAlbum = await AlbumRepository.albumVisibility(albumId, true)
-        // const updatedAlbum = await client.album.update({
-        //     where: { id: albumId },
-        //     data: {
-        //         isVisible: !album.isVisible,
-        //     },
-        //     include: {
-        //         photos: true
-        //     }
-        // })
-
-        return visibleAlbum
+        const album = await AlbumRepository.findAlbumById(albumId)
+        if (!album) {
+            throw new Error("Альбом не знайдено. Спробуйте ще раз.")
+        }
+        const updatedAlbum = await AlbumRepository.albumVisibility(albumId, !album.isVisible)
+        return updatedAlbum
     },
 
     getUserAlbums: async (userId) => {
@@ -103,5 +98,13 @@ export const AlbumService: IAlbumServiceContract = {
         }
 
         return { message: "Фото успішно видалено" };
-    }
-};
+    },
+
+    togglePhotoVisibility: async (photoId: number) => {
+        const photo = await AlbumRepository.findPhotoById(photoId)
+        if (!photo) {
+            throw new Error("Фото не знайдено")
+        }
+        return await AlbumRepository.togglePhotoVisibility(photoId,!photo.isVisible)
+    },
+}
