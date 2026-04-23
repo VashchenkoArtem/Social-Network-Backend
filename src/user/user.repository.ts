@@ -80,7 +80,7 @@ export const UserRepository: IUserRepositoryContract = {
             await client.photo.create({
             data: {
                 filename,
-                avatarForId: userId // 🔥 ВАЖНО
+                avatarForId: userId
             }
             });
             }
