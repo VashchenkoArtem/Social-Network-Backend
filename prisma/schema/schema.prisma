@@ -1,3 +1,8 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,48 +12,62 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model User {
-  id        Int       @id @default(autoincrement())
-  firstname String?
-  lastname  String?
-  nickname  String?
-  email     String    @unique
-  password  String
-  avatar    String?
-  signature String?
-  birthDate DateTime?
-  alias     String?
-  albums    Album[]
+  id          Int      @id @default(autoincrement())
+  firstname   String?
+  lastname    String?
+  nickname    String?
+  alias       String?
+  email       String   @unique
+  password    String
+
+  signature   String?
+  birthDate   DateTime?
+
+  albums      Album[]
+  photos      Photo[]
+  avatars     Photo[]  @relation("UserAvatars")
 }
 
 model Album {
-  id        Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   title     String
-  isVisible Boolean   @default(true)
+  isVisible Boolean  @default(true)
+
+  author    User     @relation(fields: [authorId], references: [id])
   authorId  Int
+
+  topic     Tag      @relation(fields: [topicId], references: [id])
   topicId   Int
-  yearId    Int
+
   year      AlbumYear @relation(fields: [yearId], references: [id])
-  topic     Tag       @relation(fields: [topicId], references: [id])
-  author    User      @relation(fields: [authorId], references: [id])
+  yearId    Int
+
   photos    Photo[]
 }
-
 model Photo {
-  id       Int    @id @default(autoincrement())
-  filename String
-  albumId  Int
-  album    Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
-}
+  id        Int     @id @default(autoincrement())
+  filename  String
+  
+  album     Album?  @relation(fields: [albumId], references: [id])
+  albumId   Int?
 
+  user      User?   @relation(fields: [userId], references: [id])
+  userId    Int?
+
+  avatarFor User?   @relation("UserAvatars", fields: [avatarForId], references: [id])
+  avatarForId Int?
+}
 model Tag {
-  id     Int     @id @default(autoincrement())
-  name   String
-  albums Album[]
+  id          Int         @id @default(autoincrement())
+  name        String
+  albums      Album[]
 }
 
 model AlbumYear {
-  id     Int     @id @default(autoincrement())
-  year   Int     @unique
+  id    Int @id @default(autoincrement())
+  year  Int @unique
+
   albums Album[]
 }

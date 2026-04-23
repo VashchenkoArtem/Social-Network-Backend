@@ -9,13 +9,14 @@ import { thumbDir, originalDir } from "../config/path";
 
 
 export const AlbumService: IAlbumServiceContract = {
-    uploadPhoto: async (file, albumId) => {
+    uploadPhoto: async (file, albumId, userId) => {
         if (!file) {
             throw new Error("файл є обов'язковим")
         }
         const imagePhoto = {
             filename: file.filename,
-            file: file.path
+            userId: userId,
+            avatarForId: null
         }
         const photo = await AlbumRepository.addPhoto(imagePhoto, albumId)
         if (typeof photo === "string"){

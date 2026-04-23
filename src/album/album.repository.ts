@@ -66,6 +66,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
                 },
             })
         } catch (error) {
+            console.log(error)
             throw new Error("Не вдалося отримати альбоми")
         }
     },

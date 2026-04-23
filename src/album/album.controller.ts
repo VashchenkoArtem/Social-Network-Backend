@@ -21,11 +21,12 @@ export const albumController: IAlbumControllerContract = {
         try {
             const albumId = req.params.albumId
             const file = req.file
+            const userId = res.locals.userId
             if (!file) {
                 res.status(400).json("Файл є обов'язковим")
                 return
             }
-            const result = await AlbumService.uploadPhoto(file, Number(albumId))
+            const result = await AlbumService.uploadPhoto(file, Number(albumId), userId)
             res.status(200).json(result)
         } catch (error) {
             res.status(400).json((error as Error).message)
