@@ -13,3 +13,4 @@ userRouter.get("/me", authMiddleware, userController.me);
 userRouter.patch("/update-user", authMiddleware,uploadMiddleware.single("file"), procImgMiddleware(300, 100), userController.updateUser);
 userRouter.post("/find-code", userController.getCode)
 userRouter.patch("/update-password", authMiddleware, userController.updatePassword)
+userRouter.patch("/signature", authMiddleware, uploadMiddleware.single("file"), procImgMiddleware(300, 100), userController.updateSignature)

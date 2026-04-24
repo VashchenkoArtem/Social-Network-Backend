@@ -13,7 +13,6 @@ export function procImgMiddleware(width: number, quality:number){
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
             if (!req.file){
-                console.log(req.file)
                 next(new ValidationError("file validation error"))
                 return
             }
@@ -21,8 +20,8 @@ export function procImgMiddleware(width: number, quality:number){
             const filePathOriginal = join(originalDir, fileName);
             const filePathThumb = join(thumbDir, fileName);
             
-            await sharp(req.file.buffer).toFile(filePathOriginal)
-            await sharp(req.file.buffer).resize({width}).jpeg({quality}).toFile(filePathThumb)
+            await sharp(req.file.buffer).flatten({ background: "#ffffff" }).toFile(filePathOriginal)
+            await sharp(req.file.buffer).resize({width}).flatten({ background: "#ffffff" }).jpeg({quality}).toFile(filePathThumb)
             
             req.file.filename = fileName
             next()

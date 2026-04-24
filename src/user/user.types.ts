@@ -68,6 +68,10 @@ export interface IUserControllerContract {
         req: Request<object, UserWithoutPassword | string, {password: string}, object>,
         res: Response<UserWithoutPassword | string>
     ) => Promise<void>
+    updateSignature: (
+        req: Request<object, UserWithoutPassword | string, UpdateUser, object>,
+        res: Response<UserWithoutPassword | string>
+    ) => void
 }
 export interface IUserServiceContract {
     registration: (data: RegistrationData) => Promise<AuthToken>;
@@ -77,6 +81,7 @@ export interface IUserServiceContract {
     updateUser: (data: UpdateUser, userId: number, filename?: string) => Promise<UserWithoutPassword | string>;
     getCode: (email: string) => Promise<VerificationCode | string>;
     updatePassword: (password: string, userId: number) => Promise<UserWithoutPassword | string>
+    updateSignature: (filename: string, userId: number) => Promise<UserWithoutPassword | string>
 }
 export interface IUserRepositoryContract {
     login: (data: CreateUser) => Promise<User | string>

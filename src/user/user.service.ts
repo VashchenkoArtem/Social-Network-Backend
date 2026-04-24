@@ -112,9 +112,12 @@ export const UserService: IUserServiceContract = {
         return record;
     },
     updatePassword: async(password, userId)=>{
-        console.log(password, "password")
         const hashedPassword = await bcrypt.hash(password, 10);
         const userData = await UserRepository.updateUser({password: hashedPassword}, userId)
+        return userData
+    },
+    updateSignature: async(filename, userId) => {
+        const userData = await UserRepository.updateUser({signature: filename}, userId)
         return userData
     }
 };
