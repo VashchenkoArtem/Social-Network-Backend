@@ -1,4 +1,3 @@
-import "dotenv/config";
 import express from "express";
 import type { Express } from "express";
 import cors from "cors";
@@ -7,6 +6,7 @@ import { uploadDir } from "./config";
 import { tagRouter } from "./tag/tag.router";
 import { albumRouter } from "./album/album.router";
 import { albumYearRouter } from "./albumYear/albumYear.router";
+import { postRouter } from "./post/post.router";
 
 const HOST = "192.168.0.104";
 const PORT = 8000;
@@ -19,6 +19,8 @@ app.use(userRouter);
 app.use(albumRouter);
 app.use(tagRouter);
 app.use(albumYearRouter)
+app.use(postRouter)
+
 app.listen(PORT, HOST, () => {
     console.log(`Сервер запущено`);
     console.log(`Локально: http://${HOST}:${PORT}`);
