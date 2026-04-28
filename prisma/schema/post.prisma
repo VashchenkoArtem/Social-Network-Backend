@@ -1,0 +1,34 @@
+model Post{
+  id    Int @id @default(autoincrement())
+  title String
+  topic String
+  content String
+  tags TagOnPost[]
+  urls PostUrl[]
+  photos Photo[]
+
+  author User @relation(fields: [authorId], references: [id])
+  authorId Int
+}
+
+model TagOnPost{
+  post       Post     @relation(fields: [postId], references: [id])
+  postId Int
+  tag       Tag @relation(fields: [tagId], references: [id])
+  tagId Int
+  @@id([postId, tagId])
+}
+
+model PostUrl{
+  id    Int @id @default(autoincrement())
+  href  String
+  post  Post @relation(fields: [postId], references: [id])
+  postId Int
+}
+
+model Tag {
+  id          Int         @id @default(autoincrement())
+  name        String      @default("Nature")
+  albums      Album[]
+  posts       TagOnPost[]
+}
