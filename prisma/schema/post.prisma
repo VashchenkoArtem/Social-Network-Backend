@@ -28,7 +28,7 @@ model PostUrl{
 
 model Tag {
   id          Int         @id @default(autoincrement())
-  name        String      @default("Nature")
+  name        String      @unique
   albums      Album[]
   posts       TagOnPost[]
 }

@@ -10,5 +10,10 @@ export const tagController: ITagControllerContract = {
             return;
         }
         res.status(200).json(response);
+    },
+    createTag: async (req, res) => {
+        const { name } = req.body;
+        const response = await TagService.create(name);
+        res.status(typeof response === "string" ? 400 : 201).json(response);
     }
 };

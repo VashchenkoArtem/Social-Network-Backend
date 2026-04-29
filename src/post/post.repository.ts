@@ -46,24 +46,47 @@ export const postRepository: IPostRepositoryContract = {
         }
     },
     
-    createPost: async (data) => {
+    createPost: async (data: any) => {
         try {
+            const { title, content, topic, authorId, tagNames, urls } = data;
+
             const newPost = await client.post.create({
-                data: data,
+                data: {
+                    title,
+                    content,
+                    topic,
+                    authorId,
+                    urls: {
+                        create: urls?.map((href: string) => ({
+                            href: href
+                        })) || []
+                    },
+
+                    tags: {
+                        create: tagNames?.map((name: string) => ({
+                            tag: {
+                                connectOrCreate: {
+                                    where: { name: name },
+                                    create: { name: name }
+                                }
+                            }
+                        })) || []
+                    }
+                },
                 include: {
                     author: {
-                        include: {
-                            avatars: true
-                        }
+                        include: { avatars: true }
                     },
                     urls: true,
                     photos: true,
-                    tags: true
+                    tags: {
+                        include: { tag: true }
+                    }
                 }
-            })
-            return newPost
+            });
+            return newPost;
         } catch (error) {
-            throw error
+            throw error;
         }
     }
 }

@@ -6,10 +6,14 @@ export const TagService: ITagServiceContract = {
         try {
             return await TagRepository.findAll();
         } catch (error) {
-            if (error instanceof Error) {
-                return error.message;
-            }
-            return "Unknown error occurred while fetching tags";
+            return error instanceof Error ? error.message : "Error fetching tags";
+        }
+    },
+    create: async (name: string) => {
+        try {
+            return await TagRepository.create(name);
+        } catch (error) {
+            return error instanceof Error ? error.message : "Error creating tag";
         }
     }
 };
