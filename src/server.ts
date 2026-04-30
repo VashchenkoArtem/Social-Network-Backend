@@ -8,7 +8,7 @@ import { albumRouter } from "./album/album.router";
 import { albumYearRouter } from "./albumYear/albumYear.router";
 import { postRouter } from "./post/post.router";
 
-const HOST = "192.168.1.111";
+const HOST = "192.168.88.237";
 const PORT = 8000;
 const app: Express = express();
 
