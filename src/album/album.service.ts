@@ -16,9 +16,9 @@ export const AlbumService: IAlbumServiceContract = {
         const imagePhoto = {
             filename: file.filename,
             userId: userId,
+            postId: null,
             avatarForId: null,
             isVisible: true,
-            postId: null,
         }
         const photo = await AlbumRepository.addPhoto(imagePhoto, albumId)
         if (typeof photo === "string"){
