@@ -11,6 +11,7 @@ export const UserRepository: IUserRepositoryContract = {
             });
             return user;
         } catch (error) {
+            console.log(error)
             throw new Error("Could not find user by email");
         }
         

@@ -6,8 +6,9 @@ import { uploadDir } from "./config";
 import { tagRouter } from "./tag/tag.router";
 import { albumRouter } from "./album/album.router";
 import { albumYearRouter } from "./albumYear/albumYear.router";
+import { postRouter } from "./post/post.router";
 
-const HOST = "192.168.0.104";
+const HOST = "192.168.88.237";
 const PORT = 8000;
 const app: Express = express();
 
@@ -18,6 +19,8 @@ app.use(userRouter);
 app.use(albumRouter);
 app.use(tagRouter);
 app.use(albumYearRouter)
+app.use(postRouter)
+
 app.listen(PORT, HOST, () => {
     console.log(`Сервер запущено`);
     console.log(`Локально: http://${HOST}:${PORT}`);

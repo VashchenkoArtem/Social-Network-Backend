@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { IUserControllerContract, CreateUser, VerifyPayload, AuthToken } from "./user.types";
 import { UserService } from "./user.service";
+import { AppError, BadRequestError } from "../errors";
 
 
 export const userController: IUserControllerContract = {
@@ -67,13 +68,21 @@ export const userController: IUserControllerContract = {
     },
     updatePassword: async (req, res) => {
         const userId = res.locals.userId
-        console.log(userId)
         const updatedPassword = req.body.password
         const response = await UserService.updatePassword(updatedPassword, userId)
         if (typeof response === "string"){
             res.status(500).json("Server error")
             return
         }
+        res.status(200).json(response)
+    },
+    updateSignature: async (req, res) => {
+        const userId = res.locals.userId
+        const filename = req.file?.filename
+        if (!filename){
+            throw BadRequestError
+        }
+        const response = await UserService.updateSignature(filename, userId)
         res.status(200).json(response)
     }
 };
