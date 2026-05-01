@@ -46,24 +46,33 @@ export const postRepository: IPostRepositoryContract = {
         }
     },
     
-    createPost: async (data) => {
+    createPost: async (data, files) => {
         try {
+            const photos = files?.map(file => ({
+                filename: file.filename
+            })) ?? [];
             const newPost = await client.post.create({
-                data: data,
+                data: {
+                    ...data,
+                    photos: {
+                        create: photos
+                    },
+                },
                 include: {
                     author: {
                         include: {
-                            avatars: true
-                        }
+                            avatars: true,
+                        },
                     },
                     urls: true,
                     photos: true,
-                    tags: true
-                }
-            })
-            return newPost
+                    tags: true,
+                },
+            });
+
+            return newPost;
         } catch (error) {
-            throw error
+            throw error;
         }
-    }
+    },
 }

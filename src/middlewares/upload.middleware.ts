@@ -9,28 +9,44 @@ import { originalDir, thumbDir } from "../config/path";
 
 export const uploadMiddleware = multer({ storage: memoryStorage() })
 
-export function procImgMiddleware(width: number, quality:number){
+export function procImgMiddleware(width: number, quality: number) {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
-            // if (!req.file && !req.body.alias && !req.body.nickname){
-            //     next(new ValidationError("file validation error"))
-            //     return
-            // }
-            if (!req.file) {
-                return next()
+            if (!req.files || !Array.isArray(req.files)) {
+                return next();
             }
-            const fileName = `${Date.now()}.jpg`
-            const filePathOriginal = join(originalDir, fileName);
-            const filePathThumb = join(thumbDir, fileName);
-            if (req.file){
-                await sharp(req.file.buffer).flatten({ background: "#ffffff" }).toFile(filePathOriginal)
-                await sharp(req.file.buffer).resize({width}).flatten({ background: "#ffffff" }).jpeg({quality}).toFile(filePathThumb)
-                req.file.filename = fileName
+
+            const processedFiles = [];
+
+            for (const file of req.files) {
+                const fileName = `${Date.now()}.jpg`;
+
+                const filePathOriginal = join(originalDir, fileName);
+                const filePathThumb = join(thumbDir, fileName);
+
+                await sharp(file.buffer)
+                    .flatten({ background: "#ffffff" })
+                    .jpeg({ quality })
+                    .toFile(filePathOriginal);
+
+                await sharp(file.buffer)
+                    .resize({ width })
+                    .flatten({ background: "#ffffff" })
+                    .jpeg({ quality })
+                    .toFile(filePathThumb);
+
+                file.filename = fileName;
+
+                processedFiles.push({
+                    filename: fileName,
+                    original: filePathOriginal,
+                    thumb: filePathThumb
+                });
             }
-            next()
+
+            next();
         } catch (error) {
-            next(error)
+            next(error);
         }
-        
-    }
+    };
 }

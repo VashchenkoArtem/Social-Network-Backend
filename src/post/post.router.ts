@@ -7,4 +7,4 @@ export const postRouter = Router();
 
 postRouter.get("/posts", authMiddleware, postsController.getAllPosts)
 postRouter.get("/posts/my", authMiddleware, postsController.getMyPosts)
-postRouter.post("/posts", authMiddleware, uploadMiddleware.single("file"), procImgMiddleware(300, 100),  postsController.createPost)
+postRouter.post("/posts", authMiddleware, uploadMiddleware.array("images", 9), procImgMiddleware(300, 100),  postsController.createPost)
