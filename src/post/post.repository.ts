@@ -15,7 +15,11 @@ export const postRepository: IPostRepositoryContract = {
                     },
                     urls: true,
                     photos: true,
-                    tags: true
+                    tags: {
+                        include: {
+                            tag: true
+                        }
+                    }
                 }
             })
             return posts
@@ -51,12 +55,32 @@ export const postRepository: IPostRepositoryContract = {
             const photos = files?.map(file => ({
                 filename: file.filename
             })) ?? [];
+
+            // 1. достаём tags отдельно
+            const tags = data.tags ?? [];
+
+            const tagIds = Array.isArray(tags)
+                ? tags.map(Number)
+                : tags ? [Number(tags)] : [];
+
             const newPost = await client.post.create({
                 data: {
-                    ...data,
+                    title: data.title,
+                    topic: data.topic,
+                    content: data.content,
+                    authorId: data.authorId,
+
                     photos: {
                         create: photos
                     },
+
+                    tags: {
+                    create: tagIds.map(tagId => ({
+                        tag: {
+                        connect: { id: tagId }
+                        }
+                    }))
+                    }
                 },
                 include: {
                     author: {
