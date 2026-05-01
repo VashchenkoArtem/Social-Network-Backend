@@ -9,22 +9,29 @@ import { thumbDir, originalDir } from "../config/path";
 
 
 export const AlbumService: IAlbumServiceContract = {
-    uploadPhoto: async (file, albumId, userId) => {
-        if (!file) {
-            throw new Error("файл є обов'язковим")
+    uploadPhoto: async (files,albumId, userId) => {
+        if (!files || files.length === 0) {
+            throw new Error("Файли є обов'язковими");
         }
-        const imagePhoto = {
-            filename: file.filename,
-            userId: userId,
-            postId: null,
-            avatarForId: null,
-            isVisible: true,
-        }
-        const photo = await AlbumRepository.addPhoto(imagePhoto, albumId)
-        if (typeof photo === "string"){
-            throw new Error("Помилка. Не вдалось додати зображення")
-        }
-        return photo
+
+        const photos = await Promise.all(
+            files.map(async (file) => {
+                const imagePhoto = {
+                    filename: file.filename,
+                    userId,
+                    postId: null,
+                    avatarForId: null,
+                    isVisible: true,
+                };
+
+                return await AlbumRepository.addPhoto(
+                    imagePhoto,
+                    albumId
+                );
+            })
+        );
+
+        return photos;
     },
 
     albumVisibility: async (albumId, userId) => {
