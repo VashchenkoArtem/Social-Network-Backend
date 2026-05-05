@@ -7,8 +7,22 @@ import { tagRouter } from "./tag/tag.router";
 import { albumRouter } from "./album/album.router";
 import { albumYearRouter } from "./albumYear/albumYear.router";
 import { postRouter } from "./post/post.router";
+import os from "os";
 
-const HOST = "192.168.88.70";
+
+const getLocalIpAddress = (): string => {
+    const interfaces = os.networkInterfaces();
+    for (const name of Object.keys(interfaces)) {
+        for (const iface of interfaces[name] || []) {
+            if (iface.family === 'IPv4' && !iface.internal) {
+                return iface.address;
+            }
+        }
+    }
+    return "localhost";
+};
+
+const HOST = getLocalIpAddress();
 const PORT = 8000;
 const app: Express = express();
 
@@ -20,6 +34,8 @@ app.use(albumRouter);
 app.use(tagRouter);
 app.use(albumYearRouter)
 app.use(postRouter)
+
+console.log(HOST)
 
 app.listen(PORT, HOST, () => {
     console.log(`Сервер запущено`);
