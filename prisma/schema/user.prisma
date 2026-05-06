@@ -13,5 +13,8 @@ model User {
   albums      Album[]
   photos      Photo[]
   avatars     Photo[]  @relation("UserAvatars")
-  posts       Post[]
+  posts       post_app_post[]
+  likes PostLike[]
+  hearts PostHeart[]
+  views PostView[]
 }

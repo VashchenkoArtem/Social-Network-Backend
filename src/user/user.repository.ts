@@ -68,22 +68,26 @@ export const UserRepository: IUserRepositoryContract = {
     updateUser: async (data, userId, filename) => {
         try {
             const { ...userData } = data;
+            console.log(userData)
             if (typeof data.birthDate === "string") {
                 data.birthDate = new Date(data.birthDate);
             }
             const user = await client.user.update({
-            where: { id: userId },
-            data: userData,
-            omit: { password: true }
+                where: { id: userId },
+                data: {
+                    ...userData,
+                    
+                },
+                omit: { password: true }
             });
-
+            console.log(user)
             if (filename) {
-            await client.photo.create({
-            data: {
-                filename,
-                avatarForId: userId
-            }
-            });
+                await client.photo.create({
+                data: {
+                    filename,
+                    avatarForId: userId
+                }
+                });
             }
 
             return user;

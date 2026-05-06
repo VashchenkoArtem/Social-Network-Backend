@@ -7,9 +7,9 @@ export const AlbumRepository: IAlbumRepositoryContract = {
 
     addPhoto: async (data, albumId) => {
         try {
-            const photo = await client.photo.create({
+            const photo = await client.albumImage.create({
                 data: {
-                    filename: data.filename,
+                    image: data.image,
                     album: {
                         connect: { id: albumId },
                     }
@@ -36,12 +36,12 @@ export const AlbumRepository: IAlbumRepositoryContract = {
         }
     },
 
-    albumVisibility: async (id: number, isVisible: boolean) => {
+    albumVisibility: async (id: number, is_shown: boolean) => {
         try {
             const album = await client.album.update({
                 where: { id },
                 data: {
-                    isVisible,
+                    is_shown,
                 },
                 include: {
                     photos: true,
@@ -57,12 +57,12 @@ export const AlbumRepository: IAlbumRepositoryContract = {
         try {
             return await client.album.findMany({
                 where: {
-                    authorId: userId,
+                    profileId: userId,
                 },
                 include: {
                     photos: true,
                     year: true,
-                    topic: true
+                    theme: true
                 },
             })
         } catch (error) {
@@ -71,8 +71,8 @@ export const AlbumRepository: IAlbumRepositoryContract = {
         }
     },
     createAlbum: async (data, userId) => {
-        const tag = await client.tag.findFirst({
-            where: { id: data.topicId }
+        const tag = await client.post_app_tag.findFirst({
+            where: { id: data.themeId }
         });
         const year = await client.albumYear.findFirst({
             where: { id: data.yearId }
@@ -84,23 +84,26 @@ export const AlbumRepository: IAlbumRepositoryContract = {
         try {
             const album = await client.album.create({
                 data: {
-                    title: data.title,
-                    isVisible: data.isVisible ?? true,
-                    author: { connect: { id: userId } },
-                    topic: { connect: { id: tag.id } },
+                    name: data.name,
+                    is_shown: data.is_shown ?? true,
+                    profile: { connect: { id: userId } },
+                    theme: { connect: { id: tag.id } },
+                    is_default: false,
                     year: { connect: {id: year.id}}
                 },
                 include: {
                     photos: true,
-                    topic: true,
+                    theme: true,
                     year: true
                 }
             });
-            if (!data.topicId || !data.yearId) {
+            console.log(data)
+            if (!data.themeId || !data.yearId) {
                 throw new NotFoundError('Topic or Year not found');
             }
             return album
         } catch (error) {
+            console.log(error)
             throw new AppError("Could not create album", 500);
         }
     },
@@ -139,26 +142,27 @@ export const AlbumRepository: IAlbumRepositoryContract = {
         }
     },
     findPhotoById: async (photoId: number) => {
-        return await client.photo.findUnique({
+        return await client.albumImage.findUnique({
             where: { id: photoId }
         });
     },
 
     deletePhoto: async (photoId: number) => {
         try {
-            await client.photo.delete({
+            await client.albumImage.delete({
                 where: { id: photoId }
             });
         } catch (error) {
+            console.log(error)
             throw new AppError("Не вдалося видалити фото з бази даних", 500);
         }
     },
 
-    togglePhotoVisibility: async (photoId: number, isVisible: boolean) => {
+    togglePhotoVisibility: async (photoId: number, is_shown: boolean) => {
         try {
-            return await client.photo.update({
+            return await client.albumImage.update({
                 where: { id: photoId },
-                data: { isVisible },
+                data: { is_shown },
             });
         } catch (error) {
             throw new AppError("Не вдалося змінити видимість фото", 500)

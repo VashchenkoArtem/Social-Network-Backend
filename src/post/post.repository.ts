@@ -5,7 +5,7 @@ import { url } from "envalid";
 export const postRepository: IPostRepositoryContract = {
     getAllPosts: async (take) => {
         try  {
-            const posts = await client.post.findMany({
+            const posts = await client.post_app_post.findMany({
                 take: take !== undefined ? take : 5,
 
                 include: {
@@ -31,7 +31,7 @@ export const postRepository: IPostRepositoryContract = {
     
     getMyPosts: async (userId) => {
         try {
-            return await client.post.findMany({
+            return await client.post_app_post.findMany({
                 where: {
                     authorId: userId
                 },
@@ -59,7 +59,7 @@ export const postRepository: IPostRepositoryContract = {
         try {
             console.log(data.urls)
             const photos = files?.map(file => ({
-                filename: file.filename
+                original_image: file.filename
             })) ?? [];
 
             const tags = data.tags ?? [];
@@ -72,8 +72,8 @@ export const postRepository: IPostRepositoryContract = {
             const urls = Array.isArray(links) ?
                 links.map(String) :
                 [String(links)]
-            console.log(urls)
-            const newPost = await client.post.create({
+            console.log(data)
+            const newPost = await client.post_app_post.create({
                 data: {
                     title: data.title,
                     topic: data.topic,
