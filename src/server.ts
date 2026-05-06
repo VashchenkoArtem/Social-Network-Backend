@@ -9,7 +9,6 @@ import { albumYearRouter } from "./albumYear/albumYear.router";
 import { postRouter } from "./post/post.router";
 import os from "os";
 
-
 const getLocalIpAddress = (): string => {
     const interfaces = os.networkInterfaces();
     for (const name of Object.keys(interfaces)) {

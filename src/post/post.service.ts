@@ -15,8 +15,7 @@ export const PostService: IPostServiceContract = {
         return posts;
     },
     
-    createPost: async (data) => {
-        const post = await postRepository.createPost(data);
-        return post
+    createPost: async (data, files) => {
+        return await postRepository.createPost(data, files);
     },
 }

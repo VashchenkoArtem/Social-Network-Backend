@@ -41,7 +41,8 @@ export const userController: IUserControllerContract = {
     updateUser: async (req, res) => {
         const userId = res.locals.userId
         const updatedData = req.body
-        const filename = req.file?.filename
+        const files = req.files as Express.Multer.File[];
+        const filename = files?.[0]?.filename;
         const response = await UserService.updateUser(updatedData, userId, filename)
         if (typeof response === "string"){
             res.status(400).json(response)
@@ -78,7 +79,8 @@ export const userController: IUserControllerContract = {
     },
     updateSignature: async (req, res) => {
         const userId = res.locals.userId
-        const filename = req.file?.filename
+        const files = req.files as Express.Multer.File[];
+        const filename = files?.[0]?.filename;
         if (!filename){
             throw BadRequestError
         }

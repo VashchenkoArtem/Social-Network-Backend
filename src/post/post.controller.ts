@@ -1,3 +1,5 @@
+import { AlbumRepository } from "../album/album.repository";
+import { AlbumService } from "../album/album.service";
 import { PostService } from "./post.service";
 import { IPostControllerContract } from "./post.types";
 
@@ -24,12 +26,18 @@ export const postsController: IPostControllerContract = {
         const userId = res.locals.userId;
         const data = req.body;
 
+        const files = req.files as Express.Multer.File[];
+
         const dataWithId = {
-            ...data, 
-            authorId: userId
-        }
-        
-        const createPost = await PostService.createPost(dataWithId)
-        res.status(200).json(createPost)
+            ...data,
+            authorId: userId,
+        };
+
+        const createPost = await PostService.createPost(
+            dataWithId,
+            files
+        );
+
+        res.status(200).json(createPost);
     },
 }

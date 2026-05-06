@@ -28,8 +28,8 @@ export type AlbumVisibilityInput = {
 
 export interface IAlbumControllerContract {
     uploadPhoto: (
-        req: Request< {albumId: string}, Photo | string, object>,
-        res: Response<Photo | string>
+        req: Request< {albumId: string}, Photo[] | string, object>,
+        res: Response<Photo[] | string>
     ) => Promise<void>
 
     albumVisibility: (
@@ -67,7 +67,7 @@ export interface IAlbumControllerContract {
 }
 
 export interface IAlbumServiceContract {
-    uploadPhoto: (file: Express.Multer.File, albumId: number, userId: number) => Promise<Photo>
+    uploadPhoto: (file: Express.Multer.File[], albumId: number, userId: number) => Promise<Photo[]>
     albumVisibility: (albumId: number, userId: number) => Promise<Album | string>
     getUserAlbums: (userId: number) => Promise<Album[]>
     createAlbum: (data: CreateAlbumInput, userId: number) => Promise<Album | string>;

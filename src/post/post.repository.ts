@@ -1,5 +1,6 @@
 import { IPostRepositoryContract } from "./post.types";
 import { client } from "../client/client";
+import { url } from "envalid";
 
 export const postRepository: IPostRepositoryContract = {
     getAllPosts: async (take) => {
@@ -15,7 +16,11 @@ export const postRepository: IPostRepositoryContract = {
                     },
                     urls: true,
                     photos: true,
-                    tags: true
+                    tags: {
+                        include: {
+                            tag: true
+                        }
+                    }
                 }
             })
             return posts
@@ -38,7 +43,11 @@ export const postRepository: IPostRepositoryContract = {
                     },
                     urls: true,
                     photos: true,
-                    tags: true
+                    tags: {
+                        include: {
+                            tag: true
+                        }
+                    }
                 }
             })
         } catch (error) {
@@ -46,47 +55,65 @@ export const postRepository: IPostRepositoryContract = {
         }
     },
     
-    createPost: async (data: any) => {
+    createPost: async (data, files) => {
         try {
-            const { title, content, topic, authorId, tagNames, urls } = data;
+            console.log(data.urls)
+            const photos = files?.map(file => ({
+                filename: file.filename
+            })) ?? [];
 
+            const tags = data.tags ?? [];
+
+            const tagIds = Array.isArray(tags)
+                ? tags.map(Number)
+                : tags ? [Number(tags)] : [];
+
+            const links = data.urls ?? [];
+            const urls = Array.isArray(links) ?
+                links.map(String) :
+                [String(links)]
+            console.log(urls)
             const newPost = await client.post.create({
                 data: {
-                    title,
-                    content,
-                    topic,
-                    authorId,
-                    urls: {
-                        create: urls?.map((href: string) => ({
-                            href: href
-                        })) || []
+                    title: data.title,
+                    topic: data.topic,
+                    content: data.content,
+                    authorId: Number(data.authorId),
+
+                    photos: {
+                        create: photos
                     },
 
                     tags: {
-                        create: tagNames?.map((name: string) => ({
+                        create: tagIds.map(tagId => ({
                             tag: {
-                                connectOrCreate: {
-                                    where: { name: name },
-                                    create: { name: name }
-                                }
+                                connect: { id: tagId }
                             }
-                        })) || []
+                        }))
+                    },
+
+                    
+                    urls: {
+                    create: urls.map((href) => ({
+                        href: href
+                    }))
                     }
                 },
                 include: {
                     author: {
-                        include: { avatars: true }
+                        include: {
+                            avatars: true,
+                        },
                     },
                     urls: true,
                     photos: true,
-                    tags: {
-                        include: { tag: true }
-                    }
-                }
+                    tags: true,
+                },
             });
+
             return newPost;
         } catch (error) {
             throw error;
         }
-    }
+    },
 }

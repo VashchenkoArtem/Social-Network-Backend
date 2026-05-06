@@ -34,7 +34,7 @@ export interface IPostControllerContract {
 export interface IPostServiceContract {
     getAllPosts: (take?: number) => Promise<Post[] | string>
 
-    createPost: (data: CreatePost) => Promise<Post | string>
+    createPost: (data: CreatePost, files?: Express.Multer.File[]) => Promise<Post | string>
     
     getMyPosts: (userId: number) => Promise<Post[]>
 }
@@ -42,7 +42,7 @@ export interface IPostServiceContract {
 export interface IPostRepositoryContract {
     getAllPosts: (take?: number) => Promise<Post[] | string>
 
-    createPost: (data: CreatePost) => Promise<Post | string>
+    createPost: (data: CreatePost, files?: Express.Multer.File[]) => Promise<Post | string>
     
     getMyPosts: (userId: number) => Promise<Post[]>
 
