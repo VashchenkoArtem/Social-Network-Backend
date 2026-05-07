@@ -40,4 +40,15 @@ export const postsController: IPostControllerContract = {
 
         res.status(200).json(createPost);
     },
+
+    deletePost: async (req, res) => {
+        const postId = Number(req.params.id)
+
+        if (isNaN(postId)) {
+            res.status(400).json("ID повинно бути числом")
+            return
+        }
+        const deletedPost = await PostService.deletePost(postId)
+        res.status(200).json(deletedPost)
+    }
 }

@@ -29,6 +29,11 @@ export interface IPostControllerContract {
         req: Request<object, Post[] | string, object >,
         res: Response<Post[] | string>
    ) => void
+
+    deletePost: (
+        req: Request<{id: string}, Post | string, object>,
+        res: Response<Post | string>
+   ) => void
 }
 
 export interface IPostServiceContract {
@@ -37,6 +42,8 @@ export interface IPostServiceContract {
     createPost: (data: CreatePost, files?: Express.Multer.File[]) => Promise<Post | string>
     
     getMyPosts: (userId: number) => Promise<Post[]>
+
+    deletePost: (postId: number) => Promise<Post | string>
 }
 
 export interface IPostRepositoryContract {
@@ -46,4 +53,5 @@ export interface IPostRepositoryContract {
     
     getMyPosts: (userId: number) => Promise<Post[]>
 
+    deletePost: (postId: number) => Promise<Post | string>
 }

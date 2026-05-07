@@ -18,4 +18,9 @@ export const PostService: IPostServiceContract = {
     createPost: async (data, files) => {
         return await postRepository.createPost(data, files);
     },
+
+    deletePost: async (postId: number) => {
+        const deletedPost = await postRepository.deletePost(postId)
+        return deletedPost
+    }
 }
