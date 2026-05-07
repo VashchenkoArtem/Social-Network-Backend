@@ -99,4 +99,27 @@ export const postRepository: IPostRepositoryContract = {
             throw error;
         }
     },
+
+    deletePost: async (postId) => {
+        try {
+            const deletedPost = await client.post.delete({
+                where: {
+                    id: postId                
+                },
+                include: {
+                    author: {
+                        include: {
+                            avatars: true,
+                        },
+                    },
+                    urls: true,
+                    photos: true,
+                    tags: true,
+                }
+            })
+            return deletedPost
+        } catch (error) {
+            throw error
+        }
+    }
 }
