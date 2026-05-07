@@ -1,6 +1,11 @@
-import { IPostRepositoryContract } from "./post.types";
+import { 
+    IPostRepositoryContract, 
+    Post, 
+    UpdatePostDto, 
+    CreatePost 
+} from "./post.types";
+import { Prisma } from "@prisma/client";
 import { client } from "../client/client";
-import { url } from "envalid";
 
 export const postRepository: IPostRepositoryContract = {
     getAllPosts: async (take) => {
@@ -116,4 +121,84 @@ export const postRepository: IPostRepositoryContract = {
             throw error;
         }
     },
+
+    updatePost: async (postId: number, data: UpdatePostDto, files?: Express.Multer.File[]) => {
+        try {
+            const { tags, urls, authorId, existingPhotos, ...rest } = data;
+            const updateData: Prisma.PostUpdateInput = {};
+
+            if (rest.title) updateData.title = rest.title;
+            if (rest.content) updateData.content = rest.content;
+            if (rest.topic !== undefined) updateData.topic = rest.topic;
+
+            if (authorId) {
+                updateData.author = { connect: { id: Number(authorId) } };
+            }
+
+            const remainingPhotoNames = (Array.isArray(existingPhotos) 
+                ? existingPhotos 
+                : [existingPhotos]
+            )
+            .filter(Boolean)
+            .map(uri => uri!.split('/').pop() as string);
+
+            const newPhotoNames = files?.map(f => f.filename).filter((n): n is string => !!n) || [];
+            
+            const finalPhotoList = [...remainingPhotoNames, ...newPhotoNames];
+
+            updateData.photos = {
+                deleteMany: {},
+                create: finalPhotoList.map(filename => ({ filename }))
+            };
+
+            if (tags) {
+                updateData.tags = {
+                    deleteMany: {},
+                    create: (Array.isArray(tags) ? tags : [tags])
+                        .map(id => Number(id))
+                        .filter(id => !isNaN(id))
+                        .map(id => ({ tag: { connect: { id } } }))
+                };
+            }
+
+            if (urls) {
+                updateData.urls = {
+                    deleteMany: {},
+                    create: (Array.isArray(urls) ? urls : [urls]).map(href => ({ href: String(href) }))
+                };
+            }
+
+            return await client.post.update({
+                where: { id: postId },
+                data: updateData,
+                include: {
+                    photos: true,
+                    tags: { include: { tag: true } },
+                    author: { include: { avatars: true } },
+                    urls: true,
+                }
+            });
+        } catch (error) {
+            console.error("Repo Error:", error);
+            throw error;
+        }
+    },
+
+    deletePost: async (postId: number): Promise<{ message: string } | string> => {
+        try {
+            await client.$transaction([
+                client.tagOnPost.deleteMany({ where: { postId } }),
+                client.postUrl.deleteMany({ where: { postId } }),
+                client.post.delete({ where: { id: postId } })
+            ]);
+
+            return { message: "Post successfully deleted" };
+        } catch (error: unknown) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+                return "Post not found";
+            }
+            console.error(error);
+            return "Failed to delete post from database";
+        }
+    }
 }
