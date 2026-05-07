@@ -10,7 +10,7 @@ import { client } from "../client/client";
 export const postRepository: IPostRepositoryContract = {
     getAllPosts: async (take) => {
         try  {
-            const posts = await client.post.findMany({
+            const posts = await client.post_app_post.findMany({
                 take: take !== undefined ? take : 5,
 
                 include: {
@@ -36,7 +36,7 @@ export const postRepository: IPostRepositoryContract = {
     
     getMyPosts: async (userId) => {
         try {
-            return await client.post.findMany({
+            return await client.post_app_post.findMany({
                 where: {
                     authorId: userId
                 },
@@ -64,7 +64,7 @@ export const postRepository: IPostRepositoryContract = {
         try {
             console.log(data.urls)
             const photos = files?.map(file => ({
-                filename: file.filename
+                original_image: file.filename
             })) ?? [];
 
             const tags = data.tags ?? [];
@@ -77,8 +77,8 @@ export const postRepository: IPostRepositoryContract = {
             const urls = Array.isArray(links) ?
                 links.map(String) :
                 [String(links)]
-            console.log(urls)
-            const newPost = await client.post.create({
+            console.log(data)
+            const newPost = await client.post_app_post.create({
                 data: {
                     title: data.title,
                     topic: data.topic,
@@ -122,62 +122,90 @@ export const postRepository: IPostRepositoryContract = {
         }
     },
 
-    updatePost: async (postId: number, data: UpdatePostDto, files?: Express.Multer.File[]) => {
+    updatePost: async (
+        postId: number,
+        data: UpdatePostDto,
+        files?: Express.Multer.File[]
+    ) => {
         try {
-            const { tags, urls, authorId, existingPhotos, ...rest } = data;
-            const updateData: Prisma.PostUpdateInput = {};
+            const photos = files?.map(file => ({
+                original_image: file.filename
+            })) ?? [];
 
-            if (rest.title) updateData.title = rest.title;
-            if (rest.content) updateData.content = rest.content;
-            if (rest.topic !== undefined) updateData.topic = rest.topic;
+            const tags = data.tags ?? [];
 
-            if (authorId) {
-                updateData.author = { connect: { id: Number(authorId) } };
-            }
+            const tagIds = Array.isArray(tags)
+                ? tags.map(Number)
+                : tags ? [Number(tags)] : [];
 
-            const remainingPhotoNames = (Array.isArray(existingPhotos) 
-                ? existingPhotos 
-                : [existingPhotos]
-            )
-            .filter(Boolean)
-            .map(uri => uri!.split('/').pop() as string);
+            const links = data.urls ?? [];
 
-            const newPhotoNames = files?.map(f => f.filename).filter((n): n is string => !!n) || [];
-            
-            const finalPhotoList = [...remainingPhotoNames, ...newPhotoNames];
+            const urls = Array.isArray(links)
+                ? links.map(String)
+                : links ? [String(links)] : [];
 
-            updateData.photos = {
-                deleteMany: {},
-                create: finalPhotoList.map(filename => ({ filename }))
+            const updateData: Prisma.post_app_postUpdateInput = {
+                name: data.title,
+                topic: data.topic,
+                content: data.content,
+
+                ...(data.authorId && {
+                    author: {
+                        connect: {
+                            id: Number(data.authorId)
+                        }
+                    }
+                }),
+
+                photos: {
+                    deleteMany: {},
+                    create: photos
+                },
+
+                tags: {
+                    deleteMany: {},
+                    create: tagIds.map(tagId => ({
+                        tag: {
+                            connect: {
+                                id: tagId
+                            }
+                        }
+                    }))
+                },
+
+                urls: {
+                    deleteMany: {},
+                    create: urls.map(href => ({
+                        href
+                    }))
+                }
             };
 
-            if (tags) {
-                updateData.tags = {
-                    deleteMany: {},
-                    create: (Array.isArray(tags) ? tags : [tags])
-                        .map(id => Number(id))
-                        .filter(id => !isNaN(id))
-                        .map(id => ({ tag: { connect: { id } } }))
-                };
-            }
+            const updatedPost = await client.post_app_post.update({
+                where: {
+                    id: postId
+                },
 
-            if (urls) {
-                updateData.urls = {
-                    deleteMany: {},
-                    create: (Array.isArray(urls) ? urls : [urls]).map(href => ({ href: String(href) }))
-                };
-            }
-
-            return await client.post.update({
-                where: { id: postId },
                 data: updateData,
+
                 include: {
-                    photos: true,
-                    tags: { include: { tag: true } },
-                    author: { include: { avatars: true } },
+                    author: {
+                        include: {
+                            avatars: true
+                        }
+                    },
                     urls: true,
+                    photos: true,
+                    tags: {
+                        include: {
+                            tag: true
+                        }
+                    }
                 }
             });
+
+            return updatedPost;
+
         } catch (error) {
             console.error("Repo Error:", error);
             throw error;
