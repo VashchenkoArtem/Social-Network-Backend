@@ -8,13 +8,8 @@ export type Album = Prisma.AlbumGetPayload<{
 export type CreateAlbumInput = Prisma.AlbumUncheckedCreateInput
 export type UpdateAlbumInput = Prisma.AlbumUpdateInput
 
-export type Photo = Prisma.PhotoGetPayload<{}>
-export type PhotoWithoutAlbumId = Prisma.PhotoGetPayload<{
-    omit: {
-        albumId: true,
-        id: true
-    }
-}>
+export type Photo = Prisma.AlbumImageGetPayload<{}>
+export type PhotoWithoutAlbumId = Prisma.AlbumImageCreateInput
 // export type CreatePhotoInput = {
 //     image: Photo,
 //     albumId: number

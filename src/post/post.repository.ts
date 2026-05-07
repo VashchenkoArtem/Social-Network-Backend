@@ -12,7 +12,9 @@ export const postRepository: IPostRepositoryContract = {
         try  {
             const posts = await client.post_app_post.findMany({
                 take: take !== undefined ? take : 5,
-
+                orderBy: {
+                    created_at: "desc"
+                },
                 include: {
                     author: {
                         include: {
@@ -39,6 +41,9 @@ export const postRepository: IPostRepositoryContract = {
             return await client.post_app_post.findMany({
                 where: {
                     authorId: userId
+                },
+                orderBy: {
+                    created_at: "desc"
                 },
                 include: {
                     author: {
@@ -144,44 +149,52 @@ export const postRepository: IPostRepositoryContract = {
                 ? links.map(String)
                 : links ? [String(links)] : [];
 
-            const updateData: Prisma.post_app_postUpdateInput = {
-                name: data.title,
-                topic: data.topic,
-                content: data.content,
+            const updateData: Prisma.post_app_postUpdateInput = {};
 
-                ...(data.authorId && {
-                    author: {
-                        connect: {
-                            id: Number(data.authorId)
-                        }
+            if (data.title !== undefined) {
+                updateData.title = data.title;
+            }
+
+            if (data.topic !== undefined) {
+                updateData.topic = data.topic;
+            }
+
+            if (data.content !== undefined) {
+                updateData.content = data.content;
+            }
+
+            if (data.authorId !== undefined) {
+                updateData.author = {
+                    connect: {
+                        id: Number(data.authorId)
                     }
-                }),
+                };
+            }
 
-                photos: {
-                    deleteMany: {},
-                    create: photos
-                },
-
-                tags: {
-                    deleteMany: {},
-                    create: tagIds.map(tagId => ({
-                        tag: {
-                            connect: {
-                                id: tagId
-                            }
-                        }
-                    }))
-                },
-
-                urls: {
-                    deleteMany: {},
-                    create: urls.map(href => ({
-                        href
-                    }))
-                }
+            updateData.photos = {
+                deleteMany: {},
+                create: photos
             };
 
-            const updatedPost = await client.post_app_post.update({
+            updateData.tags = {
+                deleteMany: {},
+                create: tagIds.map(tagId => ({
+                    tag: {
+                        connect: {
+                            id: tagId
+                        }
+                    }
+                }))
+            };
+
+            updateData.urls = {
+                deleteMany: {},
+                create: urls.map(href => ({
+                    href
+                }))
+            };
+
+            return await client.post_app_post.update({
                 where: {
                     id: postId
                 },
@@ -204,8 +217,6 @@ export const postRepository: IPostRepositoryContract = {
                 }
             });
 
-            return updatedPost;
-
         } catch (error) {
             console.error("Repo Error:", error);
             throw error;
@@ -215,9 +226,9 @@ export const postRepository: IPostRepositoryContract = {
     deletePost: async (postId: number): Promise<{ message: string } | string> => {
         try {
             await client.$transaction([
-                client.tagOnPost.deleteMany({ where: { postId } }),
+                client.post_app_post_tags.deleteMany({ where: { postId } }),
                 client.postUrl.deleteMany({ where: { postId } }),
-                client.post.delete({ where: { id: postId } })
+                client.post_app_post.delete({ where: { id: postId } })
             ]);
 
             return { message: "Post successfully deleted" };
