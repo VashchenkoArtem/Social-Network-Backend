@@ -59,6 +59,9 @@ export const AlbumRepository: IAlbumRepositoryContract = {
                 where: {
                     profileId: userId,
                 },
+                orderBy: {
+                    created_at: "desc"
+                },
                 include: {
                     photos: true
                 },
@@ -115,7 +118,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
                 where: { id: albumId },
                 include: {
                     photos: true,
-                    author: true
+                    profile: true
                 }
             })
             return deletedAlbum
