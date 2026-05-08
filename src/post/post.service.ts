@@ -1,5 +1,5 @@
 import { postRepository } from "./post.repository";
-import { IPostServiceContract } from "./post.types";
+import { IPostServiceContract, Post, UpdatePostDto } from "./post.types";
 
 export const PostService: IPostServiceContract = {
     getAllPosts: async (take) => {
@@ -18,4 +18,16 @@ export const PostService: IPostServiceContract = {
     createPost: async (data, files) => {
         return await postRepository.createPost(data, files);
     },
+
+    updatePost: async (postId: number, data: UpdatePostDto, files?: Express.Multer.File[]): Promise<Post | string> => {
+        if (data?.title !== undefined && data.title.trim().length === 0) {
+            return "Title cannot be empty";
+        }
+
+        return await postRepository.updatePost(postId, data, files);
+    },
+
+    deletePost: async (postId: number): Promise<{ message: string } | string> => {
+        return await postRepository.deletePost(postId);
+    }
 }
