@@ -5,7 +5,6 @@ import { userRouter } from "./user/user.router";
 import { uploadDir } from "./config";
 import { tagRouter } from "./tag/tag.router";
 import { albumRouter } from "./album/album.router";
-import { albumYearRouter } from "./albumYear/albumYear.router";
 import { postRouter } from "./post/post.router";
 import os from "os";
 
@@ -31,7 +30,6 @@ app.use(express.json());
 app.use(userRouter);
 app.use(albumRouter);
 app.use(tagRouter);
-app.use(albumYearRouter)
 app.use(postRouter)
 
 console.log(HOST)

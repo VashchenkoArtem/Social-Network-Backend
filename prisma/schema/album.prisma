@@ -6,11 +6,9 @@ model Album {
   profile    User     @relation(fields: [profileId], references: [id])
   profileId  Int
 
-  theme     post_app_tag      @relation(fields: [themeId], references: [id]) 
-  themeId   Int
+  theme     String
 
-  year      AlbumYear @relation(fields: [yearId], references: [id]) 
-  yearId    Int
+  year      Int
   created_at DateTime @default(now())
   is_default Boolean
   photos    AlbumImage[]
@@ -35,11 +33,4 @@ model Photo {
   avatarForId Int?
 
   isVisible Boolean @default(true)
-}
-
-model AlbumYear {
-  id    Int @id @default(autoincrement())
-  year  Int @unique @default(2024)
-
-  albums Album[]
 }

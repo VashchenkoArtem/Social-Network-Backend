@@ -60,9 +60,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
                     profileId: userId,
                 },
                 include: {
-                    photos: true,
-                    year: true,
-                    theme: true
+                    photos: true
                 },
             })
         } catch (error) {
@@ -71,36 +69,20 @@ export const AlbumRepository: IAlbumRepositoryContract = {
         }
     },
     createAlbum: async (data, userId) => {
-        const tag = await client.post_app_tag.findFirst({
-            where: { id: data.themeId }
-        });
-        const year = await client.albumYear.findFirst({
-            where: { id: data.yearId }
-        });
-        console.log(data)
-        if (!year) throw new NotFoundError("Year");
-        if (!tag) throw new NotFoundError(`Theme`);
-        console.log(data.yearId)
         try {
             const album = await client.album.create({
                 data: {
                     name: data.name,
                     is_shown: data.is_shown ?? true,
                     profile: { connect: { id: userId } },
-                    theme: { connect: { id: tag.id } },
+                    theme: data.theme,
                     is_default: false,
-                    year: { connect: {id: year.id}}
+                    year: Number(data.year)
                 },
                 include: {
                     photos: true,
-                    theme: true,
-                    year: true
                 }
             });
-            console.log(data)
-            if (!data.themeId || !data.yearId) {
-                throw new NotFoundError('Topic or Year not found');
-            }
             return album
         } catch (error) {
             console.log(error)
@@ -111,7 +93,10 @@ export const AlbumRepository: IAlbumRepositoryContract = {
         try {
             return await client.album.update({
                 where: { id: albumId },
-                data: data,
+                data: {
+                    ...data,
+                    year: Number(data.year)
+                    },
                 include: {
                     photos: true
                 }
@@ -130,8 +115,6 @@ export const AlbumRepository: IAlbumRepositoryContract = {
                 where: { id: albumId },
                 include: {
                     photos: true,
-                    topic: true,
-                    year: true,
                     author: true
                 }
             })

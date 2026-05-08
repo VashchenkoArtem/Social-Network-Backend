@@ -33,7 +33,6 @@ model PostUrl{
 model post_app_tag {
   id          Int         @id @default(autoincrement())
   name        String      @unique
-  albums      Album[]
   posts       post_app_post_tags[]
 }
 model PostImage{
