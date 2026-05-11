@@ -7,7 +7,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
 
     addPhoto: async (data, albumId) => {
         try {
-            const photo = await client.albumImage.create({
+            const photo = await client.profile_app_albumimage.create({
                 data: {
                     image: data.image,
                     album: {
@@ -24,7 +24,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
 
     findAlbumById: async (id: number) => {
         try {
-            const album = await client.album.findUnique({
+            const album = await client.profile_app_album.findUnique({
                 where: { id },
                 include: {
                     photos: true,
@@ -38,7 +38,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
 
     albumVisibility: async (id: number, is_shown: boolean) => {
         try {
-            const album = await client.album.update({
+            const album = await client.profile_app_album.update({
                 where: { id },
                 data: {
                     is_shown,
@@ -55,7 +55,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
 
     getUserAlbums: async (userId: number) => {
         try {
-            return await client.album.findMany({
+            return await client.profile_app_album.findMany({
                 where: {
                     profileId: userId,
                 },
@@ -73,7 +73,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
     },
     createAlbum: async (data, userId) => {
         try {
-            const album = await client.album.create({
+            const album = await client.profile_app_album.create({
                 data: {
                     name: data.name,
                     is_shown: data.is_shown ?? true,
@@ -94,7 +94,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
     },
     updateAlbum: async (albumId, data) => {
         try {
-            return await client.album.update({
+            return await client.profile_app_album.update({
                 where: { id: albumId },
                 data: {
                     ...data,
@@ -114,7 +114,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
     },
     deleteAlbum: async (albumId) => {
         try {
-            const deletedAlbum = await client.album.delete({
+            const deletedAlbum = await client.profile_app_album.delete({
                 where: { id: albumId },
                 include: {
                     photos: true,
@@ -128,14 +128,14 @@ export const AlbumRepository: IAlbumRepositoryContract = {
         }
     },
     findPhotoById: async (photoId: number) => {
-        return await client.albumImage.findUnique({
+        return await client.profile_app_albumimage.findUnique({
             where: { id: photoId }
         });
     },
 
     deletePhoto: async (photoId: number) => {
         try {
-            await client.albumImage.delete({
+            await client.profile_app_albumimage.delete({
                 where: { id: photoId }
             });
         } catch (error) {
@@ -146,7 +146,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
 
     togglePhotoVisibility: async (photoId: number, is_shown: boolean) => {
         try {
-            return await client.albumImage.update({
+            return await client.profile_app_albumimage.update({
                 where: { id: photoId },
                 data: { is_shown },
             });

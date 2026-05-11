@@ -6,7 +6,7 @@ import { IUserRepositoryContract } from "./user.types";
 export const UserRepository: IUserRepositoryContract = {
     findUserByEmail: async (email: string) => {
         try {
-            const user = await client.user.findUnique({
+            const user = await client.user_app_user.findUnique({
                 where: { email },
             });
             return user;
@@ -18,21 +18,39 @@ export const UserRepository: IUserRepositoryContract = {
     },
     createUser: async (data) => {
         try {
-            const user = await client.user.create({
-                data: data,
-                omit: { password: true }
+            const { id, profileId, ...userData } = data;
+
+            const user = await client.user_app_user.create({
+                data: {
+                    ...userData,
+
+                    profile: {
+                        create: {}
+                    }
+                },
+
+                include: {
+                    profile: true
+                },
+
+                omit: {
+                    password: true
+                }
             });
+
             if (!user) {
-                return "User was not created"
+                return "User was not created";
             }
+
             return user;
+
         } catch (error) {
-            throw error
+            throw error;
         }
     },
     login: async (data) => {
         try {
-            const user = await client.user.findUnique({
+            const user = await client.user_app_user.findUnique({
                 where: { email: data.email },
             });
             if (!user) {
@@ -50,11 +68,11 @@ export const UserRepository: IUserRepositoryContract = {
     },
     me: async (id) => {
         try {
-            const user = await client.user.findUnique({
+            const user = await client.user_app_user.findUnique({
                 where: { id: id },
                 omit: { password: true },
                 include: {
-                    avatars: true
+                    profile: true
                 }
             })
             if (!user) {
@@ -66,33 +84,54 @@ export const UserRepository: IUserRepositoryContract = {
         }
     },
     updateUser: async (data, userId, filename) => {
-        try {
-            const { ...userData } = data;
-            console.log(userData)
-            if (typeof data.birthDate === "string") {
-                data.birthDate = new Date(data.birthDate);
-            }
-            const user = await client.user.update({
-                where: { id: userId },
-                data: {
-                    ...userData,
-                    
-                },
-                omit: { password: true }
-            });
-            console.log(user)
-            if (filename) {
-                await client.photo.create({
-                data: {
-                    filename,
-                    avatarForId: userId
-                }
-                });
-            }
+        return await client.user_app_user.update({
+            where: { id: userId },
 
-            return user;
-        } catch (error) {
-            throw error;
-        }
+            data: {
+                ...(data.firstname !== undefined && {
+                    firstname: data.firstname
+                }),
+
+                ...(data.lastname !== undefined && {
+                    lastname: data.lastname
+                }),
+
+                ...(data.username !== undefined && {
+                    username: data.username
+                }),
+
+                ...(data.email !== undefined && {
+                    email: data.email
+                }),
+
+                profile: {
+                    update: {
+                        ...(data.signature !== undefined && {
+                            signature: data.signature
+                        }),
+
+                        ...(data.pseudonym !== undefined && {
+                            pseudonym: data.pseudonym
+                        }),
+
+                        ...(data.birth_date !== undefined && {
+                            birth_date: data.birth_date
+                        }),
+
+                        ...(filename && {
+                            avatar: filename
+                        })
+                    }
+                }
+            },
+
+            include: {
+                profile: true
+            },
+
+            omit: {
+                password: true
+            }
+        });
     }
 };

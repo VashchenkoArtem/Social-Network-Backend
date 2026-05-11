@@ -1,20 +1,39 @@
-model User {
+model user_app_user {
   id          Int      @id @default(autoincrement())
   firstname   String?
   lastname    String?
-  nickname    String?
-  alias       String?
+  username    String?
   email       String   @unique
   password    String
+  sentFriendRequests user_app_friendrequest[] @relation("SentRequests")
+  receivedFriendRequests user_app_friendrequest[] @relation("ReceivedRequests")
+  profile profile_app_profile? @relation(fields: [profileId], references: [id])
+  profileId Int? @unique
+}
 
+model profile_app_profile{
+  id          Int      @id @default(autoincrement())
   signature   String?
-  birthDate   DateTime?
+  birth_date   DateTime?
+  avatar      String?
+  pseudonym   String?
+  is_image_signature  Boolean @default(false)
+  is_text_signature Boolean @default(true)
 
-  albums      Album[]
-  photos      Photo[]
-  avatars     Photo[]  @relation("UserAvatars")
+  albums      profile_app_album[]
   posts       post_app_post[]
-  likes PostLike[]
-  hearts PostHeart[]
-  views PostView[]
+  likes       post_app_postlike[]
+  hearts      post_app_postheart[]
+  views       post_app_postview[]
+  user        user_app_user?
+}
+model user_app_friendrequest{
+  id          Int      @id @default(autoincrement())
+  status String?
+
+  from_profile user_app_user @relation("SentRequests", fields: [senderId], references: [id])
+  senderId     Int
+
+  to_profile   user_app_user @relation("ReceivedRequests", fields: [receiverId], references: [id])
+  receiverId   Int
 }
