@@ -7,6 +7,7 @@ import { tagRouter } from "./tag/tag.router";
 import { albumRouter } from "./album/album.router";
 import { postRouter } from "./post/post.router";
 import os from "os";
+import { friendRouter } from "./friends/friends.router";
 
 const getLocalIpAddress = (): string => {
     const interfaces = os.networkInterfaces();
@@ -31,7 +32,7 @@ app.use(userRouter);
 app.use(albumRouter);
 app.use(tagRouter);
 app.use(postRouter)
-
+app.use(friendRouter)
 console.log(HOST)
 
 app.listen(PORT, HOST, () => {
