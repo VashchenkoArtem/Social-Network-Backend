@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { ParamsDictionary, Query } from "express-serve-static-core";
 
 
-export type Post = Prisma.PostGetPayload<{
+export type Post = Prisma.post_app_postGetPayload<{
     include: {
         photos: true,
         tags: true,
@@ -12,8 +12,8 @@ export type Post = Prisma.PostGetPayload<{
     }
 }>
 
-export type CreatePost = Prisma.PostUncheckedCreateInput
-export type UpdatePost = Prisma.PostUncheckedUpdateInput
+export type CreatePost = Prisma.post_app_postUncheckedCreateInput
+export type UpdatePost = Prisma.post_app_postUncheckedUpdateInput
 
 export interface UpdatePostDto {
     title?: string;
