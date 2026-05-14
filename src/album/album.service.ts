@@ -17,11 +17,9 @@ export const AlbumService: IAlbumServiceContract = {
         const photos = await Promise.all(
             files.map(async (file) => {
                 const imagePhoto = {
-                    filename: file.filename,
+                    image: file.filename,
                     userId,
-                    postId: null,
-                    avatarForId: null,
-                    isVisible: true,
+                    is_shown: true,
                 };
 
                 return await AlbumRepository.addPhoto(
@@ -39,7 +37,7 @@ export const AlbumService: IAlbumServiceContract = {
         if (!album) {
             throw new Error("Альбом не знайдено. Спробуйте ще раз.")
         }
-        const updatedAlbum = await AlbumRepository.albumVisibility(albumId, !album.isVisible)
+        const updatedAlbum = await AlbumRepository.albumVisibility(albumId, !album.is_shown)
         return updatedAlbum
     },
 
@@ -71,13 +69,13 @@ export const AlbumService: IAlbumServiceContract = {
         if (deletedAlbum.photos && deletedAlbum.photos.length > 0) {
             deletedAlbum.photos.forEach(photo => {
                 try {
-                    const thumbPath = join(thumbDir, photo.filename);
-                    const originalPath = join(originalDir, photo.filename);
+                    const thumbPath = join(thumbDir, photo.image);
+                    const originalPath = join(originalDir, photo.image);
 
                     if (fs.existsSync(thumbPath)) fs.unlinkSync(thumbPath);
                     if (fs.existsSync(originalPath)) fs.unlinkSync(originalPath);
                 } catch (err) {
-                    console.error(`Не вдалося видалити файл ${photo.filename}:`, err);
+                    console.error(`Не вдалося видалити файл ${photo.image}:`, err);
                 }
             });
         }
@@ -92,8 +90,8 @@ export const AlbumService: IAlbumServiceContract = {
         }
         await AlbumRepository.deletePhoto(photoId);
         try {
-            const thumbPath = join(thumbDir, photo.filename);
-            const originalPath = join(originalDir, photo.filename);
+            const thumbPath = join(thumbDir, photo.image);
+            const originalPath = join(originalDir, photo.image);
 
             if (fs.existsSync(thumbPath)) {
                 fs.unlinkSync(thumbPath);
@@ -113,6 +111,6 @@ export const AlbumService: IAlbumServiceContract = {
         if (!photo) {
             throw new Error("Фото не знайдено")
         }
-        return await AlbumRepository.togglePhotoVisibility(photoId,!photo.isVisible)
+        return await AlbumRepository.togglePhotoVisibility(photoId,!photo.is_shown)
     },
 }

@@ -1,34 +1,66 @@
-model Post{
+model post_app_post{
   id    Int @id @default(autoincrement())
   title String
   topic String
   content String
-  tags TagOnPost[]
-  urls PostUrl[]
-  photos Photo[]
-
-  author User @relation(fields: [authorId], references: [id])
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  tags post_app_post_tags[]
+  urls post_app_postlink[]
+  photos post_app_postimage[]
+  likes post_app_postlike[]
+  hearts post_app_postheart[]
+  views post_app_postview[]
+  author profile_app_profile @relation(fields: [authorId], references: [id])
   authorId Int
 }
 
-model TagOnPost{
-  post       Post     @relation(fields: [postId], references: [id])
+model post_app_post_tags{
+  post       post_app_post     @relation(fields: [postId], references: [id])
   postId Int
-  tag       Tag @relation(fields: [tagId], references: [id])
+  tag       post_app_tag @relation(fields: [tagId], references: [id])
   tagId Int
   @@id([postId, tagId])
 }
 
-model PostUrl{
+model post_app_postlink{
   id    Int @id @default(autoincrement())
   href  String
-  post  Post @relation(fields: [postId], references: [id])
+  post  post_app_post @relation(fields: [postId], references: [id])
   postId Int
 }
 
-model Tag {
+model post_app_tag {
   id          Int         @id @default(autoincrement())
-  name        String      @default("Nature")
-  albums      Album[]
-  posts       TagOnPost[]
+  name        String      @unique
+  posts       post_app_post_tags[]
+}
+model post_app_postimage{
+  id          Int         @id @default(autoincrement())
+  original_image String
+  post     post_app_post? @relation(fields: [postId], references: [id])
+  postId   Int?
+}
+model post_app_postlike{
+  id          Int         @id @default(autoincrement())
+  post     post_app_post? @relation(fields: [postId], references: [id])
+  postId   Int?
+  user     profile_app_profile? @relation(fields: [userId], references: [id])
+  userId   Int?
+}
+
+model post_app_postheart{
+  id          Int         @id @default(autoincrement())
+  post     post_app_post? @relation(fields: [postId], references: [id])
+  postId   Int?
+  user     profile_app_profile? @relation(fields: [userId], references: [id])
+  userId   Int?
+}
+
+model post_app_postview{
+  id          Int         @id @default(autoincrement())
+  post     post_app_post? @relation(fields: [postId], references: [id])
+  postId   Int?
+  user     profile_app_profile? @relation(fields: [userId], references: [id])
+  userId   Int?
 }

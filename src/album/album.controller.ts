@@ -5,7 +5,6 @@ import { AppError, AuthenticationError } from "../errors";
 
 export const albumController: IAlbumControllerContract = {
     createAlbum: async (req, res) => {
-        try {
             const userId = res.locals.userId
             const album = await AlbumService.createAlbum(req.body, userId);
             if (typeof album === "string"){
@@ -13,9 +12,7 @@ export const albumController: IAlbumControllerContract = {
                 return
             }
             res.status(201).json(album);
-        } catch (error: unknown) {
-            console.log(error)
-        }
+
     },
     uploadPhoto: async (req, res) => {
         try {
