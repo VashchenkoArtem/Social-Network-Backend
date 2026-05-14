@@ -1,10 +1,19 @@
 import { Prisma } from "@prisma/client";
 import { Request, Response } from "express";
 
-export type User = Prisma.UserGetPayload<{}>
+export type User = Prisma.user_app_userGetPayload<{}>
 export type UserWithoutPassword = Omit<User, "password">
-export type CreateUser = Prisma.UserUncheckedCreateInput
-export type UpdateUser = Prisma.UserUncheckedUpdateInput
+export type CreateUser = Prisma.user_app_userUncheckedCreateInput
+export type UpdateUser = {
+    firstname?: string;
+    lastname?: string;
+    username?: string;
+    email?: string;
+    password?: string
+    signature?: string;
+    pseudonym?: string;
+    birth_date?: string | Date;
+};
 
 export type AuthenticatedUser = {
     id: number

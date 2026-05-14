@@ -5,10 +5,23 @@ import { userRouter } from "./user/user.router";
 import { uploadDir } from "./config";
 import { tagRouter } from "./tag/tag.router";
 import { albumRouter } from "./album/album.router";
-import { albumYearRouter } from "./albumYear/albumYear.router";
 import { postRouter } from "./post/post.router";
+import os from "os";
+import { friendRouter } from "./friends/friends.router";
 
-const HOST = "192.168.1.110";
+const getLocalIpAddress = (): string => {
+    const interfaces = os.networkInterfaces();
+    for (const name of Object.keys(interfaces)) {
+        for (const iface of interfaces[name] || []) {
+            if (iface.family === 'IPv4' && !iface.internal) {
+                return iface.address;
+            }
+        }
+    }
+    return "localhost";
+};
+
+const HOST = "192.168.1.107";
 const PORT = 8000;
 const app: Express = express();
 
@@ -18,8 +31,9 @@ app.use(express.json());
 app.use(userRouter);
 app.use(albumRouter);
 app.use(tagRouter);
-app.use(albumYearRouter)
 app.use(postRouter)
+app.use(friendRouter)
+console.log(HOST)
 
 app.listen(PORT, HOST, () => {
     console.log(`Сервер запущено`);

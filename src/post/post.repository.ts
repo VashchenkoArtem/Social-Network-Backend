@@ -1,21 +1,33 @@
-import { IPostRepositoryContract } from "./post.types";
+import { 
+    IPostRepositoryContract, 
+    Post, 
+    UpdatePostDto, 
+    CreatePost 
+} from "./post.types";
+import { Prisma } from "@prisma/client";
 import { client } from "../client/client";
 
 export const postRepository: IPostRepositoryContract = {
     getAllPosts: async (take) => {
         try  {
-            const posts = await client.post.findMany({
+            const posts = await client.post_app_post.findMany({
                 take: take !== undefined ? take : 5,
-
+                orderBy: {
+                    created_at: "desc"
+                },
                 include: {
                     author: {
                         include: {
-                            avatars: true
+                            user: true
                         }
                     },
                     urls: true,
                     photos: true,
-                    tags: true
+                    tags: {
+                        include: {
+                            tag: true
+                        }
+                    }
                 }
             })
             return posts
@@ -26,19 +38,26 @@ export const postRepository: IPostRepositoryContract = {
     
     getMyPosts: async (userId) => {
         try {
-            return await client.post.findMany({
+            return await client.post_app_post.findMany({
                 where: {
                     authorId: userId
                 },
+                orderBy: {
+                    created_at: "desc"
+                },
                 include: {
                     author: {
-                        include: {
-                            avatars: true
+                        include:{
+                            user: true
                         }
                     },
                     urls: true,
                     photos: true,
-                    tags: true
+                    tags: {
+                        include: {
+                            tag: true
+                        }
+                    }
                 }
             })
         } catch (error) {
@@ -48,22 +67,50 @@ export const postRepository: IPostRepositoryContract = {
     
     createPost: async (data, files) => {
         try {
+            console.log(data.urls)
             const photos = files?.map(file => ({
-                filename: file.filename
+                original_image: file.filename
             })) ?? [];
-            const newPost = await client.post.create({
+
+            const tags = data.tags ?? [];
+
+            const tagIds = Array.isArray(tags)
+                ? tags.map(Number)
+                : tags ? [Number(tags)] : [];
+
+            const links = data.urls ?? [];
+            const urls = Array.isArray(links) ?
+                links.map(String) :
+                [String(links)]
+            console.log(data)
+            const newPost = await client.post_app_post.create({
                 data: {
-                    ...data,
+                    title: data.title,
+                    topic: data.topic,
+                    content: data.content,
+                    authorId: Number(data.authorId),
+
                     photos: {
                         create: photos
                     },
+
+                    tags: {
+                        create: tagIds.map(tagId => ({
+                            tag: {
+                                connect: { id: tagId }
+                            }
+                        }))
+                    },
+
+                    
+                    urls: {
+                    create: urls.map((href) => ({
+                        href: href
+                    }))
+                    }
                 },
                 include: {
-                    author: {
-                        include: {
-                            avatars: true,
-                        },
-                    },
+                    author: true,
                     urls: true,
                     photos: true,
                     tags: true,
@@ -76,26 +123,113 @@ export const postRepository: IPostRepositoryContract = {
         }
     },
 
-    deletePost: async (postId) => {
+    updatePost: async (
+        postId: number,
+        data: UpdatePostDto,
+        files?: Express.Multer.File[]
+    ) => {
         try {
-            const deletedPost = await client.post.delete({
+            const photos = files?.map(file => ({
+                original_image: file.filename
+            })) ?? [];
+
+            const tags = data.tags ?? [];
+
+            const tagIds = Array.isArray(tags)
+                ? tags.map(Number)
+                : tags ? [Number(tags)] : [];
+
+            const links = data.urls ?? [];
+
+            const urls = Array.isArray(links)
+                ? links.map(String)
+                : links ? [String(links)] : [];
+
+            const updateData: Prisma.post_app_postUpdateInput = {};
+
+            if (data.title !== undefined) {
+                updateData.title = data.title;
+            }
+
+            if (data.topic !== undefined) {
+                updateData.topic = data.topic;
+            }
+
+            if (data.content !== undefined) {
+                updateData.content = data.content;
+            }
+
+            if (data.authorId !== undefined) {
+                updateData.author = {
+                    connect: {
+                        id: Number(data.authorId)
+                    }
+                };
+            }
+
+            updateData.photos = {
+                deleteMany: {},
+                create: photos
+            };
+
+            updateData.tags = {
+                deleteMany: {},
+                create: tagIds.map(tagId => ({
+                    tag: {
+                        connect: {
+                            id: tagId
+                        }
+                    }
+                }))
+            };
+
+            updateData.urls = {
+                deleteMany: {},
+                create: urls.map(href => ({
+                    href
+                }))
+            };
+
+            return await client.post_app_post.update({
                 where: {
-                    id: postId                
+                    id: postId
                 },
+
+                data: updateData,
+
                 include: {
-                    author: {
-                        include: {
-                            avatars: true,
-                        },
-                    },
+                    author: true,
                     urls: true,
                     photos: true,
-                    tags: true,
+                    tags: {
+                        include: {
+                            tag: true
+                        }
+                    }
                 }
-            })
-            return deletedPost
+            });
+
         } catch (error) {
-            throw error
+            console.error("Repo Error:", error);
+            throw error;
+        }
+    },
+
+    deletePost: async (postId: number): Promise<{ message: string } | string> => {
+        try {
+            await client.$transaction([
+                client.post_app_post_tags.deleteMany({ where: { postId } }),
+                client.post_app_postlink.deleteMany({ where: { postId } }),
+                client.post_app_post.delete({ where: { id: postId } })
+            ]);
+
+            return { message: "Post successfully deleted" };
+        } catch (error: unknown) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+                return "Post not found";
+            }
+            console.error(error);
+            return "Failed to delete post from database";
         }
     }
 }
