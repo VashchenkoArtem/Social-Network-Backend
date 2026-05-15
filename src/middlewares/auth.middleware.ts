@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import { verify } from "jsonwebtoken";
-
 import { cleanEnv, str } from "envalid";
 import { AuthenticatedUser } from "../user/user.types";
 

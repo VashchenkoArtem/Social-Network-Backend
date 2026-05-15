@@ -14,3 +14,4 @@ userRouter.patch("/update-user", authMiddleware, uploadMiddleware.array("avatars
 userRouter.post("/find-code", userController.getCode)
 userRouter.patch("/update-password", authMiddleware, userController.updatePassword)
 userRouter.patch("/signature", authMiddleware, uploadMiddleware.array("signature", 1), procImgMiddleware(300, 100), userController.updateSignature)
+userRouter.get("/:id", authMiddleware, userController.getUserById);

@@ -87,5 +87,22 @@ export const userController: IUserControllerContract = {
         }
         const response = await UserService.updateSignature(filename, userId)
         res.status(200).json(response)
-    }
+    },
+    getUserById: async (req, res) => {
+        const id = Number(req.params.id);
+        
+        if (isNaN(id)) {
+            res.status(400).json("Invalid user id");
+            return;
+        }
+    
+        const response = await UserService.getUserById(id);
+    
+        if (typeof response === "string") {
+            res.status(404).json(response);
+            return;
+        }
+    
+        res.status(200).json(response);
+    },
 };
