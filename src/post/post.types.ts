@@ -60,6 +60,10 @@ export interface IPostControllerContract {
         req: Request<PostParams, { message: string } | string>,
         res: Response<{ message: string } | string>
     ) => void | Promise<void>;
+    getPostsByUserId: (
+        req: Request<{userId: string}, Post[] | string, object>,
+        res: Response<Post[] | string>
+    ) => void
 }
 
 export interface IPostServiceContract {
@@ -73,6 +77,7 @@ export interface IPostServiceContract {
     updatePost: (postId: number, data: UpdatePostDto, files?: Express.Multer.File[]) => Promise<Post | string>
 
     deletePost: (postId: number) => Promise<{ message: string } | string>
+    getPostsByUserId: (userId: number) => Promise<Post[]>
 }
 
 export interface IPostRepositoryContract {
@@ -85,4 +90,5 @@ export interface IPostRepositoryContract {
     updatePost: (postId: number, data: UpdatePostDto, files?: Express.Multer.File[]) => Promise<Post | string>
 
     deletePost: (postId: number) => Promise<{ message: string } | string>
+    getPostsByUserId: (userId: number) => Promise<Post[]>
 }

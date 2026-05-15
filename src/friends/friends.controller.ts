@@ -19,18 +19,17 @@ export const friendController: IFriendsControllerContract = {
         res.status(200).json(requests);
     },
     createFriendRequest: async(req, res) => {
-        const receiverId = res.locals.receiverId;
-
-        const createdRequest = await friendsService.createFriendRequest(receiverId)
+        const senderId = Number(res.locals.userId)
+        const { receiverId } = req.body
+        console.log(req.body)
+        const createdRequest = await friendsService.createFriendRequest(senderId, receiverId)
         
         res.status(200).json(createdRequest)
     },
     updateFriendRequestStatus: async (req, res)  => {
         const body = req.body
-
-        const requestId = req.params.requestId
         
-        const updatedRequest = await friendsService.updateFriendRequestStatus(requestId, body)
+        const updatedRequest = await friendsService.updateFriendRequestStatus(body)
         return updatedRequest
     },
 
@@ -50,5 +49,10 @@ export const friendController: IFriendsControllerContract = {
         }
         res.status(200).json('Request deleted successfully');
         return deletedRequest;
+    },
+    recommendedPeople: async (req, res) => {
+        const userId = res.locals.userId
+        const recommendedPeople = await friendsService.recommendedPeople(userId)
+        res.status(200).json(recommendedPeople)
     }
 }

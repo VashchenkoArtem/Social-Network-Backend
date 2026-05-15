@@ -48,10 +48,14 @@ export const friendsRepository: IFriendsRepositoryContract = {
         }
     },
 
-    createFriendRequest: async (data) => {
+    createFriendRequest: async (senderId, receiverId) => {
         try {
             const request = await client.user_app_friendrequest.create({
-                data : data
+                data : {
+                    senderId: Number(senderId),
+                    receiverId: receiverId,
+                    status: "Pending"
+                }
             })
             return request
         } catch (error) {
@@ -59,13 +63,14 @@ export const friendsRepository: IFriendsRepositoryContract = {
         }
     },
 
-    updateFriendRequestStatus: async (requestId, data) => {
+    updateFriendRequestStatus: async (data) => {
         try {
+            const { requestId, ...requestData} = data
             const updatedRequest = await client.user_app_friendrequest.update({
                 where: {
                     id: requestId
                 },
-                data: data
+                data: requestData
             })
             return updatedRequest
         } catch (error) {
@@ -75,6 +80,7 @@ export const friendsRepository: IFriendsRepositoryContract = {
 
     deleteFriendRequest: async (requestId) => {
         try {
+            console.log(requestId)
             const deletedRequest = await client.user_app_friendrequest.delete({
                 where: {
                     id: requestId
@@ -85,4 +91,40 @@ export const friendsRepository: IFriendsRepositoryContract = {
             throw error
         }
     },
+    recommendedPeople: async (userId) =>{
+        const users = await client.user_app_user.findMany({
+            where: {
+                NOT: {
+                    OR: [
+                        // я отправил запрос
+                        {
+                            receivedFriendRequests: {
+                                some: {
+                                    senderId: userId
+                                }
+                            }
+                        },
+
+                        // мне отправили запрос
+                        {
+                            sentFriendRequests: {
+                                some: {
+                                    receiverId: userId
+                                }
+                            }
+                        }
+                    ]
+                },
+                id: {
+                    not: userId
+                }
+            },
+
+            include: {
+                profile: true
+            }
+        })
+
+        return users
+    }
 }

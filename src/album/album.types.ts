@@ -33,7 +33,7 @@ export interface IAlbumControllerContract {
     ) => Promise<void>
 
     getUserAlbums: (
-        req: Request,
+        req: Request<{ userId: string }, Album[] | string>,
         res: Response<Album[] | string>
     ) => Promise<void>,
     createAlbum: (

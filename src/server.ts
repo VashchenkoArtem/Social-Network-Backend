@@ -21,7 +21,7 @@ const getLocalIpAddress = (): string => {
     return "localhost";
 };
 
-const HOST = "192.168.1.107";
+const HOST = getLocalIpAddress()
 const PORT = 8000;
 const app: Express = express();
 

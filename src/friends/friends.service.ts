@@ -10,17 +10,21 @@ export const friendsService : IFriendsServiceContract = {
         const requests = await friendsRepository.getAllRequests(userId)
         return requests
     },
-    createFriendRequest: async(receiverId) => {
-        const request = await friendsRepository.createFriendRequest(receiverId)
+    createFriendRequest: async(senderId, receiverId) => {
+        const request = await friendsRepository.createFriendRequest(senderId, receiverId)
         return request
     },
-    updateFriendRequestStatus(request, data) {
-        const updatedRequest = friendsRepository.updateFriendRequestStatus(request, data)
+    updateFriendRequestStatus: async(data)=> {
+        const updatedRequest =await friendsRepository.updateFriendRequestStatus(data)
         return updatedRequest
     },
 
     deleteFriendRequest: async(requestId) => {
         const deletedRequest = await friendsRepository.deleteFriendRequest(requestId)
         return deletedRequest
+    },
+    recommendedPeople: async(userId) => {
+        const recommendedPeople = await friendsRepository.recommendedPeople(userId)
+        return recommendedPeople
     }
 }

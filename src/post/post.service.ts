@@ -30,7 +30,10 @@ export const PostService: IPostServiceContract = {
 
         return await postRepository.updatePost(postId, data, files);
     },
-
+    getPostsByUserId: async (userId) => {
+        const foundedPosts = await postRepository.getPostsByUserId(userId)
+        return foundedPosts
+    }
     // deletePost: async (postId: number): Promise<{ message: string } | string> => {
     //     return await postRepository.deletePost(postId);
     // }

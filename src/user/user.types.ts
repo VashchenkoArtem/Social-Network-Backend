@@ -14,7 +14,11 @@ export type UpdateUser = {
     pseudonym?: string;
     birth_date?: string | Date;
 };
-
+export type UserWithProfile = Prisma.user_app_userGetPayload<{
+    include: {
+        profile: true
+    }
+}>
 export type AuthenticatedUser = {
     id: number
 }
@@ -81,6 +85,10 @@ export interface IUserControllerContract {
         req: Request<object, UserWithoutPassword | string, UpdateUser, object>,
         res: Response<UserWithoutPassword | string>
     ) => void
+    findUserById: (
+        req: Request<{userId: string}, UserWithProfile | string, object>,
+        res: Response<UserWithProfile | string>
+    ) => void
 }
 export interface IUserServiceContract {
     registration: (data: RegistrationData) => Promise<AuthToken>;
@@ -91,6 +99,7 @@ export interface IUserServiceContract {
     getCode: (email: string) => Promise<VerificationCode | string>;
     updatePassword: (password: string, userId: number) => Promise<UserWithoutPassword | string>
     updateSignature: (filename: string, userId: number) => Promise<UserWithoutPassword | string>
+    findUserById: (userId: number) => Promise<UserWithProfile | null>
 }
 export interface IUserRepositoryContract {
     login: (data: CreateUser) => Promise<User | string>
@@ -98,4 +107,5 @@ export interface IUserRepositoryContract {
     createUser: (data: CreateUser) => Promise<UserWithoutPassword | string>;
     me: (id: number) => Promise<UserWithoutPassword | string>;
     updateUser: (data: UpdateUser, userId: number, filename?: string) => Promise<UserWithoutPassword | string>;
+    findUserById: (userId: number) => Promise<UserWithProfile | null>
 }
