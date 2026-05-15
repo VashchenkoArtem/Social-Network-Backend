@@ -1,6 +1,7 @@
 import { compare } from "bcrypt";
 import { client } from "../client/client";
 import { IUserRepositoryContract } from "./user.types";
+import { Album, Photo } from "../album/album.types";
 
 
 export const UserRepository: IUserRepositoryContract = {
@@ -17,36 +18,28 @@ export const UserRepository: IUserRepositoryContract = {
         
     },
     createUser: async (data) => {
-        try {
-            const { id, profileId, ...userData } = data;
-
-            const user = await client.user_app_user.create({
-                data: {
-                    ...userData,
-
-                    profile: {
-                        create: {}
+        const { id, profileId, ...userData } = data;
+        const user = await client.user_app_user.create({
+            data: {
+                ...userData,
+                profile: {
+                    create: {
+                        albums: {
+                            create: [{
+                                name: "Мої фото",
+                                theme: "За замовчуванням",
+                                year: new Date().getFullYear(),
+                                is_shown: true,
+                                is_default: true
+                            }]
+                        }
                     }
-                },
-
-                include: {
-                    profile: true
-                },
-
-                omit: {
-                    password: true
                 }
-            });
-
-            if (!user) {
-                return "User was not created";
-            }
-
-            return user;
-
-        } catch (error) {
-            throw error;
-        }
+            },
+            include: { profile: true },
+            omit: { password: true }
+        });
+        return user || "User was not created";
     },
     login: async (data) => {
         try {
@@ -132,6 +125,40 @@ export const UserRepository: IUserRepositoryContract = {
             omit: {
                 password: true
             }
+        });
+    },
+    findAlbumByName: async (userId: number, name: string): Promise<Album | null> => {
+        const album = await client.profile_app_album.findFirst({
+            where: {
+                name: name,
+                profile: { user: { id: userId } }
+            },
+            include: { photos: true }
+        });
+        
+        return album as Album | null;
+    },
+
+    addPhotoToAlbum: async (albumId: number, filename: string): Promise<Photo> => {
+        return await client.profile_app_albumimage.create({
+            data: {
+                image: filename,
+                albumId: albumId,
+                is_shown: true
+            }
+        });
+    },
+
+    updateUserAvatar: async (userId: number, filename: string | null) => {
+        return await client.profile_app_profile.update({
+            where: { id: userId },
+            data: { avatar: filename }
+        });
+    },
+
+    findProfileByUserId: async (userId: number) => {
+        return await client.profile_app_profile.findUnique({
+            where: { id: userId }
         });
     }
 };

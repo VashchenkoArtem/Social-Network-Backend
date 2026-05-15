@@ -6,13 +6,17 @@ import { ValidationError, AppError, BadRequestError, NotFoundError } from "../er
 import fs from "fs";
 import path, { join } from "path";
 import { thumbDir, originalDir } from "../config/path";
+import { UserRepository } from "../user/user.repository";
 
 
 export const AlbumService: IAlbumServiceContract = {
-    uploadPhoto: async (files,albumId, userId) => {
+    uploadPhoto: async (files, albumId, userId) => {
         if (!files || files.length === 0) {
             throw new Error("Файли є обов'язковими");
         }
+
+        const album = await AlbumRepository.findAlbumById(albumId);
+        if (!album) throw new Error("Альбом не знайдено");
 
         const photos = await Promise.all(
             files.map(async (file) => {
@@ -21,13 +25,18 @@ export const AlbumService: IAlbumServiceContract = {
                     userId,
                     is_shown: true,
                 };
-
-                return await AlbumRepository.addPhoto(
-                    imagePhoto,
-                    albumId
-                );
+                return await AlbumRepository.addPhoto(imagePhoto, albumId);
             })
         );
+
+        if (album.name === "Аватарки" || album.name === "Мої фото") {
+            const lastPhoto = photos[photos.length - 1];
+            
+            if (lastPhoto) {
+                await UserRepository.updateUserAvatar(userId, lastPhoto.image);
+                console.log(`✅ Профіль оновлено новим аватаром: ${lastPhoto.image}`);
+            }
+        }
 
         return photos;
     },

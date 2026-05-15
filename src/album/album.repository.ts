@@ -94,12 +94,15 @@ export const AlbumRepository: IAlbumRepositoryContract = {
     },
     updateAlbum: async (albumId, data) => {
         try {
+            const updateData = { ...data };
+
+            if (data.year !== undefined) {
+                updateData.year = Number(data.year);
+            }
+
             return await client.profile_app_album.update({
-                where: { id: albumId },
-                data: {
-                    ...data,
-                    year: Number(data.year)
-                    },
+                where: { id: Number(albumId) },
+                data: updateData,
                 include: {
                     photos: true
                 }
@@ -108,7 +111,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
             if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
                 throw new NotFoundError("Album");
             }
-            console.log(error)
+            console.error("Prisma Error:", error);
             throw new AppError("Could not update album", 500);
         }
     },
