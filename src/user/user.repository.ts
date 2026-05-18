@@ -133,5 +133,15 @@ export const UserRepository: IUserRepositoryContract = {
                 password: true
             }
         });
-    }
-};
+    },
+    findUserById: async (userId) => {
+      const foundedUser = await client.user_app_user.findUnique({
+        where: {
+            id: userId
+        },
+        include: {
+            profile: true
+        }
+      })
+      return foundedUser}
+}

@@ -119,5 +119,9 @@ export const UserService: IUserServiceContract = {
     updateSignature: async(filename, userId) => {
         const userData = await UserRepository.updateUser({signature: filename}, userId)
         return userData
+    },
+    findUserById: async (userId) => {
+        const foundedUser = await UserRepository.findUserById(userId)
+        return foundedUser
     }
 };

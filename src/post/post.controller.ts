@@ -89,5 +89,10 @@ export const postsController: IPostControllerContract = {
         } catch (error) {
             res.status(500).json("Internal Server Error");
         }
+    },
+    getPostsByUserId: async (req, res) => {
+        const userId = req.params.userId
+        const foundedPosts = await PostService.getPostsByUserId(Number(userId))
+        res.status(200).json(foundedPosts)
     }
 }

@@ -2,18 +2,14 @@ import { Prisma } from "@prisma/client"
 import type { Request, Response } from "express"
 
 export type FriendRequest = Prisma.user_app_friendrequestGetPayload<{}>
-export type UpdateFriendRequest = Prisma.user_app_friendrequestUpdateInput
-export type CreateFriendRequest = Prisma.user_app_friendrequestCreateInput
-type FriendWithProfile =
-    Prisma.user_app_friendrequestGetPayload<{
-        include: {
-            from_profile: {
-                include: {
-                    profile: true
-                }
-            }
-        }
-    }>
+export type UpdateFriendRequest = Prisma.user_app_friendrequestUncheckedUpdateInput
+export type CreateFriendRequest = Prisma.user_app_friendrequestUncheckedCreateInput
+
+export type UserWithProfile = Prisma.user_app_userGetPayload<{
+    include: {
+        profile: true
+    }
+}>
     
 export interface IFriendsControllerContract {
     getAllFriends: (
@@ -27,28 +23,40 @@ export interface IFriendsControllerContract {
     ) => void
 
     createFriendRequest: (
-        req: Request<object, FriendRequest | string, object, object>,
+        req: Request<object, FriendRequest | string, {receiverId: number},object >,
         res: Response<FriendRequest | string>
     ) => void
 
     updateFriendRequestStatus: (
-        req: Request<{requestId: number}, FriendRequest | string, object, UpdateFriendRequest>,
-        res: Response<string | FriendRequest>
+        req: Request<{requestId: string}, FriendRequest | string, UpdateFriendRequest & {requestId: number}, object>,
+        res: Response<FriendRequest | string>
+    ) => void
+
+    deleteFriendRequest: (
+        req: Request<{requestId: string}, FriendRequest | string, object, object>,
+        res: Response<FriendRequest | string>
+    ) => void,
+    recommendedPeople: (
+        req: Request<object, UserWithProfile[] | string, object, object>,
+        res: Response<UserWithProfile[] | string>
     ) => void
 }
 
 export interface IFriendsServiceContract {
     getAllFriends: (userId: number) => Promise<FriendRequest[]>
     getAllRequests: (userId: number) => Promise<FriendRequest[]>
-    createFriendRequest: (data: CreateFriendRequest) => Promise<FriendRequest>
-    updateFriendRequestStatus: (requestId: number, data: UpdateFriendRequest) => Promise<FriendRequest>
+    createFriendRequest: (senderId: number, receiverId: number) => Promise<FriendRequest>
+    updateFriendRequestStatus: (data: UpdateFriendRequest & {requestId: number}) => Promise<FriendRequest>
+    deleteFriendRequest: (requestId: number) => Promise<FriendRequest>
+    recommendedPeople: (userId: number) => Promise<UserWithProfile[]>
 }
 
 
 export interface IFriendsRepositoryContract {
     getAllFriends: (userId: number) => Promise<FriendRequest[]>
-    createFriendRequest: (data: CreateFriendRequest) => Promise<FriendRequest>
+    createFriendRequest: (senderId: number, receiverId: number) => Promise<FriendRequest>
     getAllRequests: (userId: number) => Promise<FriendRequest[]>
-    
-    updateFriendRequestStatus: (requestId: number, data: UpdateFriendRequest) => Promise<FriendRequest>
+    updateFriendRequestStatus: (data: UpdateFriendRequest & {requestId: number}) => Promise<FriendRequest>
+    deleteFriendRequest: (requestId: number) => Promise<FriendRequest>
+    recommendedPeople: (userId: number) => Promise<UserWithProfile[]>
 }
