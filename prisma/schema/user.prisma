@@ -9,6 +9,10 @@ model user_app_user {
   receivedFriendRequests user_app_friendrequest[] @relation("ReceivedRequests")
   profile profile_app_profile? @relation(fields: [profileId], references: [id])
   profileId Int? @unique
+  chats chat_app_chat_users[]
+  admin chat_app_chat[] @relation("ChatAdmin")
+  sentMessages chat_app_message[]
+  readMessages chat_app_message[] @relation("MessageReaders")
 }
 
 model profile_app_profile{
