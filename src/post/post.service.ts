@@ -19,6 +19,10 @@ export const PostService: IPostServiceContract = {
         return await postRepository.createPost(data, files);
     },
 
+    deletePost: async (postId: number) => {
+        const deletedPost = await postRepository.deletePost(postId)
+        return deletedPost
+    },
     updatePost: async (postId: number, data: UpdatePostDto, files?: Express.Multer.File[]): Promise<Post | string> => {
         if (data?.title !== undefined && data.title.trim().length === 0) {
             return "Title cannot be empty";
@@ -26,8 +30,11 @@ export const PostService: IPostServiceContract = {
 
         return await postRepository.updatePost(postId, data, files);
     },
-
-    deletePost: async (postId: number): Promise<{ message: string } | string> => {
-        return await postRepository.deletePost(postId);
+    getPostsByUserId: async (userId) => {
+        const foundedPosts = await postRepository.getPostsByUserId(userId)
+        return foundedPosts
     }
+    // deletePost: async (postId: number): Promise<{ message: string } | string> => {
+    //     return await postRepository.deletePost(postId);
+    // }
 }

@@ -1,0 +1,37 @@
+model chat_app_chat {
+    id          Int         @id @default(autoincrement())
+    name String
+    is_group Boolean
+    avatar String
+    users chat_app_chat_users[]
+    admin user_app_user @relation("ChatAdmin", fields: [adminId], references: [id])
+    adminId Int @unique
+    messages chat_app_message[]
+}
+model chat_app_chat_users{
+    chat chat_app_chat @relation(fields: [chatId],references: [id])
+    chatId Int
+    user user_app_user @relation(fields: [userId], references: [id])
+    userId Int
+    @@id([chatId, userId])
+}
+
+model chat_app_messageimage {
+    id          Int         @id @default(autoincrement())
+    image String
+    message chat_app_message @relation(fields: [messageId], references: [id])
+    messageId Int
+}
+
+model chat_app_message {
+    id          Int         @id @default(autoincrement())
+    text String
+    chat chat_app_chat @relation(fields: [chatId], references: [id])
+    chatId Int
+    created_at DateTime @default(now())
+    sender user_app_user @relation(fields: [senderId], references: [id])
+    senderId Int
+    readers user_app_user @relation("MessageReaders", fields: [readerId], references: [id])
+    readerId Int
+    images chat_app_messageimage[]
+}

@@ -231,5 +231,26 @@ export const postRepository: IPostRepositoryContract = {
             console.error(error);
             return "Failed to delete post from database";
         }
+    },
+    getPostsByUserId: async (userId) => {
+        return await client.post_app_post.findMany({
+            where: {
+                authorId: userId
+            },
+            include: {
+                author: {
+                    include:{
+                        user: true
+                    }
+                },
+                urls: true,
+                photos: true,
+                tags: {
+                    include: {
+                        tag: true
+                    }
+                }
+            }
+        })
     }
 }

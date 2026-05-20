@@ -1,13 +1,15 @@
+import os from "os";
+import cors from "cors";
 import express from "express";
 import type { Express } from "express";
-import cors from "cors";
 import { userRouter } from "./user/user.router";
 import { uploadDir } from "./config";
 import { tagRouter } from "./tag/tag.router";
 import { albumRouter } from "./album/album.router";
 import { postRouter } from "./post/post.router";
-import os from "os";
 import { friendRouter } from "./friends/friends.router";
+import { chatRouter } from "./chat";
+import { messageRouter } from "./message";
 
 const getLocalIpAddress = (): string => {
     const interfaces = os.networkInterfaces();
@@ -21,7 +23,7 @@ const getLocalIpAddress = (): string => {
     return "localhost";
 };
 
-const HOST = getLocalIpAddress();
+const HOST = getLocalIpAddress()
 const PORT = 8000;
 const app: Express = express();
 
@@ -33,7 +35,9 @@ app.use(albumRouter);
 app.use(tagRouter);
 app.use(postRouter)
 app.use(friendRouter)
-console.log(HOST)
+app.use(chatRouter)
+app.use(messageRouter)
+
 
 app.listen(PORT, HOST, () => {
     console.log(`Сервер запущено`);

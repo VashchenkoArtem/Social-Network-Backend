@@ -15,7 +15,11 @@ export type UpdateUser = {
     pseudonym?: string;
     birth_date?: string | Date;
 };
-
+export type UserWithProfile = Prisma.user_app_userGetPayload<{
+    include: {
+        profile: true
+    }
+}>
 export type AuthenticatedUser = {
     id: number
 }
@@ -81,6 +85,10 @@ export interface IUserControllerContract {
     updateSignature: (
         req: Request<object, UserWithoutPassword | string, UpdateUser, object>,
         res: Response<UserWithoutPassword | string>
+    ) => void
+    findUserById: (
+        req: Request<{userId: string}, UserWithProfile | string, object>,
+        res: Response<UserWithProfile | string>
     ) => void
 }
 export interface IUserServiceContract {
