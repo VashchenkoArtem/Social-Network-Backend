@@ -86,10 +86,6 @@ export interface IUserControllerContract {
         req: Request<object, UserWithoutPassword | string, UpdateUser, object>,
         res: Response<UserWithoutPassword | string>
     ) => void
-    findUserById: (
-        req: Request<{userId: string}, UserWithProfile | string, object>,
-        res: Response<UserWithProfile | string>
-    ) => void
 }
 export interface IUserServiceContract {
     registration: (data: RegistrationData) => Promise<AuthToken>;

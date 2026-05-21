@@ -141,5 +141,6 @@ export const UserService: IUserServiceContract = {
     },
     addPhotoToAlbum: function (albumId: number, filename: string): Promise<Photo> {
         throw new Error("Function not implemented.");
-    }
+    },
+    
 };
