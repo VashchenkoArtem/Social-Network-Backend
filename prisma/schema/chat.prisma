@@ -5,7 +5,7 @@ model chat_app_chat {
     avatar String
     users chat_app_chat_users[]
     admin user_app_user @relation("ChatAdmin", fields: [adminId], references: [id])
-    adminId Int @unique
+    adminId Int
     messages chat_app_message[]
 }
 model chat_app_chat_users{

@@ -87,13 +87,5 @@ export const userController: IUserControllerContract = {
         }
         const response = await UserService.updateSignature(filename, userId)
         res.status(200).json(response)
-    },
-    findUserById: async (req, res) => {
-        const userId = Number(req.params.userId)
-        const foundedUser = await UserService.findUserById(userId)
-        if (!foundedUser){
-            return res.status(404).json("User not found")
-        }
-        res.status(200).json(foundedUser)
     }
 };

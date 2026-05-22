@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { AlbumService } from "./album.service";
-import { IAlbumControllerContract } from "./album.types";
+import { ErrorResponse, IAlbumControllerContract } from "./album.types";
 import { AppError, AuthenticationError } from "../errors";
 
 export const albumController: IAlbumControllerContract = {
@@ -68,7 +68,7 @@ export const albumController: IAlbumControllerContract = {
             }
             const album = await AlbumService.updateAlbum(id, req.body);
             res.status(200).json(album);
-        } catch (error: unknown) {
+        } catch (error) {
             console.log(error)
         }
     },

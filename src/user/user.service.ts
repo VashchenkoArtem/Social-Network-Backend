@@ -4,6 +4,10 @@ import nodemailer from "nodemailer";
 import { IUserServiceContract, AuthToken, CreateUser, VerifyPayload } from "./user.types";
 import { cleanEnv, str } from "envalid";
 import { UserRepository } from "./user.repository";
+import { Album, Photo } from "../album/album.types";
+
+
+
 type VerificationRecord = {
     code: string;
     expiresAt: number;
@@ -29,7 +33,7 @@ export const UserService: IUserServiceContract = {
         const code = Math.floor(100000 + Math.random() * 900000).toString();
 
         verificationCodes.set(data.email, code);
-        console.log(verificationCodes)
+        console.log(verificationCodes);
         await transporter.sendMail({
             from: 'mobileteamsocial@gmail.com',
             to: data.email,
@@ -53,57 +57,69 @@ export const UserService: IUserServiceContract = {
         if (foundedUser) {
             throw new Error("User already exists");
         }
-        const dataWithoutCode = {...data, code: undefined}
-        const createdUser = await UserRepository.createUser({...dataWithoutCode, password: hashedPassword });
+        const dataWithoutCode = { ...data, code: undefined };
+        const createdUser = await UserRepository.createUser({ ...dataWithoutCode, password: hashedPassword });
         if (typeof createdUser === "string") {
-            throw new Error("User was not created")
+            throw new Error("User was not created");
         }
         const token = sign(
             { id: createdUser.id },
             ENV.JWT_SECRET,
             { expiresIn: '7d' }
-        )
-        return { token }
+        );
+        return { token };
     },
     login: async (data) => {
-        const user = await UserRepository.findUserByEmail(data.email)
+        const user = await UserRepository.findUserByEmail(data.email);
 
         if (!user) {
-            return 'User was not found. Try again, please'
-        }
-        
-        if (typeof user === "string") {
-            return user
+            return 'User was not found. Try again, please';
         }
 
-        const userConfirmation = await compare(data.password, user.password)
+        if (typeof user === "string") {
+            return user;
+        }
+
+        const userConfirmation = await compare(data.password, user.password);
         if (!userConfirmation) {
-            return 'You entered wrong credentionals. Try again, please'
+            return 'You entered wrong credentionals. Try again, please';
         }
 
         const token = sign(
             { id: user.id },
             ENV.JWT_SECRET,
             { expiresIn: '7d' }
-        )
-        return { token }
+        );
+        return { token };
     },
     me: async (id) => {
-        const user = await UserRepository.me(id)
+        const user = await UserRepository.me(id);
 
         if (typeof user === "string") {
-            return user
+            return user;
         }
-        return user
+        return user;
     },
-    updateUser : async(data, userId, filename) =>{
-        const userData = UserRepository.updateUser(data, userId, filename)
-        if (typeof userData === "string") {
-            return userData
+    updateUser: async (data, userId, filename) => {
+        const result = await UserRepository.updateUser(data, userId, filename);
+
+        if (typeof result === "string") return result;
+        if (filename) {
+            try {
+                const album = await UserRepository.findAlbumByName(userId, "Аватарки") 
+                            || await UserRepository.findAlbumByName(userId, "Мої фото");
+                
+                if (album) {
+                    await UserRepository.addPhotoToAlbum(album.id, filename);
+                }
+            } catch (error) {
+                console.error("Синхронізація не вдалася, але дані профілю збережені");
+            }
         }
-        return userData
+
+        return result;
     },
-    getCode: async (email: string)=> {
+    getCode: async (email: string) => {
         const record = verificationCodes.get(email);
 
         if (!record) {
@@ -111,17 +127,20 @@ export const UserService: IUserServiceContract = {
         }
         return record;
     },
-    updatePassword: async(password, userId)=>{
+    updatePassword: async (password, userId) => {
         const hashedPassword = await bcrypt.hash(password, 10);
-        const userData = await UserRepository.updateUser({password: hashedPassword}, userId)
-        return userData
+        const userData = await UserRepository.updateUser({ password: hashedPassword }, userId);
+        return userData;
     },
-    updateSignature: async(filename, userId) => {
-        const userData = await UserRepository.updateUser({signature: filename}, userId)
-        return userData
+    updateSignature: async (filename, userId) => {
+        const userData = await UserRepository.updateUser({ signature: filename }, userId);
+        return userData;
     },
-    findUserById: async (userId) => {
-        const foundedUser = await UserRepository.findUserById(userId)
-        return foundedUser
-    }
+    findAlbumByName: function (userId: number, name: string): Promise<Album | null> {
+        throw new Error("Function not implemented.");
+    },
+    addPhotoToAlbum: function (albumId: number, filename: string): Promise<Photo> {
+        throw new Error("Function not implemented.");
+    },
+    
 };

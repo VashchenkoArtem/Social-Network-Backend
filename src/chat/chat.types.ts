@@ -1,47 +1,51 @@
-import { Prisma } from '@prisma/client'
-import type { Request, Response } from 'express'
+import { Prisma } from "@prisma/client";
+import type { Request, Response } from "express";
 
-export type IChat = Prisma.chat_app_chatGetPayload<{}>
-export type IChatWithUsers = Prisma.chat_app_chatGetPayload<{
+
+export type ChatWithUsers = Prisma.chat_app_chatGetPayload<{
     include: {
         users: {
-            select: {
+            include: {
                 user: {
-                    select: {
-                        id: true,
-                        username: true,
-                        profile: {
-                            select: {
-                                avatar: true
-                            }
-                        }
+                    include: {
+                        profile: true
                     }
                 }
             }
         }
     }
-}>
+}>;
 
-export interface IChatControllerContract {
-    getGroupChats: (
-        req: Request<object, IChatWithUsers[] | string, object>,
-        res: Response<IChatWithUsers[] | string>
-    ) => void
-
-
-    getPersonalChats: (
-        req: Request<object, IChatWithUsers[] | string, object>,
-        res: Response<IChatWithUsers[] | string>
-    ) => void
-}   
-export interface IChatServiceContract {
-    getGroupChats: (userId: number)=> Promise<IChatWithUsers[]>
-    getPersonalChats: (userId: number) => Promise<IChatWithUsers[]>
+export interface ICreateGroupChatDto {
+    name: string;
+    userIds: number[];
 }
 
 export interface IChatRepositoryContract {
-    getGroupChats: (userId: number) => Promise<IChatWithUsers[]>,
-    getPersonalChats: (userId: number) => Promise<IChatWithUsers[]>
+    getGroupChats: (userId: number) => Promise<ChatWithUsers[]>;
+    getPersonalChats: (userId: number) => Promise<ChatWithUsers[]>;
+    createGroupChat: (adminId: number, data: ICreateGroupChatDto, filename: string | null) => Promise<ChatWithUsers>;
 }
 
+export interface IChatServiceContract {
+    getGroupChats: (userId: number) => Promise<ChatWithUsers[]>;
+    getPersonalChats: (userId: number) => Promise<ChatWithUsers[]>;
+    createGroupChat: (adminId: number, data: ICreateGroupChatDto, filename: string | null) => Promise<ChatWithUsers>;
+}
 
+export interface IChatControllerContract {
+    getGroupChats: (
+        req: Request<object, ChatWithUsers[] | string, object>,
+        res: Response<ChatWithUsers[] | string>
+    ) => Promise<void>;
+    
+    getPersonalChats: (
+        req: Request<object, ChatWithUsers[] | string, object>,
+        res: Response<ChatWithUsers[] | string>
+    ) => Promise<void>;
+
+    createGroupChat: (
+        req: Request<object, ChatWithUsers | string, { name: string; userIds: string | number[] }, object>,
+        res: Response<ChatWithUsers | string>
+    ) => Promise<void>;
+}
