@@ -7,3 +7,4 @@ export const chatRouter = Router()
 
 chatRouter.get("/personal-chats", authMiddleware, ChatController.getPersonalChats)
 chatRouter.get("/group-chats", authMiddleware, ChatController.getGroupChats)
+chatRouter.delete("/group-chats/:chatId", authMiddleware, ChatController.deleteGroupChat)

@@ -14,5 +14,14 @@ export const ChatController: IChatControllerContract = {
         const personalChats = await ChatService.getPersonalChats(userId)
 
         res.status(200).json(personalChats)
+    },
+
+    deleteGroupChat: async(req, res) => {
+        const userId = res.locals.userId
+        const chatId = parseInt(req.params.chatId)
+
+        const deletedChat = await ChatService.deleteGroupChat(chatId, userId)
+
+        res.status(200).json(deletedChat)
     }
 }

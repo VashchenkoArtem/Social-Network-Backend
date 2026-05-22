@@ -70,5 +70,24 @@ export const ChatRepository: IChatRepositoryContract = {
         } catch (error) {
             throw error
         }
+    },
+
+    deleteGroupChat: async(chatId, userId) => {
+        try {
+            const deletedChat = await client.chat_app_chat.delete({
+                where: {
+                    id: chatId,
+                    users: {
+                        some: {
+                            userId: userId
+                        }
+                    },
+                    is_group: true
+                }
+            })
+            return deletedChat
+        } catch (error) {
+            throw error
+        }
     }
 }

@@ -33,15 +33,22 @@ export interface IChatControllerContract {
         req: Request<object, IChatWithUsers[] | string, object>,
         res: Response<IChatWithUsers[] | string>
     ) => void
-}   
+
+    deleteGroupChat: (
+        req: Request<{ chatId: string }, IChat | string, object>,
+        res: Response<IChat | string>
+    ) => void
+}
 export interface IChatServiceContract {
     getGroupChats: (userId: number)=> Promise<IChatWithUsers[]>
     getPersonalChats: (userId: number) => Promise<IChatWithUsers[]>
+    deleteGroupChat: (chatId: number, userId: number) => Promise<IChat>
 }
 
 export interface IChatRepositoryContract {
     getGroupChats: (userId: number) => Promise<IChatWithUsers[]>,
-    getPersonalChats: (userId: number) => Promise<IChatWithUsers[]>
+    getPersonalChats: (userId: number) => Promise<IChatWithUsers[]>,
+    deleteGroupChat: (chatId: number, userId: number) => Promise<IChat>
 }
 
 
