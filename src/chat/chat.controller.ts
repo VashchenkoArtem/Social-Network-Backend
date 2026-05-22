@@ -46,6 +46,7 @@ export const ChatController: IChatControllerContract = {
 
             res.status(200).json(newChat);
         } catch (error) {
+            console.log(error)
             res.status(500).json("Internal Server Error");
         }
     }
