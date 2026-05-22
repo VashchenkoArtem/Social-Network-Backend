@@ -30,12 +30,12 @@ const app: Express = express();
 app.use(cors());
 app.use("/media/", express.static(uploadDir));
 app.use(express.json());
-app.use(userRouter);
-app.use(albumRouter);
-app.use(tagRouter);
 app.use(postRouter)
 app.use(friendRouter)
 app.use(chatRouter)
+app.use(userRouter);
+app.use(albumRouter);
+app.use(tagRouter);
 app.use(messageRouter)
 
 

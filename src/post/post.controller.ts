@@ -11,7 +11,7 @@ import {
 export const postsController: IPostControllerContract = {
     getAllPosts: async (req, res) => {
         const take = Number(req.query.take)
-
+        console.log(take, "asdasds")
         if (Number.isNaN(take)) {
             res.status(400).json('Query param take must be a number')
             return

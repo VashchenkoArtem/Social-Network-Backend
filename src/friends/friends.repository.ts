@@ -18,6 +18,11 @@ export const friendsRepository: IFriendsRepositoryContract = {
                         include: {
                             profile: true
                         }
+                    },
+                    to_profile: {
+                        include: {
+                            profile: true
+                        }
                     }
                 }
             })
