@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { AlbumService } from "./album.service";
-import { IAlbumControllerContract } from "./album.types";
+import { ErrorResponse, IAlbumControllerContract } from "./album.types";
 import { AppError, AuthenticationError } from "../errors";
 
 export const albumController: IAlbumControllerContract = {
@@ -51,9 +51,9 @@ export const albumController: IAlbumControllerContract = {
     },
 
     getUserAlbums: async (req, res) => {
-            const userId = res.locals.userId
-            const albums = await AlbumService.getUserAlbums(userId)
-            res.status(200).json(albums)
+        const userId = Number(req.params.userId)
+        const albums = await AlbumService.getUserAlbums(userId)
+        res.status(200).json(albums)
             
     },
     updateAlbum: async (req, res) => {
@@ -68,7 +68,7 @@ export const albumController: IAlbumControllerContract = {
             }
             const album = await AlbumService.updateAlbum(id, req.body);
             res.status(200).json(album);
-        } catch (error: unknown) {
+        } catch (error) {
             console.log(error)
         }
     },

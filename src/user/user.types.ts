@@ -1,11 +1,25 @@
 import { Prisma } from "@prisma/client";
 import { Request, Response } from "express";
+import { Album, Photo } from "../album/album.types";
 
-export type User = Prisma.UserGetPayload<{}>
+export type User = Prisma.user_app_userGetPayload<{}>
 export type UserWithoutPassword = Omit<User, "password">
-export type CreateUser = Prisma.UserUncheckedCreateInput
-export type UpdateUser = Prisma.UserUncheckedUpdateInput
-
+export type CreateUser = Prisma.user_app_userUncheckedCreateInput
+export type UpdateUser = {
+    firstname?: string;
+    lastname?: string;
+    username?: string;
+    email?: string;
+    password?: string
+    signature?: string;
+    pseudonym?: string;
+    birth_date?: string | Date;
+};
+export type UserWithProfile = Prisma.user_app_userGetPayload<{
+    include: {
+        profile: true
+    }
+}>
 export type AuthenticatedUser = {
     id: number
 }
@@ -82,6 +96,8 @@ export interface IUserServiceContract {
     getCode: (email: string) => Promise<VerificationCode | string>;
     updatePassword: (password: string, userId: number) => Promise<UserWithoutPassword | string>
     updateSignature: (filename: string, userId: number) => Promise<UserWithoutPassword | string>
+    findAlbumByName: (userId: number, name: string) => Promise<Album | null>;
+    addPhotoToAlbum: (albumId: number, filename: string) => Promise<Photo>;
 }
 export interface IUserRepositoryContract {
     login: (data: CreateUser) => Promise<User | string>
@@ -89,4 +105,8 @@ export interface IUserRepositoryContract {
     createUser: (data: CreateUser) => Promise<UserWithoutPassword | string>;
     me: (id: number) => Promise<UserWithoutPassword | string>;
     updateUser: (data: UpdateUser, userId: number, filename?: string) => Promise<UserWithoutPassword | string>;
+    findAlbumByName: (userId: number, name: string) => Promise<Album | null>;
+    addPhotoToAlbum: (albumId: number, filename: string) => Promise<Photo>;
+    updateUserAvatar: (userId: number, filename: string | null) => Promise<Prisma.profile_app_profileGetPayload<{}>>;
+    findProfileByUserId: (userId: number) => Promise<Prisma.profile_app_profileGetPayload<{}> | null>;
 }

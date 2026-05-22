@@ -7,7 +7,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
 
     addPhoto: async (data, albumId) => {
         try {
-            const photo = await client.albumImage.create({
+            const photo = await client.profile_app_albumimage.create({
                 data: {
                     image: data.image,
                     album: {
@@ -24,7 +24,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
 
     findAlbumById: async (id: number) => {
         try {
-            const album = await client.album.findUnique({
+            const album = await client.profile_app_album.findUnique({
                 where: { id },
                 include: {
                     photos: true,
@@ -38,7 +38,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
 
     albumVisibility: async (id: number, is_shown: boolean) => {
         try {
-            const album = await client.album.update({
+            const album = await client.profile_app_album.update({
                 where: { id },
                 data: {
                     is_shown,
@@ -55,14 +55,15 @@ export const AlbumRepository: IAlbumRepositoryContract = {
 
     getUserAlbums: async (userId: number) => {
         try {
-            return await client.album.findMany({
+            return await client.profile_app_album.findMany({
                 where: {
                     profileId: userId,
                 },
+                orderBy: {
+                    created_at: "desc"
+                },
                 include: {
-                    photos: true,
-                    year: true,
-                    theme: true
+                    photos: true
                 },
             })
         } catch (error) {
@@ -71,36 +72,20 @@ export const AlbumRepository: IAlbumRepositoryContract = {
         }
     },
     createAlbum: async (data, userId) => {
-        const tag = await client.post_app_tag.findFirst({
-            where: { id: data.themeId }
-        });
-        const year = await client.albumYear.findFirst({
-            where: { id: data.yearId }
-        });
-        console.log(data)
-        if (!year) throw new NotFoundError("Year");
-        if (!tag) throw new NotFoundError(`Theme`);
-        console.log(data.yearId)
         try {
-            const album = await client.album.create({
+            const album = await client.profile_app_album.create({
                 data: {
                     name: data.name,
                     is_shown: data.is_shown ?? true,
                     profile: { connect: { id: userId } },
-                    theme: { connect: { id: tag.id } },
+                    theme: data.theme,
                     is_default: false,
-                    year: { connect: {id: year.id}}
+                    year: Number(data.year)
                 },
                 include: {
                     photos: true,
-                    theme: true,
-                    year: true
                 }
             });
-            console.log(data)
-            if (!data.themeId || !data.yearId) {
-                throw new NotFoundError('Topic or Year not found');
-            }
             return album
         } catch (error) {
             console.log(error)
@@ -109,9 +94,15 @@ export const AlbumRepository: IAlbumRepositoryContract = {
     },
     updateAlbum: async (albumId, data) => {
         try {
-            return await client.album.update({
-                where: { id: albumId },
-                data: data,
+            const updateData = { ...data };
+
+            if (data.year !== undefined) {
+                updateData.year = Number(data.year);
+            }
+
+            return await client.profile_app_album.update({
+                where: { id: Number(albumId) },
+                data: updateData,
                 include: {
                     photos: true
                 }
@@ -120,19 +111,17 @@ export const AlbumRepository: IAlbumRepositoryContract = {
             if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
                 throw new NotFoundError("Album");
             }
-            console.log(error)
+            console.error("Prisma Error:", error);
             throw new AppError("Could not update album", 500);
         }
     },
     deleteAlbum: async (albumId) => {
         try {
-            const deletedAlbum = await client.album.delete({
+            const deletedAlbum = await client.profile_app_album.delete({
                 where: { id: albumId },
                 include: {
                     photos: true,
-                    topic: true,
-                    year: true,
-                    author: true
+                    profile: true
                 }
             })
             return deletedAlbum
@@ -142,14 +131,14 @@ export const AlbumRepository: IAlbumRepositoryContract = {
         }
     },
     findPhotoById: async (photoId: number) => {
-        return await client.albumImage.findUnique({
+        return await client.profile_app_albumimage.findUnique({
             where: { id: photoId }
         });
     },
 
     deletePhoto: async (photoId: number) => {
         try {
-            await client.albumImage.delete({
+            await client.profile_app_albumimage.delete({
                 where: { id: photoId }
             });
         } catch (error) {
@@ -160,7 +149,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
 
     togglePhotoVisibility: async (photoId: number, is_shown: boolean) => {
         try {
-            return await client.albumImage.update({
+            return await client.profile_app_albumimage.update({
                 where: { id: photoId },
                 data: { is_shown },
             });
