@@ -123,4 +123,8 @@ export const UserService: IUserServiceContract = {
     getUserById: async (id: number) => {
         return await UserRepository.findUserById(id);
     },
+    findUserById: async (userId) => {
+        const foundedUser = await UserRepository.findUserById(userId)
+        return foundedUser
+    }
 };

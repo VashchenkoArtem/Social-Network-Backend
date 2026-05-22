@@ -8,3 +8,7 @@ export const postRouter = Router();
 postRouter.get("/posts", authMiddleware, postsController.getAllPosts)
 postRouter.get("/posts/my", authMiddleware, postsController.getMyPosts)
 postRouter.post("/posts", authMiddleware, uploadMiddleware.array("images", 7), procImgMiddleware(300, 100),  postsController.createPost)
+postRouter.patch( "/posts/:id", authMiddleware, uploadMiddleware.array("images", 7), procImgMiddleware(300, 100), postsController.updatePost );
+
+postRouter.delete( "/posts/:id", authMiddleware, postsController.deletePost );
+postRouter.get("/users/:userId/posts", authMiddleware, postsController.getPostsByUserId)

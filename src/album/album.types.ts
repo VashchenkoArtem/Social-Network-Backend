@@ -1,15 +1,15 @@
 import { Prisma } from "@prisma/client";
 import { Request, Response } from "express";
 
-export type Album = Prisma.AlbumGetPayload<{
+export type Album = Prisma.profile_app_albumGetPayload<{
     include: { photos: true }
 }>
 
-export type CreateAlbumInput = Prisma.AlbumUncheckedCreateInput
-export type UpdateAlbumInput = Prisma.AlbumUpdateInput
+export type CreateAlbumInput = Prisma.profile_app_albumUncheckedCreateInput
+export type UpdateAlbumInput = Prisma.profile_app_albumUpdateInput
 
-export type Photo = Prisma.AlbumImageGetPayload<{}>
-export type PhotoWithoutAlbumId = Prisma.AlbumImageCreateInput
+export type Photo = Prisma.profile_app_albumimageGetPayload<{}>
+export type PhotoWithoutAlbumId = Prisma.profile_app_albumimageCreateInput
 // export type CreatePhotoInput = {
 //     image: Photo,
 //     albumId: number
@@ -33,7 +33,7 @@ export interface IAlbumControllerContract {
     ) => Promise<void>
 
     getUserAlbums: (
-        req: Request,
+        req: Request<{ userId: string }, Album[] | string>,
         res: Response<Album[] | string>
     ) => Promise<void>,
     createAlbum: (

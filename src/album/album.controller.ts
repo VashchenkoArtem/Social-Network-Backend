@@ -51,9 +51,9 @@ export const albumController: IAlbumControllerContract = {
     },
 
     getUserAlbums: async (req, res) => {
-            const userId = res.locals.userId
-            const albums = await AlbumService.getUserAlbums(userId)
-            res.status(200).json(albums)
+        const userId = Number(req.params.userId)
+        const albums = await AlbumService.getUserAlbums(userId)
+        res.status(200).json(albums)
             
     },
     updateAlbum: async (req, res) => {
