@@ -10,5 +10,21 @@ export const ChatService: IChatServiceContract = {
     getPersonalChats: async(userId) => {
         const personalChats = await ChatRepository.getPersonalChats(userId)
         return personalChats
-    }
+    },
+
+    createChat: async (data, userId) => {
+        return await ChatRepository.createChat(data, userId)
+    },
+    
+    updateChat: async (chatId, data) => {
+        return await ChatRepository.updateChat(chatId, data)
+    },
+    
+    deleteChat: async (chatId) => {
+        await ChatRepository.deleteChat(chatId)
+    },
+    
+    leaveChat: async (userId) => {
+        await ChatRepository.leaveChat(userId)
+    },
 }
