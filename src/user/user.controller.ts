@@ -88,6 +88,7 @@ export const userController: IUserControllerContract = {
         const response = await UserService.updateSignature(filename, userId)
         res.status(200).json(response)
     },
+<<<<<<< HEAD
     getUserById: async (req, res) => {
         const id = Number(req.params.id);
         
@@ -105,4 +106,14 @@ export const userController: IUserControllerContract = {
     
         res.status(200).json(response);
     },
+=======
+    findUserById: async (req, res) => {
+        const userId = Number(req.params.userId)
+        const foundedUser = await UserService.findUserById(userId)
+        if (!foundedUser){
+            return res.status(404).json("User not found")
+        }
+        res.status(200).json(foundedUser)
+    }
+>>>>>>> 3f70cfcbef5f17e2cbc9bafc3426b4b85533d7ac
 };

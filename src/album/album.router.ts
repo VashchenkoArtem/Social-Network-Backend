@@ -7,7 +7,7 @@ export const albumRouter = Router()
 
 albumRouter.post("/upload/:albumId", authMiddleware, uploadMiddleware.array("images", 10), procImgMiddleware(300, 100), albumController.uploadPhoto)
 albumRouter.patch("/albums/:id/visibility", authMiddleware, albumController.albumVisibility);
-albumRouter.get("/albums", authMiddleware, albumController.getUserAlbums)
+albumRouter.get("/albums/:userId", authMiddleware, albumController.getUserAlbums)
 albumRouter.post("/albums", authMiddleware,  albumController.createAlbum);
 albumRouter.patch("/albums/:id", authMiddleware,  albumController.updateAlbum); 
 albumRouter.delete("/albums/:id", authMiddleware, albumController.deleteAlbum);

@@ -1,7 +1,12 @@
 import { AlbumRepository } from "../album/album.repository";
 import { AlbumService } from "../album/album.service";
 import { PostService } from "./post.service";
-import { IPostControllerContract } from "./post.types";
+import { 
+    IPostControllerContract, 
+    Post, 
+    UpdatePostDto, 
+    PostParams, 
+    CreatePost } from "./post.types";
 
 export const postsController: IPostControllerContract = {
     getAllPosts: async (req, res) => {
@@ -40,4 +45,54 @@ export const postsController: IPostControllerContract = {
 
         res.status(200).json(createPost);
     },
+    updatePost: async (req, res) => {
+        try {
+            const postId = Number(req.params.id);
+            if (isNaN(postId)) {
+                res.status(400).json('Invalid Post ID');
+                return;
+            }
+
+            const files = req.files as Express.Multer.File[];
+
+            const response = await PostService.updatePost(postId, req.body, files);
+
+            if (typeof response === "string") {
+                const status = response === "Post not found" ? 404 : 400;
+                res.status(status).json(response);
+                return;
+            }
+
+            res.status(200).json(response);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json("Internal Server Error");
+        }
+    },
+    deletePost: async (req, res) => {
+        try {
+            const postId = Number(req.params.id);
+
+            if (isNaN(postId)) {
+                res.status(400).json('Invalid Post ID');
+                return;
+            }
+
+            const response = await PostService.deletePost(postId);
+
+            if (typeof response === "string") {
+                res.status(400).json(response);
+                return;
+            }
+
+            res.status(200).json(response);
+        } catch (error) {
+            res.status(500).json("Internal Server Error");
+        }
+    },
+    getPostsByUserId: async (req, res) => {
+        const userId = req.params.userId
+        const foundedPosts = await PostService.getPostsByUserId(Number(userId))
+        res.status(200).json(foundedPosts)
+    }
 }

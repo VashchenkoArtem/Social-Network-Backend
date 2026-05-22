@@ -1,45 +1,21 @@
-model Album {
+model profile_app_album {
   id        Int      @id @default(autoincrement())
   name     String
   is_shown Boolean  @default(true)
-
-  profile    User     @relation(fields: [profileId], references: [id])
+  profile    profile_app_profile     @relation(fields: [profileId], references: [id])
   profileId  Int
-
-  theme     post_app_tag      @relation(fields: [themeId], references: [id]) 
-  themeId   Int
-
-  year      AlbumYear @relation(fields: [yearId], references: [id]) 
-  yearId    Int
+  theme     String
+  year      Int
   created_at DateTime @default(now())
   is_default Boolean
-  photos    AlbumImage[]
+  photos    profile_app_albumimage[]
 }
 
-model AlbumImage{
+model profile_app_albumimage{
   id        Int     @id @default(autoincrement())
   created_at DateTime @default(now())
   image     String
   is_shown Boolean  @default(true)
-  album     Album?  @relation(fields: [albumId], references: [id])
+  album     profile_app_album?  @relation(fields: [albumId], references: [id])
   albumId   Int?
-}
-model Photo {
-  id        Int     @id @default(autoincrement())
-  filename  String
-  
-  user      User?   @relation(fields: [userId], references: [id])
-  userId    Int?
-
-  avatarFor User?   @relation("UserAvatars", fields: [avatarForId], references: [id])
-  avatarForId Int?
-
-  isVisible Boolean @default(true)
-}
-
-model AlbumYear {
-  id    Int @id @default(autoincrement())
-  year  Int @unique @default(2024)
-
-  albums Album[]
 }
