@@ -112,4 +112,26 @@ export const ChatRepository: IChatRepositoryContract = {
             throw error
         }
     },
+
+    findChatById: async (chatId) => {
+        try {
+            const chat = await client.chat_app_chat.findUnique({
+                where: { id: chatId },
+                include: {
+                    users: {
+                        include: {
+                            user: {
+                                include: {
+                                    profile: true
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+            return chat
+        } catch (error) {
+            throw error
+        }
+    }
 }

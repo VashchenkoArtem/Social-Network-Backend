@@ -66,4 +66,13 @@ export const ChatController: IChatControllerContract = {
         await ChatService.leaveChat(userId)
         res.status(200).json("Left chat")
     },
+    findChatById: async (req, res) => {
+        const chatId = Number(req.params.chatId)
+        const chat = await ChatService.findChatById(chatId)
+        if (!chat) {
+            res.status(404).json("Chat not found")
+            return
+        }
+        res.status(200).json(chat)
+    }
 }

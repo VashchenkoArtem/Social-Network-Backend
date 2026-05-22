@@ -18,3 +18,4 @@ chatRouter.post(
 chatRouter.patch("/:id", authMiddleware, ChatController.updateChat)
 chatRouter.delete("/:id", authMiddleware, ChatController.deleteChat)
 chatRouter.delete("/leave", authMiddleware, ChatController.leaveChat) 
+chatRouter.get('/chat/:chatId', authMiddleware, ChatController.findChatById)

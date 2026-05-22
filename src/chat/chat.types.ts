@@ -56,6 +56,10 @@ export interface IChatControllerContract {
         req: Request<object, IChatWithUsers | string, { name: string; userIds: string | number[] }, object>,
         res: Response<IChatWithUsers | string>
     ) => Promise<void>;
+    findChatById: (
+        req: Request<{chatId: string}, IChatWithUsers | string, object, object>,
+        res: Response<IChatWithUsers | string>
+    ) => Promise<void>
 }
 
 export interface IChatServiceContract {
@@ -65,6 +69,7 @@ export interface IChatServiceContract {
     updateChat: (chatId: number, data: IUpdateChat) => Promise<IChatWithUsers>
     deleteChat: (chatId: number) => Promise<void>
     leaveChat: (userId: number) => Promise<void>
+    findChatById: (chatId: number) => Promise<IChatWithUsers | null>
 }
 
 export interface IChatRepositoryContract {
@@ -74,4 +79,5 @@ export interface IChatRepositoryContract {
     updateChat: (chatId: number, data: IUpdateChat) => Promise<IChatWithUsers>
     deleteChat: (chatId: number) => Promise<void>
     leaveChat: (userId: number) => Promise<void>
+    findChatById: (chatId: number) => Promise<IChatWithUsers | null>
 }

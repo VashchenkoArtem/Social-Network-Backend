@@ -23,4 +23,8 @@ export const ChatService: IChatServiceContract = {
     leaveChat: async (userId) => {
         await ChatRepository.leaveChat(userId)
     },
+
+    findChatById: async (chatId) => {
+        return await ChatRepository.findChatById(chatId)
+    }
 }
