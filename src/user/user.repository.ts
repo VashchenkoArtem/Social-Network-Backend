@@ -160,6 +160,18 @@ export const UserRepository: IUserRepositoryContract = {
         return await client.profile_app_profile.findUnique({
             where: { id: userId }
         });
-    }
+    },
+    findUserById: async (userId) => {
+        try {
+            const user = await client.user_app_user.findUnique({
+                where: { id: userId },
+                omit: { password: true },
+                include: { profile: true }
+            });
+            if (!user) return "User was not found";
+            return user;
+        } catch (error) {
+            throw new Error("Could not find user by id");
+        }
+    },
 };
-

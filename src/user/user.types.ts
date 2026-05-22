@@ -18,6 +18,9 @@ export type UpdateUser = {
 export type UserWithProfile = Prisma.user_app_userGetPayload<{
     include: {
         profile: true
+    },
+    omit: {
+        password: true
     }
 }>
 export type AuthenticatedUser = {
@@ -86,6 +89,15 @@ export interface IUserControllerContract {
         req: Request<object, UserWithoutPassword | string, UpdateUser, object>,
         res: Response<UserWithoutPassword | string>
     ) => void
+    getUserById: (
+        req: Request<{ id: string }, UserWithoutPassword | string>,
+        res: Response<UserWithoutPassword | string>
+    ) => Promise<void>;
+
+    findUserById: (
+        req: Request<{userId: string}, UserWithProfile | string, object>,
+        res: Response<UserWithProfile | string>
+    ) => void
 }
 export interface IUserServiceContract {
     registration: (data: RegistrationData) => Promise<AuthToken>;
@@ -98,6 +110,8 @@ export interface IUserServiceContract {
     updateSignature: (filename: string, userId: number) => Promise<UserWithoutPassword | string>
     findAlbumByName: (userId: number, name: string) => Promise<Album | null>;
     addPhotoToAlbum: (albumId: number, filename: string) => Promise<Photo>;
+    getUserById: (id: number) => Promise<UserWithoutPassword | string>;
+    findUserById: (userId: number) => Promise<UserWithProfile | string>
 }
 export interface IUserRepositoryContract {
     login: (data: CreateUser) => Promise<User | string>
@@ -109,4 +123,5 @@ export interface IUserRepositoryContract {
     addPhotoToAlbum: (albumId: number, filename: string) => Promise<Photo>;
     updateUserAvatar: (userId: number, filename: string | null) => Promise<Prisma.profile_app_profileGetPayload<{}>>;
     findProfileByUserId: (userId: number) => Promise<Prisma.profile_app_profileGetPayload<{}> | null>;
+    findUserById: (userId: number) => Promise<UserWithProfile | string>
 }

@@ -15,3 +15,6 @@ chatRouter.post(
     procImgMiddleware(300, 100), 
     ChatController.createGroupChat
 );
+chatRouter.patch("/:id", authMiddleware, ChatController.updateChat)
+chatRouter.delete("/:id", authMiddleware, ChatController.deleteChat)
+chatRouter.delete("/leave", authMiddleware, ChatController.leaveChat) 
