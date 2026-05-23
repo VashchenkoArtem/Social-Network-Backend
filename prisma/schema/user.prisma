@@ -11,6 +11,7 @@ model user_app_user {
   profileId Int? @unique
   chats chat_app_chat_users[]
   admin chat_app_chat[] @relation("ChatAdmin")
+  posts       post_app_post[]
   sentMessages chat_app_message[]
   readMessages chat_app_message[] @relation("MessageReaders")
 }
@@ -23,9 +24,7 @@ model profile_app_profile{
   pseudonym   String?
   is_image_signature  Boolean @default(false)
   is_text_signature Boolean @default(true)
-
   albums      profile_app_album[]
-  posts       post_app_post[]
   likes       post_app_postlike[]
   hearts      post_app_postheart[]
   views       post_app_postview[]

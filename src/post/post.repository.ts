@@ -18,7 +18,7 @@ export const postRepository: IPostRepositoryContract = {
                 include: {
                     author: {
                         include: {
-                            user: true
+                            profile: true
                         }
                     },
                     urls: true,
@@ -48,7 +48,7 @@ export const postRepository: IPostRepositoryContract = {
                 include: {
                     author: {
                         include:{
-                            user: true
+                            profile: true
                         }
                     },
                     urls: true,
@@ -67,9 +67,9 @@ export const postRepository: IPostRepositoryContract = {
     
     createPost: async (data, files) => {
         try {
-            console.log(data.urls)
             const photos = files?.map(file => ({
-                original_image: file.filename
+                original_image: file.filename,
+                compressed_image: file.filename
             })) ?? [];
 
             const tags = data.tags ?? [];
@@ -89,7 +89,7 @@ export const postRepository: IPostRepositoryContract = {
                     topic: data.topic,
                     content: data.content,
                     authorId: Number(data.authorId),
-
+                    
                     photos: {
                         create: photos
                     },
@@ -101,11 +101,9 @@ export const postRepository: IPostRepositoryContract = {
                             }
                         }))
                     },
-
-                    
                     urls: {
                     create: urls.map((href) => ({
-                        href: href
+                        url: href
                     }))
                     }
                 },
@@ -130,7 +128,8 @@ export const postRepository: IPostRepositoryContract = {
     ) => {
         try {
             const photos = files?.map(file => ({
-                original_image: file.filename
+                original_image: file.filename,
+                compressed_image: file.filename
             })) ?? [];
 
             const tags = data.tags ?? [];
@@ -186,7 +185,7 @@ export const postRepository: IPostRepositoryContract = {
             updateData.urls = {
                 deleteMany: {},
                 create: urls.map(href => ({
-                    href
+                    url: href
                 }))
             };
 
@@ -240,7 +239,7 @@ export const postRepository: IPostRepositoryContract = {
             include: {
                 author: {
                     include:{
-                        user: true
+                        profile: true
                     }
                 },
                 urls: true,

@@ -5,13 +5,13 @@ model post_app_post{
   content String
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
-  tags post_app_post_tags[]
   urls post_app_postlink[]
-  photos post_app_postimage[]
-  likes post_app_postlike[]
-  hearts post_app_postheart[]
   views post_app_postview[]
-  author profile_app_profile @relation(fields: [authorId], references: [id])
+  tags post_app_post_tags[]
+  hearts post_app_postheart[]
+  likes post_app_postlike[]
+  photos post_app_postimage[]
+  author user_app_user @relation(fields: [authorId], references: [id])
   authorId Int
 }
 
@@ -25,7 +25,7 @@ model post_app_post_tags{
 
 model post_app_postlink{
   id    Int @id @default(autoincrement())
-  href  String
+  url  String
   post  post_app_post @relation(fields: [postId], references: [id])
   postId Int
 }
@@ -38,6 +38,7 @@ model post_app_tag {
 model post_app_postimage{
   id          Int         @id @default(autoincrement())
   original_image String
+  compressed_image String
   post     post_app_post? @relation(fields: [postId], references: [id])
   postId   Int?
 }
