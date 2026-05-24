@@ -35,7 +35,7 @@ export const postsController: IPostControllerContract = {
 
         const dataWithId = {
             ...data,
-            authorId: userId,
+            author_id: userId,
         };
 
         const createPost = await PostService.createPost(
@@ -55,7 +55,7 @@ export const postsController: IPostControllerContract = {
 
             const files = req.files as Express.Multer.File[];
 
-            const response = await PostService.updatePost(postId, req.body, files);
+            const response = await PostService.updatePost(BigInt(postId), req.body, files);
 
             if (typeof response === "string") {
                 const status = response === "Post not found" ? 404 : 400;
@@ -78,7 +78,7 @@ export const postsController: IPostControllerContract = {
                 return;
             }
 
-            const response = await PostService.deletePost(postId);
+            const response = await PostService.deletePost(BigInt(postId));
 
             if (typeof response === "string") {
                 res.status(400).json(response);
@@ -91,8 +91,8 @@ export const postsController: IPostControllerContract = {
         }
     },
     getPostsByUserId: async (req, res) => {
-        const userId = req.params.userId
-        const foundedPosts = await PostService.getPostsByUserId(Number(userId))
+        const userId = Number(req.params.userId)
+        const foundedPosts = await PostService.getPostsByUserId(BigInt(userId))
         res.status(200).json(foundedPosts)
     }
 }

@@ -6,15 +6,15 @@ export const ChatRepository: IChatRepositoryContract = {
     getGroupChats: async (userId) => {
         return await client.chat_app_chat.findMany({
             where: {
-                users: { some: { userId: userId } },
+                chat_app_chat_users: { some: { user_id: userId } },
                 is_group: true
             },
             include: {
-                users: {
+                chat_app_chat_users: {
                     include: {
-                        user: {
+                        user_app_user: {
                             include: {
-                                profile: true
+                                profile_app_profile: true
                             }
                         }
                     }
@@ -26,15 +26,15 @@ export const ChatRepository: IChatRepositoryContract = {
     getPersonalChats: async (userId) => {
         return await client.chat_app_chat.findMany({
             where: {
-                users: { some: { userId: userId } },
+                chat_app_chat_users: { some: { user_id: userId } },
                 is_group: false
             },
             include: {
-                users: {
+                chat_app_chat_users: {
                     include: {
-                        user: {
+                        user_app_user: {
                             include: {
-                                profile: true
+                                profile_app_profile: true
                             }
                         }
                     }
@@ -56,17 +56,17 @@ export const ChatRepository: IChatRepositoryContract = {
                 name: data.name,
                 is_group: true,
                 avatar: filename || "default-group-avatar.png",
-                adminId: cleanAdminId,
-                users: {
-                    create: allUniqueUserIds.map((id) => ({ userId: id }))
+                admin_id: cleanAdminId,
+                chat_app_chat_users: {
+                    create: allUniqueUserIds.map((id) => ({ user_id: BigInt(id) }))
                 }
             },
             include: {
-                users: {
+                chat_app_chat_users: {
                     include: {
-                        user: {
+                        user_app_user: {
                             include: {
-                                profile: true
+                                profile_app_profile: true
             }}}}}})
     },
     updateChat: async (chatId, data) => {
@@ -75,11 +75,11 @@ export const ChatRepository: IChatRepositoryContract = {
                 where: { id: chatId },
                 data,
                 include: {
-                    users: {
+                    chat_app_chat_users: {
                         include: {
-                            user: {
+                            user_app_user: {
                                 include: {
-                                    profile: true
+                                    profile_app_profile: true
                                 }
                             }
                         }
@@ -106,7 +106,7 @@ export const ChatRepository: IChatRepositoryContract = {
     leaveChat: async (userId) => {
         try {
             await client.chat_app_chat_users.deleteMany({
-                where: { userId }
+                where: { user_id: userId }
             })
         } catch (error) {
             throw error
@@ -118,11 +118,11 @@ export const ChatRepository: IChatRepositoryContract = {
             const chat = await client.chat_app_chat.findUnique({
                 where: { id: chatId },
                 include: {
-                    users: {
+                    chat_app_chat_users: {
                         include: {
-                            user: {
+                            user_app_user: {
                                 include: {
-                                    profile: true
+                                    profile_app_profile: true
                                 }
                             }
                         }

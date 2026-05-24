@@ -4,11 +4,11 @@ import type { Request, Response } from "express";
 
 export type IChatWithUsers = Prisma.chat_app_chatGetPayload<{
     include: {
-        users: {
+        chat_app_chat_users: {
             include: {
-                user: {
+                user_app_user: {
                     include: {
-                        profile: true
+                        profile_app_profile: true
                     }
                 }
             }

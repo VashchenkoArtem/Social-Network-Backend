@@ -11,6 +11,9 @@ import { friendRouter } from "./friends/friends.router";
 import { chatRouter } from "./chat";
 import { messageRouter } from "./message";
 
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
 const getLocalIpAddress = (): string => {
     const interfaces = os.networkInterfaces();
     for (const name of Object.keys(interfaces)) {

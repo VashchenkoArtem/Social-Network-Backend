@@ -58,12 +58,22 @@ export const UserService: IUserServiceContract = {
             throw new Error("User already exists");
         }
         const dataWithoutCode = { ...data, code: undefined };
-        const createdUser = await UserRepository.createUser({ ...dataWithoutCode, password: hashedPassword });
+        const createdUser = await UserRepository.createUser({ 
+            ...dataWithoutCode, 
+            password: hashedPassword,
+            is_superuser: false,
+            is_active: true,
+            is_staff: false,
+            first_name: "",
+            last_name: "",
+            date_joined: new Date(Date.now())
+            
+        });
         if (typeof createdUser === "string") {
             throw new Error("User was not created");
         }
         const token = sign(
-            { id: createdUser.id },
+            { id: Number(createdUser.id.toString()) },
             ENV.JWT_SECRET,
             { expiresIn: '7d' }
         );
@@ -86,7 +96,7 @@ export const UserService: IUserServiceContract = {
         }
 
         const token = sign(
-            { id: user.id },
+            { id: Number(user.id.toString()) },
             ENV.JWT_SECRET,
             { expiresIn: '7d' }
         );
@@ -127,6 +137,16 @@ export const UserService: IUserServiceContract = {
         }
         return record;
     },
+    // findAlbumByName: function (userId: number, name: string): Promise<Album | null> {
+    //     throw new Error("Function not implemented.");
+    // },
+    // addPhotoToAlbum: function (albumId: number, filename: string): Promise<Photo> {
+    //     throw new Error("Function not implemented.");
+    // },
+    
+    getUserById: async (id) => {
+        return await UserRepository.findUserById(id);
+    },
     updatePassword: async (password, userId) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const userData = await UserRepository.updateUser({ password: hashedPassword }, userId);
@@ -135,16 +155,6 @@ export const UserService: IUserServiceContract = {
     updateSignature: async (filename, userId) => {
         const userData = await UserRepository.updateUser({ signature: filename }, userId);
         return userData;
-    },
-    findAlbumByName: function (userId: number, name: string): Promise<Album | null> {
-        throw new Error("Function not implemented.");
-    },
-    addPhotoToAlbum: function (albumId: number, filename: string): Promise<Photo> {
-        throw new Error("Function not implemented.");
-    },
-    
-    getUserById: async (id: number) => {
-        return await UserRepository.findUserById(id);
     },
     findUserById: async (userId) => {
         const foundedUser = await UserRepository.findUserById(userId)

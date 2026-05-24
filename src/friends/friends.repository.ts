@@ -5,23 +5,23 @@ import { client } from "../client/client";
 export const friendsRepository: IFriendsRepositoryContract = {
     getAllFriends: async (userId) => {
         try {
-            const friends = await client.user_app_friendrequest.findMany({
+            const friends = await client.user_app_friendship.findMany({
                 where: {
                     OR: [
-                        { senderId: userId},
-                        { receiverId: userId}
+                        { from_user_id: userId},
+                        { to_user_id: userId}
                     ],
                     status: "Accepted"
                 },
                 include: {
-                    from_profile: {
+                    user_app_user_user_app_friendship_from_user_idTouser_app_user: {
                         include: {
-                            profile: true
+                            profile_app_profile: true
                         }
                     },
-                    to_profile: {
+                    user_app_user_user_app_friendship_to_user_idTouser_app_user: {
                         include: {
-                            profile: true
+                            profile_app_profile: true
                         }
                     }
                 }
@@ -34,15 +34,15 @@ export const friendsRepository: IFriendsRepositoryContract = {
     
     getAllRequests: async (userId) => {
         try {
-            const requests = await client.user_app_friendrequest.findMany({
+            const requests = await client.user_app_friendship.findMany({
                 where: {
-                    receiverId: userId,
+                    to_user_id: userId,
                     status: "Pending"
                 },
                 include: {
-                    from_profile: {
+                    user_app_user_user_app_friendship_from_user_idTouser_app_user: {
                         include: {
-                            profile: true
+                            profile_app_profile: true
                         }
                     }
                 }
@@ -55,11 +55,12 @@ export const friendsRepository: IFriendsRepositoryContract = {
 
     createFriendRequest: async (senderId, receiverId) => {
         try {
-            const request = await client.user_app_friendrequest.create({
+            const request = await client.user_app_friendship.create({
                 data : {
-                    senderId: Number(senderId),
-                    receiverId: receiverId,
-                    status: "Pending"
+                    from_user_id: senderId,
+                    to_user_id: receiverId,
+                    status: "Pending",
+                    created_at: new Date(Date.now())
                 }
             })
             return request
@@ -71,7 +72,7 @@ export const friendsRepository: IFriendsRepositoryContract = {
     updateFriendRequestStatus: async (data) => {
         try {
             const { requestId, ...requestData} = data
-            const updatedRequest = await client.user_app_friendrequest.update({
+            const updatedRequest = await client.user_app_friendship.update({
                 where: {
                     id: requestId
                 },
@@ -86,7 +87,7 @@ export const friendsRepository: IFriendsRepositoryContract = {
     deleteFriendRequest: async (requestId) => {
         try {
             console.log(requestId)
-            const deletedRequest = await client.user_app_friendrequest.delete({
+            const deletedRequest = await client.user_app_friendship.delete({
                 where: {
                     id: requestId
                 }
@@ -101,20 +102,17 @@ export const friendsRepository: IFriendsRepositoryContract = {
             where: {
                 NOT: {
                     OR: [
-                        // я отправил запрос
                         {
-                            receivedFriendRequests: {
+                            user_app_friendship_user_app_friendship_to_user_idTouser_app_user: {
                                 some: {
-                                    senderId: userId
+                                    id: userId
                                 }
                             }
                         },
-
-                        // мне отправили запрос
                         {
-                            sentFriendRequests: {
+                            user_app_friendship_user_app_friendship_from_user_idTouser_app_user: {
                                 some: {
-                                    receiverId: userId
+                                    id: userId
                                 }
                             }
                         }
@@ -126,7 +124,7 @@ export const friendsRepository: IFriendsRepositoryContract = {
             },
 
             include: {
-                profile: true
+                profile_app_profile: true
             }
         })
 

@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { Request, Response } from "express";
 
 export type Album = Prisma.profile_app_albumGetPayload<{
-    include: { photos: true }
+    include: { profile_app_albumimage: true }
 }>
 
 export type CreateAlbumInput = Prisma.profile_app_albumUncheckedCreateInput

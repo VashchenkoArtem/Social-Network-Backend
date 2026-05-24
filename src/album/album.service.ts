@@ -22,9 +22,16 @@ export const AlbumService: IAlbumServiceContract = {
             files.map(async (file) => {
                 const imagePhoto = {
                     image: file.filename,
-                    userId,
                     is_shown: true,
+                    created_at: new Date(),
+
+                    profile_app_album: {
+                        connect: {
+                            id: BigInt(albumId)
+                        }
+                    }
                 };
+
                 return await AlbumRepository.addPhoto(imagePhoto, albumId);
             })
         );
@@ -33,8 +40,7 @@ export const AlbumService: IAlbumServiceContract = {
             const lastPhoto = photos[photos.length - 1];
             
             if (lastPhoto) {
-                await UserRepository.updateUserAvatar(userId, lastPhoto.image);
-                console.log(`✅ Профіль оновлено новим аватаром: ${lastPhoto.image}`);
+                await UserRepository.updateUserAvatar(BigInt(userId), lastPhoto.image);
             }
         }
 
@@ -75,8 +81,8 @@ export const AlbumService: IAlbumServiceContract = {
         if (typeof deletedAlbum === "string") {
             throw new BadRequestError("Помилка при видаленні альбому");
         }
-        if (deletedAlbum.photos && deletedAlbum.photos.length > 0) {
-            deletedAlbum.photos.forEach(photo => {
+        if (deletedAlbum.profile_app_albumimage && deletedAlbum.profile_app_albumimage.length > 0) {
+            deletedAlbum.profile_app_albumimage.forEach(photo => {
                 try {
                     const thumbPath = join(thumbDir, photo.image);
                     const originalPath = join(originalDir, photo.image);

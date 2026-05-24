@@ -36,7 +36,12 @@ export const userController: IUserControllerContract = {
             res.status(400).json(response)
             return
         }
-        res.status(200).json(response)
+        const { id, ...user } = response
+        console.log(user, id.toString())
+        res.status(200).json({
+            ...user,
+            id: id.toString()
+        });
     },
     updateUser: async (req, res) => {
         const userId = res.locals.userId
@@ -89,9 +94,15 @@ export const userController: IUserControllerContract = {
         res.status(200).json(response)
     },
     getUserById: async (req, res) => {
-        const id = Number(req.params.id);
+        let id = 0n
+        if (req.params.id){
+            id = BigInt(req.params.id);
+        }else{
+            id = BigInt(res.locals.userId)
+        }
         
-        if (isNaN(id)) {
+        console.log(id)
+        if (!id) {
             res.status(400).json("Invalid user id");
             return;
         }
@@ -106,7 +117,7 @@ export const userController: IUserControllerContract = {
         res.status(200).json(response);
     },
     findUserById: async (req, res) => {
-        const userId = Number(req.params.userId)
+        const userId = BigInt(req.params.userId)
         const foundedUser = await UserService.findUserById(userId)
         if (!foundedUser){
             return res.status(404).json("User not found")

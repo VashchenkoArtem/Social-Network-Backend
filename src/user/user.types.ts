@@ -3,6 +3,18 @@ import { Request, Response } from "express";
 import { Album, Photo } from "../album/album.types";
 
 export type User = Prisma.user_app_userGetPayload<{}>
+export type UserWithoutPasswordDTO = {
+    id: string;
+    last_login: Date | null;
+    is_superuser: boolean;
+    first_name: string;
+    last_name: string;
+    is_staff: boolean;
+    is_active: boolean;
+    date_joined: Date;
+    username: string | null;
+    email: string;
+}
 export type UserWithoutPassword = Omit<User, "password">
 export type CreateUser = Prisma.user_app_userUncheckedCreateInput
 export type UpdateUser = {
@@ -17,7 +29,7 @@ export type UpdateUser = {
 };
 export type UserWithProfile = Prisma.user_app_userGetPayload<{
     include: {
-        profile: true
+        profile_app_profile: true
     },
     omit: {
         password: true
@@ -70,8 +82,8 @@ export interface IUserControllerContract {
 		res: Response<{token: string} | string>,
 	) => Promise<void>
     me: (
-        req: Request<object, UserWithoutPassword | string, object, object, {userId: number}>, 
-        res: Response<UserWithoutPassword | string>
+        req: Request<object, UserWithoutPasswordDTO | string, object, object, {userId: number}>, 
+        res: Response<UserWithoutPasswordDTO | string>
     ) => Promise<void>
     updateUser: (
         req: Request<object, UserWithoutPassword | string, UpdateUser, object>,
@@ -104,24 +116,24 @@ export interface IUserServiceContract {
     sendCode: (data: RegistrationData) => Promise<Message>;
     login: (data: CreateUser) => Promise<{token: string} | string>;
     me: (id: number) => Promise<UserWithoutPassword | string>;
-    updateUser: (data: UpdateUser, userId: number, filename?: string) => Promise<UserWithoutPassword | string>;
+    updateUser: (data: UpdateUser, userId: bigint, filename?: string) => Promise<UserWithoutPassword | string>;
     getCode: (email: string) => Promise<VerificationCode | string>;
-    updatePassword: (password: string, userId: number) => Promise<UserWithoutPassword | string>
-    updateSignature: (filename: string, userId: number) => Promise<UserWithoutPassword | string>
-    findAlbumByName: (userId: number, name: string) => Promise<Album | null>;
-    addPhotoToAlbum: (albumId: number, filename: string) => Promise<Photo>;
-    getUserById: (id: number) => Promise<UserWithoutPassword | string>;
-    findUserById: (userId: number) => Promise<UserWithProfile | string>
+    updatePassword: (password: string, userId: bigint) => Promise<UserWithoutPassword | string>
+    updateSignature: (filename: string, userId: bigint) => Promise<UserWithoutPassword | string>
+    // findAlbumByName: (userId: bigint, name: string) => Promise<Album | null>;
+    // addPhotoToAlbum: (albumId: bigint, filename: string) => Promise<Photo>;
+    getUserById: (id: bigint) => Promise<UserWithoutPassword | string>;
+    findUserById: (userId: bigint) => Promise<UserWithProfile | string>
 }
 export interface IUserRepositoryContract {
     login: (data: CreateUser) => Promise<User | string>
     findUserByEmail: (email: string) => Promise<User | null>;
     createUser: (data: CreateUser) => Promise<UserWithoutPassword | string>;
     me: (id: number) => Promise<UserWithoutPassword | string>;
-    updateUser: (data: UpdateUser, userId: number, filename?: string) => Promise<UserWithoutPassword | string>;
-    findAlbumByName: (userId: number, name: string) => Promise<Album | null>;
-    addPhotoToAlbum: (albumId: number, filename: string) => Promise<Photo>;
-    updateUserAvatar: (userId: number, filename: string | null) => Promise<Prisma.profile_app_profileGetPayload<{}>>;
-    findProfileByUserId: (userId: number) => Promise<Prisma.profile_app_profileGetPayload<{}> | null>;
-    findUserById: (userId: number) => Promise<UserWithProfile | string>
+    updateUser: (data: UpdateUser, userId: bigint, filename?: string) => Promise<UserWithoutPassword | string>;
+    findAlbumByName: (userId: bigint, name: string) => Promise<Album | null>;
+    addPhotoToAlbum: (albumId: bigint, filename: string) => Promise<Photo>;
+    updateUserAvatar: (userId: bigint, filename: string | null) => Promise<Prisma.profile_app_profileGetPayload<{}>>;
+    findProfileByUserId: (userId: bigint) => Promise<Prisma.profile_app_profileGetPayload<{}> | null>;
+    findUserById: (userId: bigint) => Promise<UserWithProfile | string>
 }

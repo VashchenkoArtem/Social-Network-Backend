@@ -6,7 +6,7 @@ export const MessageRepository: IMessageRepositoryContract = {
         try {
             const messages = await client.chat_app_message.findMany({
                 where: {
-                    chatId: chatId
+                    chat_id: chatId
                 }
             })
             return messages

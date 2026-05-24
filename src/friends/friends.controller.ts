@@ -8,6 +8,7 @@ export const friendController: IFriendsControllerContract = {
             const friends = await friendsService.getAllFriends(userId);
             res.status(200).json(friends);
         } catch (error) {
+            console.log(error)
             res.status(500).json("Internal Server Error");
         }
     },
@@ -18,6 +19,7 @@ export const friendController: IFriendsControllerContract = {
             const requests = await friendsService.getAllRequests(userId);
             res.status(200).json(requests);
         } catch (error) {
+            console.log(error)
             res.status(500).json("Internal Server Error");
         }
     },

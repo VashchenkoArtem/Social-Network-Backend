@@ -1,13 +1,13 @@
 import { Prisma } from "@prisma/client"
 import type { Request, Response } from "express"
 
-export type FriendRequest = Prisma.user_app_friendrequestGetPayload<{}>
-export type UpdateFriendRequest = Prisma.user_app_friendrequestUncheckedUpdateInput
-export type CreateFriendRequest = Prisma.user_app_friendrequestUncheckedCreateInput
+export type FriendRequest = Prisma.user_app_friendshipGetPayload<{}>
+export type UpdateFriendRequest = Prisma.user_app_friendshipUncheckedUpdateInput
+export type CreateFriendRequest = Prisma.user_app_friendshipUncheckedCreateInput
 
 export type UserWithProfile = Prisma.user_app_userGetPayload<{
     include: {
-        profile: true
+        profile_app_profile: true
     }
 }>
     
