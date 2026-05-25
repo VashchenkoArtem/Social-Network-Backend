@@ -5,6 +5,9 @@ export const client = new PrismaClient().$extends({
     model: {
         post_app_post: {
             paginate
+        },
+        chat_app_message: {
+            paginate
         }
     }
 })

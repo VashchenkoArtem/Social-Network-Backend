@@ -1,5 +1,6 @@
-import type { Request, Response } from "express";
-import { IChatParticipant, IChatWithUsers, ICreateGroupChatDto, IUpdateChat } from "./chat.types";
+import type { NextFunction, Request, Response } from "express";
+import { CreateChat, IChat, IChatParticipant, IChatWithUsers, ICreateGroupChatDto, IUpdateChat, JoinChatCallback, JoinChatPayload, LeaveChatPayload } from "./chat.types";
+import { AuthenticatedSocket } from "../../socket/socket.types";
 
 export interface IChatControllerContract {
     getGroupChats: (
@@ -82,6 +83,20 @@ export interface IChatControllerContract {
             IChatWithUsers | string
         >
     ) => Promise<void>;
+
+
+
+
+    // getChats: (
+	// 	req: Request<object, IChatWithUsers[] | string, object, object, { userId: number }>,
+	// 	res: Response<IChatWithUsers[] | string>,
+	// 	next: NextFunction,
+	// ) => void;
+	// createChat: (
+	// 	req: Request<object, IChat | string, CreateChat, {participantId: string} , { userId: number}>,
+	// 	res: Response<IChat | string>,
+	// 	next: NextFunction
+	// ) => void
 }
 
 export interface IChatServiceContract {
@@ -120,6 +135,13 @@ export interface IChatServiceContract {
         chatId: number,
         userId: number
     ) => Promise<boolean>;
+
+
+
+
+    // getAllWithChatParticipantInfo: (
+    //     userId: number
+    // ) => Promise<IChatWithUsers[]>;
 }
 
 export interface IChatRepositoryContract {
@@ -157,4 +179,33 @@ export interface IChatRepositoryContract {
     getChatParticipants: (
         chatId: number
     ) => Promise<IChatParticipant | null>;
+
+
+
+
+    // getAllWithChatParticipantInfo: (
+    //     userId: number
+    // ) => Promise<IChatWithUsers[]>;
+	// getChatByParticipants: (
+	// 	userId: number,
+	// 	userIdSecond: number,
+	// ) => Promise<IChat | null>;
+}
+
+
+
+
+export interface ChatClientEvents {
+	joinChat: (data: JoinChatPayload, ack?: JoinChatCallback) => void;
+	leaveChat: (data: LeaveChatPayload) => void;
+}
+
+export interface ChatSocketControllerContract {
+    registerHandlers: (socket: AuthenticatedSocket) => void
+    joinChat: (
+        socket: AuthenticatedSocket,
+        data: JoinChatPayload,
+        ack?: JoinChatCallback,
+    ) => void;
+    leaveChat: (socket: AuthenticatedSocket, data: LeaveChatPayload) => void;
 }

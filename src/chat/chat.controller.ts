@@ -75,4 +75,5 @@ export const ChatController: IChatControllerContract = {
         }
         res.status(200).json(chat)
     }
+
 }

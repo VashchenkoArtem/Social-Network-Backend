@@ -11,6 +11,8 @@ import { chatRouter } from "./chat";
 import { messageRouter } from "./message";
 import { startTunnel } from "./config/db.tunnel";
 import { getLocalIpAddress } from "./config/ip";
+import { createServer } from "http";
+import { SocketManager } from "./socket/socket.manager";
 
 (BigInt.prototype as any).toJSON = function () {
     return this.toString();
@@ -21,8 +23,10 @@ import { getLocalIpAddress } from "./config/ip";
 const HOST = getLocalIpAddress();
 const PORT = 8000;
 
-
 const app: Express = express();
+export const httpServer = createServer(app)
+
+SocketManager.initSocketServer(httpServer) 
 
 app.use(cors());
 app.use("/media/", express.static(uploadDir));
@@ -40,7 +44,7 @@ app.use(messageRouter);
 async function bootstrap(){
     try {
         await startTunnel();
-        app.listen(PORT, HOST, () => {
+        httpServer.listen(PORT, HOST, () => {
             console.log(`Сервер запущено`);
             console.log(`http://${HOST}:${PORT}`);
         });

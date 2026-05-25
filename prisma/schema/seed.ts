@@ -1,17 +1,15 @@
 import { client } from "../../src/client/client";
+import { startTunnel } from "../../src/config/db.tunnel";
 
 async function main() {
-    await client.post_app_post.delete({
+    await startTunnel();
+    await client.profile_app_profile.update({
         where: {
-            id: BigInt(2)
+            user_id: 3
+        },
+        data: {
+            pseudonym: "Artem"
         }
-        // data: {
-        //     title: "New post",
-        //     content: "Some content for post",
-        //     topic: "Nature",
-        //     author_id: 2,
-        //     created_at: new Date(Date.now())
-        // }
     });
 }
 

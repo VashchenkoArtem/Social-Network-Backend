@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 
+
 export type IChatWithUsers = Prisma.chat_app_chatGetPayload<{
     include: {
         chat_app_chat_users: {
@@ -13,7 +14,7 @@ export type IChatWithUsers = Prisma.chat_app_chatGetPayload<{
         }
     }
 }>;
-
+export type IChat = Prisma.chat_app_chatGetPayload<{}>
 export type IChatParticipant = Prisma.chat_app_chatGetPayload<{
     include: {
         chat_app_chat_users: true
@@ -34,4 +35,16 @@ export type ICreateChat = {
 export type IUpdateChat = {
     name?: string;
 };
+export interface JoinChatPayload {
+    chat_id: number
+}
 
+export interface LeaveChatPayload {
+    chat_id: number
+}
+
+export type JoinChatCallback = (
+    response: { status: "ok" } | { status: "error"; message?: string}
+) => void
+
+export type CreateChat = Prisma.chat_app_chatUncheckedCreateInput
