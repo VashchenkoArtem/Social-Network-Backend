@@ -1,5 +1,6 @@
+import { NotFoundError } from "../errors";
 import { ChatRepository } from "./chat.repository";
-import { IChatServiceContract } from "./chat.types";
+import { IChatServiceContract } from "./types/chat.contracts";
 
 export const ChatService: IChatServiceContract = {
     getGroupChats: async (userId) => {
@@ -26,5 +27,16 @@ export const ChatService: IChatServiceContract = {
 
     findChatById: async (chatId) => {
         return await ChatRepository.findChatById(chatId)
-    }
+    },
+    isUserChatParticipant: async (chatId, userId) => {
+		const chat = await ChatRepository.getChatParticipants(chatId);
+		if (!chat) {
+			throw new NotFoundError("Chat");
+		}
+		const isUserInChat = chat.chat_app_chat_users.some((participant) => {
+			return participant.user_id === BigInt(userId);
+		});
+
+		return isUserInChat;
+	},
 }

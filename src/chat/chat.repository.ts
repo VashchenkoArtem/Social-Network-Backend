@@ -1,6 +1,5 @@
 import { client } from "../client/client";
-import { IChatRepositoryContract } from "./chat.types";
-
+import { IChatRepositoryContract } from "./types/chat.contracts";
 
 export const ChatRepository: IChatRepositoryContract = {
     getGroupChats: async (userId) => {
@@ -133,5 +132,16 @@ export const ChatRepository: IChatRepositoryContract = {
         } catch (error) {
             throw error
         }
-    }
+    },
+    getChatParticipants: async (chatId) => {
+		const participants = await client.chat_app_chat.findUnique({
+			where: {
+				id: chatId,
+			},
+			include: {
+				chat_app_chat_users: true,
+			},
+		});
+		return participants;
+	},
 }

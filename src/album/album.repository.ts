@@ -1,7 +1,7 @@
 import { client } from "../client/client";
-import { IAlbumRepositoryContract } from "./album.types";
 import { Prisma } from "@prisma/client";
 import { NotFoundError, AppError } from "../errors";
+import { IAlbumRepositoryContract } from "./types/album.contracts";
 
 export const AlbumRepository: IAlbumRepositoryContract = {
 

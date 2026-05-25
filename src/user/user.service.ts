@@ -4,7 +4,7 @@ import nodemailer from "nodemailer";
 import { IUserServiceContract, AuthToken, CreateUser, VerifyPayload } from "./user.types";
 import { cleanEnv, str } from "envalid";
 import { UserRepository } from "./user.repository";
-import { Album, Photo } from "../album/album.types";
+import { Album, Photo } from "../album/types/album.types";
 
 
 

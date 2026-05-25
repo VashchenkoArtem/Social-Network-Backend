@@ -1,7 +1,6 @@
-import { Request, Response } from "express";
 import { AlbumService } from "./album.service";
-import { ErrorResponse, IAlbumControllerContract } from "./album.types";
 import { AppError, AuthenticationError } from "../errors";
+import { IAlbumControllerContract } from "./types/album.contracts";
 
 export const albumController: IAlbumControllerContract = {
     createAlbum: async (req, res) => {

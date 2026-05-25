@@ -1,12 +1,11 @@
-import { client } from "../client/client";
-import { Multer } from "multer";
-import { IAlbumServiceContract } from "./album.types";
+
 import { AlbumRepository } from "./album.repository";
-import { ValidationError, AppError, BadRequestError, NotFoundError } from "../errors";
+import { BadRequestError, NotFoundError } from "../errors";
 import fs from "fs";
-import path, { join } from "path";
+import { join } from "path";
 import { thumbDir, originalDir } from "../config/path";
 import { UserRepository } from "../user/user.repository";
+import { IAlbumServiceContract } from "./types/album.contracts";
 
 
 export const AlbumService: IAlbumServiceContract = {

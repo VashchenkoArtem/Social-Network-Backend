@@ -1,7 +1,7 @@
 import { compare } from "bcrypt";
 import { client } from "../client/client";
 import { IUserRepositoryContract } from "./user.types";
-import { Album, Photo } from "../album/album.types";
+import { Album, Photo } from "../album/types/album.types";
 
 
 export const UserRepository: IUserRepositoryContract = {

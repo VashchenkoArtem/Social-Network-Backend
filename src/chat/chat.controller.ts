@@ -1,5 +1,5 @@
 import { ChatService } from "./chat.service";
-import { IChatControllerContract } from "./chat.types";
+import { IChatControllerContract } from "./types/chat.contracts";
 
 export const ChatController: IChatControllerContract = {
     getGroupChats: async (req, res) => {

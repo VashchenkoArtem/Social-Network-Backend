@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { Request, Response } from "express";
-import { Album, Photo } from "../album/album.types";
+import { Album, Photo } from "../album/types/album.types";
 
 export type User = Prisma.user_app_userGetPayload<{}>
 export type UserWithoutPasswordDTO = {
