@@ -7,3 +7,4 @@ src/prisma/schema/databases
 media/
 package-lock.json
 prisma/database.db
+src/config/db.tunnel.ts
