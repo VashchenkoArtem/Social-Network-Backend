@@ -97,37 +97,41 @@ export const friendsRepository: IFriendsRepositoryContract = {
             throw error
         }
     },
-    recommendedPeople: async (userId) =>{
+    recommendedPeople: async (userId) => {
+        const friendships = await client.user_app_friendship.findMany({
+            where: {
+                OR: [
+                    { from_user_id: BigInt(userId) },
+                    { to_user_id: BigInt(userId) },
+                ],
+            },
+            select: {
+                from_user_id: true,
+                to_user_id: true,
+            },
+        });
+
+        const excludedUserIds = new Set<number>();
+
+        friendships.forEach(f => {
+            const from = Number(f.from_user_id);
+            const to = Number(f.to_user_id);
+
+            if (from === userId) excludedUserIds.add(to);
+            else excludedUserIds.add(from);
+        });
+
         const users = await client.user_app_user.findMany({
             where: {
-                NOT: {
-                    OR: [
-                        {
-                            user_app_friendship_user_app_friendship_to_user_idTouser_app_user: {
-                                some: {
-                                    id: userId
-                                }
-                            }
-                        },
-                        {
-                            user_app_friendship_user_app_friendship_from_user_idTouser_app_user: {
-                                some: {
-                                    id: userId
-                                }
-                            }
-                        }
-                    ]
-                },
                 id: {
-                    not: userId
-                }
+                    notIn: [userId, ...Array.from(excludedUserIds)],
+                },
             },
-
             include: {
-                profile_app_profile: true
-            }
-        })
-
-        return users
+                profile_app_profile: true,
+            },
+        });
+        console.log(users)
+        return users;
     }
 }

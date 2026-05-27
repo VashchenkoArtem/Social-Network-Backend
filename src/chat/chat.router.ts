@@ -9,11 +9,11 @@ export const chatRouter = Router()
 chatRouter.get("/personal-chats", authMiddleware, ChatController.getPersonalChats)
 chatRouter.get("/group-chats", authMiddleware, ChatController.getGroupChats)
 chatRouter.post(
-    "/group-chats", 
+    "/chats", 
     authMiddleware, 
     uploadMiddleware.array("avatar", 1), 
     procImgMiddleware(300, 100), 
-    ChatController.createGroupChat
+    ChatController.createChat
 );
 chatRouter.patch("/:id", authMiddleware, ChatController.updateChat)
 chatRouter.delete("/:id", authMiddleware, ChatController.deleteChat)

@@ -9,8 +9,8 @@ export const ChatService: IChatServiceContract = {
     getPersonalChats: async (userId) => {
         return await ChatRepository.getPersonalChats(userId);
     },
-    createGroupChat: async (adminId, data, filename) => {
-        return await ChatRepository.createGroupChat(adminId, data, filename);
+    createChat: async (adminId, data, filename) => {
+        return await ChatRepository.createChat(adminId, data, filename);
     },
 
     updateChat: async (chatId, data) => {
@@ -39,4 +39,7 @@ export const ChatService: IChatServiceContract = {
 
 		return isUserInChat;
 	},
+    getChatByParticipants: async (userId, participantId) => {
+        return await ChatRepository.getChatByParticipants(userId, participantId)
+    },
 }

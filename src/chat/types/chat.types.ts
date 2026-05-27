@@ -24,13 +24,9 @@ export type IChatParticipant = Prisma.chat_app_chatGetPayload<{
 export interface ICreateGroupChatDto {
     name: string;
     userIds: number[];
-}
+    isGroup?: boolean
 
-export type ICreateChat = {
-    name?: string;
-    is_group: boolean;
-    userIds: number[];
-};
+}
 
 export type IUpdateChat = {
     name?: string;

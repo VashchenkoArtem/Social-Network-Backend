@@ -58,14 +58,11 @@ export interface IChatControllerContract {
         >
     ) => Promise<void>;
 
-    createGroupChat: (
+    createChat: (
         req: Request<
             object,
             IChatWithUsers | string,
-            {
-                name: string;
-                userIds: string | number[];
-            }
+            ICreateGroupChatDto
         >,
         res: Response<
             IChatWithUsers | string
@@ -108,7 +105,7 @@ export interface IChatServiceContract {
         userId: number
     ) => Promise<IChatWithUsers[]>;
 
-    createGroupChat: (
+    createChat: (
         adminId: number,
         data: ICreateGroupChatDto,
         filename: string | null
@@ -135,6 +132,10 @@ export interface IChatServiceContract {
         chatId: number,
         userId: number
     ) => Promise<boolean>;
+    getChatByParticipants: (
+        userId: number,
+        participantId: number,
+    ) => Promise<IChatWithUsers | null>;
 
 
 
@@ -153,7 +154,7 @@ export interface IChatRepositoryContract {
         userId: number
     ) => Promise<IChatWithUsers[]>;
 
-    createGroupChat: (
+    createChat: (
         adminId: number,
         data: ICreateGroupChatDto,
         filename: string | null
@@ -180,16 +181,10 @@ export interface IChatRepositoryContract {
         chatId: number
     ) => Promise<IChatParticipant | null>;
 
-
-
-
-    // getAllWithChatParticipantInfo: (
-    //     userId: number
-    // ) => Promise<IChatWithUsers[]>;
-	// getChatByParticipants: (
-	// 	userId: number,
-	// 	userIdSecond: number,
-	// ) => Promise<IChat | null>;
+    getChatByParticipants: (
+        userId: number,
+        participantId: number,
+    ) => Promise<IChatWithUsers | null>;
 }
 
 

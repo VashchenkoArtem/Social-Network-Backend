@@ -67,6 +67,9 @@ export const UserRepository: IUserRepositoryContract = {
             const user = await client.user_app_user.findUnique({
                 where: { id: BigInt(id) },
                 omit: { password: true },
+                include: {
+                    profile_app_profile: true
+                }
             })
             if (!user) {
                 return "User was not found"

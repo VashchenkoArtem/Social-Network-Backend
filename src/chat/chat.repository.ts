@@ -42,7 +42,7 @@ export const ChatRepository: IChatRepositoryContract = {
         });
     },
 
-    createGroupChat: async (adminId, data, filename) => {
+    createChat: async (adminId, data, filename) => {
         const cleanAdminId = Number(adminId);
         const cleanUserIds = data.userIds.map(id => Number(id));
 
@@ -53,7 +53,7 @@ export const ChatRepository: IChatRepositoryContract = {
         return await client.chat_app_chat.create({
             data: {
                 name: data.name,
-                is_group: true,
+                is_group: data.isGroup || false,
                 avatar: filename || "default-group-avatar.png",
                 admin_id: cleanAdminId,
                 chat_app_chat_users: {
@@ -144,4 +144,39 @@ export const ChatRepository: IChatRepositoryContract = {
 		});
 		return participants;
 	},
+    getChatByParticipants: async (userId, participantId) => {
+        const chat = await client.chat_app_chat.findFirst({
+            where: {
+                is_group: false,
+                AND: [
+                    {
+                        chat_app_chat_users: {
+                            some: {
+                                user_id: BigInt(userId),
+                            },
+                        },
+                    },
+                    {
+                        chat_app_chat_users: {
+                            some: {
+                                user_id: BigInt(participantId),
+                            },
+                        },
+                    },
+                ],
+            },
+            include: {
+                chat_app_chat_users: {
+                    include: {
+                        user_app_user: {
+                            include: {
+                                profile_app_profile: true,
+                            },
+                        },
+                    },
+                },
+            },
+    })
+    return chat
+    },
 }

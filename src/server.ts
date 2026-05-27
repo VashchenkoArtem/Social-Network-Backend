@@ -15,7 +15,7 @@ import { createServer } from "http";
 import { SocketManager } from "./socket/socket.manager";
 
 (BigInt.prototype as any).toJSON = function () {
-    return this.toString();
+    return Number(this.toString());
 };
 
 

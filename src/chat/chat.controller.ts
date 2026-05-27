@@ -22,31 +22,53 @@ export const ChatController: IChatControllerContract = {
         }
     },
 
-    createGroupChat: async (req, res) => {
+    createChat: async (req, res) => {
         try {
             const adminId = Number(res.locals.userId);
-            const { name, userIds } = req.body;
+            const { name, userIds, isGroup } = req.body;
 
             let parsedUserIds: number[] = [];
+
             if (typeof userIds === "string") {
                 const rawArray = JSON.parse(userIds);
-                parsedUserIds = Array.isArray(rawArray) ? rawArray.map(Number) : [];
+
+                parsedUserIds = Array.isArray(rawArray)
+                    ? rawArray.map(Number)
+                    : [];
             } else if (Array.isArray(userIds)) {
                 parsedUserIds = userIds.map(Number);
+            }
+            if (!isGroup && parsedUserIds.length === 1) {
+                const participantId = parsedUserIds[0]!;
+
+                const existingChat =
+                    await ChatService.getChatByParticipants(
+                        adminId,
+                        participantId
+                    );
+
+                if (existingChat) {
+                    res.status(200).json(existingChat);
+                    return
+                }
             }
 
             const files = req.files as Express.Multer.File[];
             const filename = files?.[0]?.filename || null;
 
-            const newChat = await ChatService.createGroupChat(
-                adminId, 
-                { name, userIds: parsedUserIds },
+            const newChat = await ChatService.createChat(
+                adminId,
+                {
+                    name,
+                    userIds: parsedUserIds,
+                    isGroup: isGroup || false,
+                },
                 filename
             );
 
             res.status(200).json(newChat);
         } catch (error) {
-            console.log(error)
+            console.log(error);
             res.status(500).json("Internal Server Error");
         }
     },
