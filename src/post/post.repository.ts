@@ -3,7 +3,7 @@ import {
     Post, 
     UpdatePostDto, 
     CreatePost 
-} from "./post.types";
+} from "./types/post.types";
 import { Prisma } from "@prisma/client";
 import { client } from "../client/client";
 

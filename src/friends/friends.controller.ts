@@ -1,5 +1,5 @@
 import { friendsService } from "./friends.service";
-import { IFriendsControllerContract } from "./friends.types";
+import { IFriendsControllerContract } from "./types/friends.types";
 
 export const friendController: IFriendsControllerContract = {
     getAllFriends: async (req, res) => {

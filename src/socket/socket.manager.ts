@@ -1,7 +1,7 @@
 import { ChatSocketController } from "../chat/chat.socket.controller";
 import { MessageSocketController } from "../message/message.socket.controller";
 import { authSocketMiddleware } from "../middlewares/auth-socket.middleware";
-import { AuthenticatedSocket, ServerSocket, SocketManagerContract } from "./socket.types";
+import { AuthenticatedSocket, ServerSocket, SocketManagerContract } from "./types/socket.types";
 import { Server as SocketServer } from "socket.io"
 
 export const SocketManager: SocketManagerContract = {

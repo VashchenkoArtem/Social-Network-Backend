@@ -1,4 +1,4 @@
-import { ITagControllerContract } from "./tag.types";
+import { ITagControllerContract } from "./types/tag.types";
 import { TagService } from "./tag.service";
 
 export const tagController: ITagControllerContract = {
