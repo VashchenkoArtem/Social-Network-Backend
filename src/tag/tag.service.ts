@@ -1,4 +1,4 @@
-import { ITagServiceContract } from "./tag.types";
+import { ITagServiceContract } from "./types/tag.types";
 import { TagRepository } from "./tag.repository";
 
 export const TagService: ITagServiceContract = {

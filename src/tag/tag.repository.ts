@@ -1,5 +1,5 @@
 import { client } from "../client/client";
-import { ITagRepositoryContract } from "./tag.types";
+import { ITagRepositoryContract } from "./types/tag.types";
 
 export const TagRepository: ITagRepositoryContract = {
     findAll: async () => {

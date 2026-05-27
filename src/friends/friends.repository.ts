@@ -1,4 +1,4 @@
-import { IFriendsRepositoryContract } from './friends.types'
+import { IFriendsRepositoryContract } from './types/friends.types'
 import { Prisma } from "@prisma/client";
 import { client } from "../client/client";
 

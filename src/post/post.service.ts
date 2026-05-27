@@ -1,5 +1,5 @@
 import { postRepository } from "./post.repository";
-import { IPostServiceContract, Post, UpdatePostDto } from "./post.types";
+import { IPostServiceContract, Post, UpdatePostDto } from "./types/post.types";
 
 export const PostService: IPostServiceContract = {
     getAllPosts: async (take) => {

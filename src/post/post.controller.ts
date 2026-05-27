@@ -6,7 +6,7 @@ import {
     Post, 
     UpdatePostDto, 
     PostParams, 
-    CreatePost } from "./post.types";
+    CreatePost } from "./types/post.types";
 
 export const postsController: IPostControllerContract = {
     getAllPosts: async (req, res) => {

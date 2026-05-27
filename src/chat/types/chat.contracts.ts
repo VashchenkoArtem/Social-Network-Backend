@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { CreateChat, IChat, IChatParticipant, IChatWithUsers, ICreateGroupChatDto, IUpdateChat, JoinChatCallback, JoinChatPayload, LeaveChatPayload } from "./chat.types";
-import { AuthenticatedSocket } from "../../socket/socket.types";
+import { AuthenticatedSocket } from "../../Socket/types/socket.types";
 
 export interface IChatControllerContract {
     getGroupChats: (

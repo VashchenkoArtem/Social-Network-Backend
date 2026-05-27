@@ -1,5 +1,5 @@
 import { friendsRepository } from "./friends.repository";
-import { IFriendsServiceContract } from "./friends.types";
+import { IFriendsServiceContract } from "./types/friends.types";
 
 export const friendsService : IFriendsServiceContract = {
     getAllFriends: async(userId) => {
