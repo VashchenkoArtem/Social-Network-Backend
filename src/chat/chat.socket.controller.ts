@@ -16,15 +16,16 @@ export const ChatSocketController: ChatSocketControllerContract = {
 	},
 	async joinChat(socket, data, ack) {
 		try {
+			console.log(data)
 			const isSocketParticipant = await ChatService.isUserChatParticipant(
-				data.chat_id,
+				data.chatId,
 				socket.data.userId,
 			);
 			console.log("checking over")
 			if (isSocketParticipant) {
 				console.log("user is participant")
 
-				await socket.join(`chat-${data.chat_id}`);
+				await socket.join(`chat-${data.chatId}`);
 
 				console.log("joined room")
 
@@ -57,6 +58,6 @@ export const ChatSocketController: ChatSocketControllerContract = {
 	},
     leaveChat(socket, data){
 		console.log("leave from chat")
-        socket.leave(`chat-${data.chat_id}`)
+        socket.leave(`chat-${data.chatId}`)
     }
 };

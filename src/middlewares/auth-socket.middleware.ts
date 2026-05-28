@@ -11,9 +11,8 @@ export function authSocketMiddleware(
         next(new AuthenticationError("Token is missing in headers."))
         return;
     }
-
+    console.log(authorizationHeaders)
     const [typeToken, token] = authorizationHeaders.split(" ")
-    console.log(typeToken, token)
     if (typeToken !== 'Bearer' || !token) {
         next(new AuthenticationError("Authorization header is missing or invalid"))
         return;

@@ -4,4 +4,4 @@ import { MessageController } from "./message.controller";
 
 export const messageRouter = Router()
 
-messageRouter.get('/messages', authMiddleware, MessageController.getMessages)
+messageRouter.get('/messages/:chatId', authMiddleware, MessageController.getMessages)

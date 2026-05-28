@@ -82,7 +82,6 @@ export const postRepository: IPostRepositoryContract = {
             const urls = Array.isArray(links) ?
                 links.map(String) :
                 [String(links)]
-            console.log(data)
             const newPost = await client.post_app_post.create({
                 data: {
                     title: data.title,

@@ -7,6 +7,24 @@ export const MessageRepository: IMessageRepositoryContract = {
             const messages = await client.chat_app_message.findMany({
                 where: {
                     chat_id: chatId
+                },
+                orderBy: {
+                    created_at: 'desc'
+                }
+                ,
+                include: {
+                    user_app_user: {
+                        select: {
+                            id: true,
+                            username: true,
+                            profile_app_profile: {
+                                select: {
+                                    id: true,
+                                    avatar: true
+                                }
+                            }
+                        }
+                    }
                 }
             })
             return messages

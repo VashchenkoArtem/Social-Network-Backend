@@ -4,12 +4,14 @@ import { IMessageSocketControllerContract } from "./message.types";
 export const MessageSocketController: IMessageSocketControllerContract = {
     registerHandlers (socketServer, socket) {
         socket.on("sendMessage", (data) => {
+            console.log(data,' dndsad')
             this.sendMessage(socketServer, socket, data)
         })
     },
 
     async sendMessage(socketServer, socket, data) {
         try {
+            console.log(socketServer.sockets.adapter.rooms)
             const newMessage = await MessageService.createMessage({
                 ...data,
                 created_at: new Date(Date.now()),

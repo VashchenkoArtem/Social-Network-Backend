@@ -32,11 +32,11 @@ export type IUpdateChat = {
     name?: string;
 };
 export interface JoinChatPayload {
-    chat_id: number
+    chatId: number
 }
 
 export interface LeaveChatPayload {
-    chat_id: number
+    chatId: number
 }
 
 export type JoinChatCallback = (

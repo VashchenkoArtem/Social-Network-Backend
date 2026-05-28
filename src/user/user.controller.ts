@@ -37,7 +37,6 @@ export const userController: IUserControllerContract = {
             return
         }
         const { id, ...user } = response
-        console.log(user, id.toString())
         res.status(200).json({
             ...user,
             id: id.toString()
@@ -46,7 +45,6 @@ export const userController: IUserControllerContract = {
     updateUser: async (req, res) => {
         const userId = res.locals.userId
         const updatedData = req.body
-        console.log(updatedData)
         const files = req.files as Express.Multer.File[];
         const filename = files?.[0]?.filename;
         const response = await UserService.updateUser(updatedData, userId, filename)

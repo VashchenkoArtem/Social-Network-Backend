@@ -131,7 +131,6 @@ export const friendsRepository: IFriendsRepositoryContract = {
                 profile_app_profile: true,
             },
         });
-        console.log(users)
         return users;
     }
 }
