@@ -4,10 +4,17 @@ import { Prisma } from "@prisma/client";
 export type IChatWithUsers = Prisma.chat_app_chatGetPayload<{
     include: {
         chat_app_chat_users: {
-            include: {
+            select: {
                 user_app_user: {
-                    include: {
-                        profile_app_profile: true
+                    select: {
+                        id: true,
+                        username: true
+                        profile_app_profile: {
+                            select: {
+                                id: true,
+                                avatar: true
+                            }
+                        }
                     }
                 }
             }

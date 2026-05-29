@@ -8,27 +8,47 @@ export const friendsRepository: IFriendsRepositoryContract = {
             const friends = await client.user_app_friendship.findMany({
                 where: {
                     OR: [
-                        { from_user_id: userId},
-                        { to_user_id: userId}
+                        { from_user_id: userId },
+                        { to_user_id: userId }
                     ],
                     status: "Accepted"
                 },
-                include: {
+
+                select: {
+                    id: true,
+
                     user_app_user_user_app_friendship_from_user_idTouser_app_user: {
                         include: {
                             profile_app_profile: true
                         }
                     },
+
                     user_app_user_user_app_friendship_to_user_idTouser_app_user: {
                         include: {
                             profile_app_profile: true
                         }
                     }
                 }
-            })
-            return friends
+            });
+
+            return friends.map((friendship) => {
+                const isCurrentUserSender =
+                    friendship
+                        .user_app_user_user_app_friendship_from_user_idTouser_app_user
+                        .id === BigInt(userId);
+
+                const user = isCurrentUserSender
+                    ? friendship.user_app_user_user_app_friendship_to_user_idTouser_app_user
+                    : friendship.user_app_user_user_app_friendship_from_user_idTouser_app_user;
+
+                return {
+                    id: Number(friendship.id.toString()),
+                    user
+                };
+            });
+
         } catch (error) {
-            throw error
+            throw error;
         }
     },
     
@@ -39,17 +59,38 @@ export const friendsRepository: IFriendsRepositoryContract = {
                     to_user_id: userId,
                     status: "Pending"
                 },
+
                 include: {
                     user_app_user_user_app_friendship_from_user_idTouser_app_user: {
                         include: {
                             profile_app_profile: true
                         }
+                    },
+
+                    user_app_user_user_app_friendship_to_user_idTouser_app_user: {
+                        include: {
+                            profile_app_profile: true
+                        }
                     }
                 }
-            })
-            return requests
+            });
+
+            return requests.map((request) => {
+                const isCurrentUserSender =
+                    request.from_user_id === BigInt(userId);
+
+                const user = isCurrentUserSender
+                    ? request.user_app_user_user_app_friendship_to_user_idTouser_app_user
+                    : request.user_app_user_user_app_friendship_from_user_idTouser_app_user;
+
+                return {
+                    id: Number(request.id.toString()),
+                    user
+                };
+            });
+
         } catch (error) {
-            throw error
+            throw error;
         }
     },
 
@@ -78,6 +119,7 @@ export const friendsRepository: IFriendsRepositoryContract = {
                 },
                 data: requestData
             })
+            console.log(updatedRequest)
             return updatedRequest
         } catch (error) {
             throw error

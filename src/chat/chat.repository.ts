@@ -5,15 +5,36 @@ export const ChatRepository: IChatRepositoryContract = {
     getGroupChats: async (userId) => {
         return await client.chat_app_chat.findMany({
             where: {
-                chat_app_chat_users: { some: { user_id: userId } },
+                chat_app_chat_users: {
+                    some: {
+                        user_id: userId
+                    }
+                },
                 is_group: true
             },
             include: {
                 chat_app_chat_users: {
-                    include: {
+                    where: {
+                        NOT: {
+                            user_id: userId
+                        }
+                    },
+                    select: {
+                        id: true,
+                        chat_id: true,
+                        user_id: true,
                         user_app_user: {
-                            include: {
-                                profile_app_profile: true
+                            select: {
+                                id: true,
+                                username: true,
+                                profile_app_profile: {
+                                    select: {
+                                        id: true,
+                                        avatar: true,
+                                        pseudonym: true
+                                    }
+                                    
+                                }
                             }
                         }
                     }
@@ -25,17 +46,54 @@ export const ChatRepository: IChatRepositoryContract = {
     getPersonalChats: async (userId) => {
         return await client.chat_app_chat.findMany({
             where: {
-                chat_app_chat_users: { some: { user_id: userId } },
+                chat_app_chat_users: {
+                    some: {
+                        user_id: userId
+                    }
+                },
                 is_group: false
             },
+
             include: {
                 chat_app_chat_users: {
-                    include: {
+                    where: {
+                        NOT: {
+                            user_id: userId
+                        }
+                    },
+                    select: {
+                        id: true,
+                        chat_id: true,
+                        user_id: true,
+
                         user_app_user: {
-                            include: {
-                                profile_app_profile: true
+                            select: {
+                                id: true,
+                                username: true,
+
+                                profile_app_profile: {
+                                    select: {
+                                        id: true,
+                                        avatar: true
+                                    }
+                                }
                             }
                         }
+                    }
+                },
+
+                chat_app_message: {
+                    take: 1,
+
+                    orderBy: {
+                        created_at: "desc"
+                    },
+
+                    select: {
+                        id: true,
+                        text: true,
+                        created_at: true,
+                        sender_id: true
                     }
                 }
             }

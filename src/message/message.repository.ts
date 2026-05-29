@@ -50,7 +50,21 @@ export const MessageRepository: IMessageRepositoryContract = {
     createMessage: async (data) => {
         try {
             const newMessage = await client.chat_app_message.create({
-                data
+                data,
+                include: {
+                    user_app_user: {
+                        select: {
+                            id: true,
+                            username: true,
+                            profile_app_profile: {
+                                select: {
+                                    id: true,
+                                    avatar: true
+                                }
+                            }
+                        } 
+                    }
+                }
             })
             return newMessage
         } catch (error) {
