@@ -11,13 +11,44 @@ export const MessageSocketController: IMessageSocketControllerContract = {
 
     async sendMessage(socketServer, socket, data) {
         try {
-            console.log(socketServer.sockets.adapter.rooms)
-            const newMessage = await MessageService.createMessage({
-                ...data,
+    //         data: {
+    //     id: number;
+    //     created_at: Date;
+    //     text: string;
+    //     chat_id: number;
+    //     sender_id: number;
+    //     user_app_user: {
+    //         id: number;
+    //         username: string;
+    //         profile_app_profile: {
+    //             id: number;
+    //             avatar: string;
+    //         };
+    //     };
+    // };
+            const tempMessage = {
+                id: BigInt(Number(new Date(Date.now()))),
+                created_at: new Date(Date.now()),
+                text: data.text,
+                chat_id: BigInt(data.chat_id),
+                sender_id: BigInt(socket.data.userId),
+                user_app_user: {
+                    id: BigInt(Number(new Date(Date.now()))),
+                    username: data.username,
+                    profile_app_profile: {
+                        id: BigInt(Number(new Date(Date.now()))),
+                        avatar: data.avatar
+                    }
+                }
+
+            }
+            this.newMessage(socketServer, tempMessage)
+            await MessageService.createMessage({
+                text: data.text,
+                chat_id: data.chat_id,
                 created_at: new Date(Date.now()),
                 sender_id: socket.data.userId
             })
-            this.newMessage(socketServer, newMessage)
         } catch (error) {
             throw error
         }

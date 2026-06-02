@@ -11,7 +11,14 @@ export type Post = Prisma.post_app_postGetPayload<{
         post_app_postlink: true,
     }
 }>
-
+export type CreatePostDTO = {
+    title: string;
+    content: string;
+    topic: string;
+    tags: number[];
+    urls: string[];
+    author_id: number
+}
 export type CreatePost = Prisma.post_app_postUncheckedCreateInput
 export type UpdatePost = Prisma.post_app_postUncheckedUpdateInput
 
@@ -37,7 +44,7 @@ export interface IPostControllerContract {
     ) => void
     
     createPost: (
-        req: Request<object, Post | string, CreatePost, object>,
+        req: Request<object, Post | string, CreatePostDTO, object>,
         res: Response<Post | string>
     ) => void
     
@@ -69,7 +76,7 @@ export interface IPostControllerContract {
 export interface IPostServiceContract {
     getAllPosts: (take?: number) => Promise<Post[] | string>
 
-    createPost: (data: CreatePost, files?: Express.Multer.File[]) => Promise<Post | string>
+    createPost: (data: CreatePostDTO, files?: Express.Multer.File[]) => Promise<Post | string>
     
     getMyPosts: (userId: bigint) => Promise<Post[]>
 
@@ -83,7 +90,7 @@ export interface IPostServiceContract {
 export interface IPostRepositoryContract {
     getAllPosts: (take?: number) => Promise<Post[] | string>
 
-    createPost: (data: CreatePost, files?: Express.Multer.File[]) => Promise<Post | string>
+    createPost: (data: CreatePostDTO, files?: Express.Multer.File[]) => Promise<Post | string>
     
     getMyPosts: (userId: bigint) => Promise<Post[]>
 

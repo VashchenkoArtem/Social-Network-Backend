@@ -70,5 +70,94 @@ export const MessageRepository: IMessageRepositoryContract = {
         } catch (error) {
             throw error
         }
-    }
+    },
+    
+    getAllUnreadMessages: async (userId) => {
+        try {
+            const unreadMessages = await client.chat_app_message.count({
+                where: {
+                    sender_id: {
+                        not: userId
+                    },
+                    chat_app_chat: {
+                        chat_app_chat_users: {
+                            some: {
+                                user_id: userId
+                            }
+                        }
+                    },
+                    chat_app_message_readers: {
+                        none: {
+                            user_id: userId
+                        }
+                    }
+                }
+            })
+            return unreadMessages
+        } catch (error) {
+            throw error
+        }
+    },
+
+    markAsRead: async (chatId, userId) => {
+        try {
+            const unreadMessages = await client.chat_app_message.findMany({
+                where: {
+                    sender_id: {
+                        not: userId
+                    },
+                    chat_app_message_readers: {
+                        none: {
+                            user_id: userId
+                        }
+                    }
+                }
+            })
+            const readStatus = unreadMessages.map((message) => {
+                return client.chat_app_message_readers.create({
+                    data: {
+                        message_id: message.id,
+                        user_id: userId
+                    }
+                })
+            })
+            return 'Status was changed to read'
+        } catch (error) {
+            throw error
+        }
+    },
+
+    getAllUnreadChatMessages: async (chatId, userId) => {
+        try {
+            console.log(userId)
+            const unreadChatMessages = await client.chat_app_message.count({
+                where: {
+                    sender_id: {
+                        not: userId
+                    },
+                    chat_app_chat: {
+                        chat_app_message:{
+                            some: {
+                                chat_id: chatId
+                            }
+                        },
+                        chat_app_chat_users: {
+                            some: {
+                                user_id: Number(userId)
+                            }
+                        }
+                    },
+                    chat_app_message_readers: {
+                        none: {
+                            user_id: userId
+                        }
+                    }
+                }
+            })
+            return unreadChatMessages
+        } catch (error) {
+            throw error
+        }
+    },
+    
 }

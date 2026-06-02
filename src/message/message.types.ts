@@ -29,7 +29,9 @@ export interface IMessageCreate {
 }
 export interface IMessageCreateDTO {
     text: string | null
-    chat_id: number
+    chat_id: number,
+    username: string,
+    avatar: string
 }
 
 export interface IMessageWithPagination {
@@ -43,19 +45,39 @@ export interface IMessageControllerContract {
         req: Request<{chatId: string}, IMessage[] | string, object>,
         res: Response<IMessage[] | string>
     ) => void
-}
 
+    getAllUnreadMessages: (
+        req: Request<object, number | string, object>,
+        res: Response<number | string>
+    ) => void
+    
+    markAsRead: (
+        req: Request<{chatId: string}, IMessage | string, object>,
+        res: Response<IMessage | string>
+    ) => void
+
+    getAllUnreadChatMessages: (
+        req: Request<{chatId: string}, number | string, { chatId: number}[]>,
+        res: Response<number | string>
+    ) => void
+}
 
 export interface IMessageServiceContract {
     getMessages: (chatId: number) => Promise<IMessage[]>
     getAllMessagesByChatId: (chatId: number) => Promise<IMessage[]>
     createMessage: (data: IMessageCreate) => Promise<IMessageWithAuthor>
+    markAsRead: (chatId: number, userId: number) => Promise<string>
+    getAllUnreadMessages: (userId: number) => Promise<number | string>
+    getAllUnreadChatMessages: (chatId: number, userId: number) => Promise<number | string>
 }
 
 export interface IMessageRepositoryContract {
     getMessages: (chatId: number) => Promise<IMessage[]>
     getAllMessagesByChatId: (chatId: number) => Promise<IMessage[]>
     createMessage: (data: IMessageCreate) => Promise<IMessageWithAuthor>
+    getAllUnreadMessages: (userId: number) => Promise<number | string>
+    markAsRead: (chatId: number, userId: number) => Promise<string>
+    getAllUnreadChatMessages: (chatId: number, userId: number) => Promise<number | string>
 }
 
 

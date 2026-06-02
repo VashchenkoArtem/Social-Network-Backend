@@ -11,7 +11,7 @@ export const postRepository: IPostRepositoryContract = {
     getAllPosts: async (take) => {
         try  {
             const posts = await client.post_app_post.findMany({
-                take: take !== undefined ? take : 5,
+                take: take !== undefined ? take : 3,
                 orderBy: {
                     created_at: "desc"
                 },
@@ -45,6 +45,7 @@ export const postRepository: IPostRepositoryContract = {
                 orderBy: {
                     created_at: "desc"
                 },
+                take: 3,
                 include: {
                     user_app_user: {
                         include:{
@@ -72,16 +73,18 @@ export const postRepository: IPostRepositoryContract = {
                 compressed_image: file.filename
             })) ?? [];
 
-            const tags = data.post_app_post_tags ?? [];
+            // ВИПРАВЛЕНО: Читаємо "tags", як їх відправляє мобільний додаток
+            const tags = data.tags ?? [];
 
             const tagIds = Array.isArray(tags)
                 ? tags.map(Number)
                 : tags ? [Number(tags)] : [];
 
-            const links = data.post_app_postlink ?? [];
+            const links = data.urls ?? [];
             const urls = Array.isArray(links) ?
                 links.map(String) :
-                [String(links)]
+                links ? [String(links)] : [];
+
             const newPost = await client.post_app_post.create({
                 data: {
                     title: data.title,
@@ -92,18 +95,18 @@ export const postRepository: IPostRepositoryContract = {
                     post_app_postimage: {
                         create: photos
                     },
-
                     post_app_post_tags: {
-                    create: tagIds.map(tagId => ({
-                        post_app_tag: {
-                        connect: { id: BigInt(tagId) }
-                        }
-                    }))
+                        // ВИПРАВЛЕНО: Переконуємось, що id є BigInt
+                        create: tagIds.map(tagId => ({
+                            post_app_tag: {
+                                connect: { id: BigInt(tagId) }
+                            }
+                        }))
                     },
                     post_app_postlink: {
-                    create: urls.map((href) => ({
-                        url: href
-                    }))
+                        create: urls.map((href) => ({
+                            url: href
+                        }))
                     }
                 },
                 include: {
@@ -172,10 +175,11 @@ export const postRepository: IPostRepositoryContract = {
 
             updateData.post_app_post_tags = {
                 deleteMany: {},
+                // ВИПРАВЛЕНО: Додано BigInt(tagId), інакше оновлення падало з помилкою типу
                 create: tagIds.map(tagId => ({
                     post_app_tag: {
                         connect: {
-                            id: tagId
+                            id: BigInt(tagId) 
                         }
                     }
                 }))
@@ -192,9 +196,7 @@ export const postRepository: IPostRepositoryContract = {
                 where: {
                     id: postId
                 },
-
                 data: updateData,
-
                 include: {
                     user_app_user: true,
                     post_app_postlink: true,

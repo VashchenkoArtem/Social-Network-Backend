@@ -29,6 +29,7 @@ export const postsController: IPostControllerContract = {
     createPost: async (req, res) => {
         const userId = res.locals.userId;
         const data = req.body;
+        console.log(data)
         const files = req.files as Express.Multer.File[];
 
         const dataWithId = {

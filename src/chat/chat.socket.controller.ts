@@ -1,4 +1,5 @@
 import { AppError } from "../errors"; 
+import { MessageService } from "../message/message.service";
 import { ChatService } from "./chat.service";
 import { ChatSocketControllerContract } from "./types/chat.contracts";
 
@@ -26,7 +27,8 @@ export const ChatSocketController: ChatSocketControllerContract = {
 				console.log("user is participant")
 
 				await socket.join(`chat-${data.chatId}`);
-
+				const messages = await MessageService.markAsRead(data.chatId, socket.data.userId)
+				console.log(messages)
 				console.log("joined room")
 
 				if (ack) {

@@ -11,9 +11,9 @@ export const friendsRepository: IFriendsRepositoryContract = {
                         { from_user_id: userId },
                         { to_user_id: userId }
                     ],
-                    status: "Accepted"
+                    status: "accepted"
                 },
-
+                take: 2,
                 select: {
                     id: true,
 
@@ -57,9 +57,9 @@ export const friendsRepository: IFriendsRepositoryContract = {
             const requests = await client.user_app_friendship.findMany({
                 where: {
                     to_user_id: userId,
-                    status: "Pending"
+                    status: "pending"
                 },
-
+                take: 2,
                 include: {
                     user_app_user_user_app_friendship_from_user_idTouser_app_user: {
                         include: {
@@ -100,7 +100,7 @@ export const friendsRepository: IFriendsRepositoryContract = {
                 data : {
                     from_user_id: senderId,
                     to_user_id: receiverId,
-                    status: "Pending",
+                    status: "pending",
                     created_at: new Date(Date.now())
                 }
             })
@@ -169,6 +169,10 @@ export const friendsRepository: IFriendsRepositoryContract = {
                     notIn: [userId, ...Array.from(excludedUserIds)],
                 },
             },
+            orderBy: {
+                date_joined: "desc"
+            },
+            take: 2,
             include: {
                 profile_app_profile: true,
             },
