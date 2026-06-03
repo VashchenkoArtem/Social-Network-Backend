@@ -13,7 +13,6 @@ export const friendsRepository: IFriendsRepositoryContract = {
                     ],
                     status: "accepted"
                 },
-                take: 2,
                 select: {
                     id: true,
 
@@ -30,7 +29,7 @@ export const friendsRepository: IFriendsRepositoryContract = {
                     }
                 }
             });
-
+            console.log(friends)
             return friends.map((friendship) => {
                 const isCurrentUserSender =
                     friendship
