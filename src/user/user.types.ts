@@ -18,8 +18,8 @@ export type UserWithoutPasswordDTO = {
 export type UserWithoutPassword = Omit<User, "password">
 export type CreateUser = Prisma.user_app_userUncheckedCreateInput
 export type UpdateUser = {
-    firstname?: string;
-    lastname?: string;
+    first_name?: string;
+    last_name?: string;
     username?: string;
     email?: string;
     password?: string

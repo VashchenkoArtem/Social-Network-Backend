@@ -80,16 +80,17 @@ export const UserRepository: IUserRepositoryContract = {
         }
     },
     updateUser: async (data, userId, filename) => {
+        console.log(data)
         return await client.user_app_user.update({
             where: { id: userId },
 
             data: {
-                ...(data.firstname !== undefined && {
-                    firstname: data.firstname
+                ...(data.first_name !== undefined && {
+                    first_name: data.first_name
                 }),
 
-                ...(data.lastname !== undefined && {
-                    lastname: data.lastname
+                ...(data.last_name !== undefined && {
+                    last_name: data.last_name
                 }),
 
                 ...(data.username !== undefined && {

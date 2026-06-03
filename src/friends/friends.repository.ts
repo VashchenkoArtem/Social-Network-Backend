@@ -169,9 +169,6 @@ export const friendsRepository: IFriendsRepositoryContract = {
                     notIn: [userId, ...Array.from(excludedUserIds)],
                 },
             },
-            orderBy: {
-                date_joined: "desc"
-            },
             take: 2,
             include: {
                 profile_app_profile: true,
