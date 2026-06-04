@@ -8,29 +8,53 @@ import { Prisma } from "@prisma/client";
 import { client } from "../client/client";
 
 export const postRepository: IPostRepositoryContract = {
-    getAllPosts: async (take) => {
+    getAllPosts: async (paginationData) => {
         try  {
+            const limit = paginationData.limit ?? 3
             const posts = await client.post_app_post.findMany({
-                take: take !== undefined ? take : 3,
-                orderBy: {
-                    created_at: "desc"
-                },
+                orderBy: [
+                    { created_at: "desc" },
+                    { id: "desc" },
+                ],
+                take: limit + 1,
+                ...(paginationData.cursor
+                    ? {
+                        cursor: {
+                            id: paginationData.cursor,
+                        },
+                        skip: 1,
+                    }
+                    : {}),
                 include: {
                     user_app_user: {
                         include: {
-                            profile_app_profile: true
-                        }
+                            profile_app_profile: true,
+                        },
                     },
                     post_app_postlink: true,
                     post_app_postimage: true,
                     post_app_post_tags: {
                         include: {
-                            post_app_tag: true
-                        }
-                    }
-                }
-            })
-            return posts
+                            post_app_tag: true,
+                        },
+                    },
+                },
+            });
+
+            const hasMore = posts.length > limit;
+            const data = hasMore ? posts.slice(0, limit) : posts;
+
+            const nextCursor = hasMore
+                ? data[data.length - 1]?.id ?? null
+                : null;
+            console.log(posts)
+            return {
+                data,
+                meta: {
+                    nextCursor: Number(nextCursor?.toString()),
+                    hasMore,
+                },
+            };
         } catch (error) {
             throw error
         }
@@ -73,7 +97,6 @@ export const postRepository: IPostRepositoryContract = {
                 compressed_image: file.filename
             })) ?? [];
 
-            // ВИПРАВЛЕНО: Читаємо "tags", як їх відправляє мобільний додаток
             const tags = data.tags ?? [];
 
             const tagIds = Array.isArray(tags)

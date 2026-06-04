@@ -10,13 +10,14 @@ import {
 
 export const postsController: IPostControllerContract = {
     getAllPosts: async (req, res) => {
-        const take = Number(req.query.take)
-        if (Number.isNaN(take)) {
+        const limit = Number(req.query.limit)
+        const cursor = Number(req.query.cursor)
+        if (Number.isNaN(limit)) {
             res.status(400).json('Query param take must be a number')
             return
         }
 
-        const response = await PostService.getAllPosts(take)
+        const response = await PostService.getAllPosts({ limit, cursor})
         res.status(200).json(response)
     },
 
