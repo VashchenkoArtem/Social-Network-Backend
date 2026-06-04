@@ -97,7 +97,6 @@ export const postRepository: IPostRepositoryContract = {
                 compressed_image: file.filename
             })) ?? [];
 
-            // ВИПРАВЛЕНО: Читаємо "tags", як їх відправляє мобільний додаток
             const tags = data.tags ?? [];
 
             const tagIds = Array.isArray(tags)
