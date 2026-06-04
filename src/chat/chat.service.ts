@@ -1,19 +1,45 @@
-import { ChatRepository } from './chat.repository'
-import { IChatServiceContract } from './chat.types'
+import { NotFoundError } from "../errors";
+import { ChatRepository } from "./chat.repository";
+import { IChatServiceContract } from "./types/chat.contracts";
 
 export const ChatService: IChatServiceContract = {
-    getGroupChats: async(userId) => {
-        const groupChats = await ChatRepository.getGroupChats(userId)
-        return groupChats
+    getGroupChats: async (userId) => {
+        return await ChatRepository.getGroupChats(userId);
+    },
+    getPersonalChats: async (userId) => {
+        return await ChatRepository.getPersonalChats(userId);
+    },
+    createChat: async (adminId, data, filename) => {
+        return await ChatRepository.createChat(adminId, data, filename);
     },
 
-    getPersonalChats: async(userId) => {
-        const personalChats = await ChatRepository.getPersonalChats(userId)
-        return personalChats
+    updateChat: async (chatId, data) => {
+        return await ChatRepository.updateChat(chatId, data)
+    },
+    
+    deleteChat: async (chatId) => {
+        await ChatRepository.deleteChat(chatId)
+    },
+    
+    leaveChat: async (userId) => {
+        await ChatRepository.leaveChat(userId)
     },
 
-    deleteGroupChat: async(chatId, userId) => {
-        const deletedChat = await ChatRepository.deleteGroupChat(chatId, userId)
-        return deletedChat
-    }
+    findChatById: async (chatId) => {
+        return await ChatRepository.findChatById(chatId)
+    },
+    isUserChatParticipant: async (chatId, userId) => {
+		const chat = await ChatRepository.getChatParticipants(chatId);
+		if (!chat) {
+			throw new NotFoundError("Chat");
+		}
+		const isUserInChat = chat.chat_app_chat_users.some((participant) => {
+			return participant.user_id === BigInt(userId);
+		});
+        console.log(isUserInChat)
+		return isUserInChat;
+	},
+    getChatByParticipants: async (userId, participantId) => {
+        return await ChatRepository.getChatByParticipants(userId, participantId)
+    },
 }

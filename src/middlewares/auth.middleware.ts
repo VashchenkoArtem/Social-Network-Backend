@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import { verify } from "jsonwebtoken";
-
 import { cleanEnv, str } from "envalid";
 import { AuthenticatedUser } from "../user/user.types";
 
@@ -11,7 +10,6 @@ const ENV = cleanEnv(process.env, {
 })
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
     const authorizationHeaders = req.headers.authorization;
-    
     if (!authorizationHeaders) {
         res.status(401).json("Authorization is required. Please, log in");
         return;

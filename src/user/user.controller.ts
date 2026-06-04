@@ -36,12 +36,15 @@ export const userController: IUserControllerContract = {
             res.status(400).json(response)
             return
         }
-        res.status(200).json(response)
+        const { id, ...user } = response
+        res.status(200).json({
+            ...user,
+            id: id.toString()
+        });
     },
     updateUser: async (req, res) => {
         const userId = res.locals.userId
         const updatedData = req.body
-        console.log(updatedData)
         const files = req.files as Express.Multer.File[];
         const filename = files?.[0]?.filename;
         const response = await UserService.updateUser(updatedData, userId, filename)
@@ -88,8 +91,31 @@ export const userController: IUserControllerContract = {
         const response = await UserService.updateSignature(filename, userId)
         res.status(200).json(response)
     },
+    getUserById: async (req, res) => {
+        let id = 0n
+        if (req.params.id){
+            id = BigInt(req.params.id);
+        }else{
+            id = BigInt(res.locals.userId)
+        }
+        
+        console.log(id)
+        if (!id) {
+            res.status(400).json("Invalid user id");
+            return;
+        }
+    
+        const response = await UserService.getUserById(id);
+    
+        if (typeof response === "string") {
+            res.status(404).json(response);
+            return;
+        }
+    
+        res.status(200).json(response);
+    },
     findUserById: async (req, res) => {
-        const userId = Number(req.params.userId)
+        const userId = BigInt(req.params.userId)
         const foundedUser = await UserService.findUserById(userId)
         if (!foundedUser){
             return res.status(404).json("User not found")

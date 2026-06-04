@@ -5,13 +5,20 @@ import { ParamsDictionary, Query } from "express-serve-static-core";
 
 export type Post = Prisma.post_app_postGetPayload<{
     include: {
-        photos: true,
-        tags: true,
-        author: true,
-        urls: true,
+        post_app_postimage: true,
+        post_app_post_tags: true,
+        user_app_user: true,
+        post_app_postlink: true,
     }
 }>
-
+export type CreatePostDTO = {
+    title: string;
+    content: string;
+    topic: string;
+    tags: number[];
+    urls: string[];
+    author_id: number
+}
 export type CreatePost = Prisma.post_app_postUncheckedCreateInput
 export type UpdatePost = Prisma.post_app_postUncheckedUpdateInput
 
@@ -37,7 +44,7 @@ export interface IPostControllerContract {
     ) => void
     
     createPost: (
-        req: Request<object, Post | string, CreatePost, object>,
+        req: Request<object, Post | string, CreatePostDTO, object>,
         res: Response<Post | string>
     ) => void
     
@@ -69,26 +76,26 @@ export interface IPostControllerContract {
 export interface IPostServiceContract {
     getAllPosts: (take?: number) => Promise<Post[] | string>
 
-    createPost: (data: CreatePost, files?: Express.Multer.File[]) => Promise<Post | string>
+    createPost: (data: CreatePostDTO, files?: Express.Multer.File[]) => Promise<Post | string>
     
-    getMyPosts: (userId: number) => Promise<Post[]>
+    getMyPosts: (userId: bigint) => Promise<Post[]>
 
     // deletePost: (postId: number) => Promise<Post | string>
-    updatePost: (postId: number, data: UpdatePostDto, files?: Express.Multer.File[]) => Promise<Post | string>
+    updatePost: (postId: bigint, data: UpdatePostDto, files?: Express.Multer.File[]) => Promise<Post | string>
 
-    deletePost: (postId: number) => Promise<{ message: string } | string>
-    getPostsByUserId: (userId: number) => Promise<Post[]>
+    deletePost: (postId: bigint) => Promise<{ message: string } | string>
+    getPostsByUserId: (userId: bigint) => Promise<Post[]>
 }
 
 export interface IPostRepositoryContract {
     getAllPosts: (take?: number) => Promise<Post[] | string>
 
-    createPost: (data: CreatePost, files?: Express.Multer.File[]) => Promise<Post | string>
+    createPost: (data: CreatePostDTO, files?: Express.Multer.File[]) => Promise<Post | string>
     
-    getMyPosts: (userId: number) => Promise<Post[]>
+    getMyPosts: (userId: bigint) => Promise<Post[]>
 
-    updatePost: (postId: number, data: UpdatePostDto, files?: Express.Multer.File[]) => Promise<Post | string>
+    updatePost: (postId: bigint, data: UpdatePostDto, files?: Express.Multer.File[]) => Promise<Post | string>
 
-    deletePost: (postId: number) => Promise<{ message: string } | string>
-    getPostsByUserId: (userId: number) => Promise<Post[]>
+    deletePost: (postId: bigint) => Promise<{ message: string } | string>
+    getPostsByUserId: (userId: bigint) => Promise<Post[]>
 }

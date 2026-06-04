@@ -11,21 +11,21 @@ export const postRepository: IPostRepositoryContract = {
     getAllPosts: async (take) => {
         try  {
             const posts = await client.post_app_post.findMany({
-                take: take !== undefined ? take : 5,
+                take: take !== undefined ? take : 3,
                 orderBy: {
                     created_at: "desc"
                 },
                 include: {
-                    author: {
+                    user_app_user: {
                         include: {
-                            user: true
+                            profile_app_profile: true
                         }
                     },
-                    urls: true,
-                    photos: true,
-                    tags: {
+                    post_app_postlink: true,
+                    post_app_postimage: true,
+                    post_app_post_tags: {
                         include: {
-                            tag: true
+                            post_app_tag: true
                         }
                     }
                 }
@@ -40,22 +40,23 @@ export const postRepository: IPostRepositoryContract = {
         try {
             return await client.post_app_post.findMany({
                 where: {
-                    authorId: userId
+                    author_id: userId
                 },
                 orderBy: {
                     created_at: "desc"
                 },
+                take: 3,
                 include: {
-                    author: {
+                    user_app_user: {
                         include:{
-                            user: true
+                            profile_app_profile: true
                         }
                     },
-                    urls: true,
-                    photos: true,
-                    tags: {
+                    post_app_postlink: true,
+                    post_app_postimage: true,
+                    post_app_post_tags: {
                         include: {
-                            tag: true
+                            post_app_tag: true
                         }
                     }
                 }
@@ -67,11 +68,12 @@ export const postRepository: IPostRepositoryContract = {
     
     createPost: async (data, files) => {
         try {
-            console.log(data.urls)
             const photos = files?.map(file => ({
-                original_image: file.filename
+                original_image: file.filename,
+                compressed_image: file.filename
             })) ?? [];
 
+            // ВИПРАВЛЕНО: Читаємо "tags", як їх відправляє мобільний додаток
             const tags = data.tags ?? [];
 
             const tagIds = Array.isArray(tags)
@@ -81,39 +83,37 @@ export const postRepository: IPostRepositoryContract = {
             const links = data.urls ?? [];
             const urls = Array.isArray(links) ?
                 links.map(String) :
-                [String(links)]
-            console.log(data)
+                links ? [String(links)] : [];
+
             const newPost = await client.post_app_post.create({
                 data: {
                     title: data.title,
-                    topic: data.topic,
+                    topic: data.topic ?? null,
                     content: data.content,
-                    authorId: Number(data.authorId),
-
-                    photos: {
+                    author_id: BigInt(data.author_id),
+                    created_at: new Date(Date.now()),
+                    post_app_postimage: {
                         create: photos
                     },
-
-                    tags: {
+                    post_app_post_tags: {
+                        // ВИПРАВЛЕНО: Переконуємось, що id є BigInt
                         create: tagIds.map(tagId => ({
-                            tag: {
-                                connect: { id: tagId }
+                            post_app_tag: {
+                                connect: { id: BigInt(tagId) }
                             }
                         }))
                     },
-
-                    
-                    urls: {
-                    create: urls.map((href) => ({
-                        href: href
-                    }))
+                    post_app_postlink: {
+                        create: urls.map((href) => ({
+                            url: href
+                        }))
                     }
                 },
                 include: {
-                    author: true,
-                    urls: true,
-                    photos: true,
-                    tags: true,
+                    user_app_user: true,
+                    post_app_postlink: true,
+                    post_app_postimage: true,
+                    post_app_post_tags: true,
                 },
             });
 
@@ -124,13 +124,14 @@ export const postRepository: IPostRepositoryContract = {
     },
 
     updatePost: async (
-        postId: number,
+        postId,
         data: UpdatePostDto,
         files?: Express.Multer.File[]
     ) => {
         try {
             const photos = files?.map(file => ({
-                original_image: file.filename
+                original_image: file.filename,
+                compressed_image: file.filename
             })) ?? [];
 
             const tags = data.tags ?? [];
@@ -160,33 +161,34 @@ export const postRepository: IPostRepositoryContract = {
             }
 
             if (data.authorId !== undefined) {
-                updateData.author = {
+                updateData.user_app_user = {
                     connect: {
                         id: Number(data.authorId)
                     }
                 };
             }
 
-            updateData.photos = {
+            updateData.post_app_postimage = {
                 deleteMany: {},
                 create: photos
             };
 
-            updateData.tags = {
+            updateData.post_app_post_tags = {
                 deleteMany: {},
+                // ВИПРАВЛЕНО: Додано BigInt(tagId), інакше оновлення падало з помилкою типу
                 create: tagIds.map(tagId => ({
-                    tag: {
+                    post_app_tag: {
                         connect: {
-                            id: tagId
+                            id: BigInt(tagId) 
                         }
                     }
                 }))
             };
 
-            updateData.urls = {
+            updateData.post_app_postlink = {
                 deleteMany: {},
                 create: urls.map(href => ({
-                    href
+                    url: href
                 }))
             };
 
@@ -194,16 +196,14 @@ export const postRepository: IPostRepositoryContract = {
                 where: {
                     id: postId
                 },
-
                 data: updateData,
-
                 include: {
-                    author: true,
-                    urls: true,
-                    photos: true,
-                    tags: {
+                    user_app_user: true,
+                    post_app_postlink: true,
+                    post_app_postimage: true,
+                    post_app_post_tags: {
                         include: {
-                            tag: true
+                            post_app_tag: true
                         }
                     }
                 }
@@ -215,11 +215,12 @@ export const postRepository: IPostRepositoryContract = {
         }
     },
 
-    deletePost: async (postId: number): Promise<{ message: string } | string> => {
+    deletePost: async (postId): Promise<{ message: string } | string> => {
         try {
+            
             await client.$transaction([
-                client.post_app_post_tags.deleteMany({ where: { postId } }),
-                client.post_app_postlink.deleteMany({ where: { postId } }),
+                client.post_app_post_tags.deleteMany({ where: { post_id: BigInt(postId)  } }),
+                client.post_app_postlink.deleteMany({ where: { post_id: BigInt(postId) } }),
                 client.post_app_post.delete({ where: { id: postId } })
             ]);
 
@@ -235,19 +236,19 @@ export const postRepository: IPostRepositoryContract = {
     getPostsByUserId: async (userId) => {
         return await client.post_app_post.findMany({
             where: {
-                authorId: userId
+                author_id: userId
             },
             include: {
-                author: {
+                user_app_user: {
                     include:{
-                        user: true
+                        profile_app_profile: true
                     }
                 },
-                urls: true,
-                photos: true,
-                tags: {
+                post_app_postlink: true,
+                post_app_postimage: true,
+                post_app_post_tags: {
                     include: {
-                        tag: true
+                        post_app_tag: true
                     }
                 }
             }

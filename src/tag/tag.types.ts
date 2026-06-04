@@ -1,4 +1,4 @@
-import { Prisma, Tag as PrismaTag } from "@prisma/client";
+import { Prisma, post_app_tag as PrismaTag } from "@prisma/client";
 import { Request, Response } from "express";
 
 export type Tag = PrismaTag;

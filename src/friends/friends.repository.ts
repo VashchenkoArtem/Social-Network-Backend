@@ -5,56 +5,103 @@ import { client } from "../client/client";
 export const friendsRepository: IFriendsRepositoryContract = {
     getAllFriends: async (userId) => {
         try {
-            const friends = await client.user_app_friendrequest.findMany({
+            const friends = await client.user_app_friendship.findMany({
                 where: {
                     OR: [
-                        { senderId: userId},
-                        { receiverId: userId}
+                        { from_user_id: userId },
+                        { to_user_id: userId }
                     ],
-                    status: "Accepted"
+                    status: "accepted"
                 },
-                include: {
-                    from_profile: {
+                take: 2,
+                select: {
+                    id: true,
+
+                    user_app_user_user_app_friendship_from_user_idTouser_app_user: {
                         include: {
-                            profile: true
+                            profile_app_profile: true
+                        }
+                    },
+
+                    user_app_user_user_app_friendship_to_user_idTouser_app_user: {
+                        include: {
+                            profile_app_profile: true
                         }
                     }
                 }
-            })
-            return friends
+            });
+
+            return friends.map((friendship) => {
+                const isCurrentUserSender =
+                    friendship
+                        .user_app_user_user_app_friendship_from_user_idTouser_app_user
+                        .id === BigInt(userId);
+
+                const user = isCurrentUserSender
+                    ? friendship.user_app_user_user_app_friendship_to_user_idTouser_app_user
+                    : friendship.user_app_user_user_app_friendship_from_user_idTouser_app_user;
+
+                return {
+                    id: Number(friendship.id.toString()),
+                    user
+                };
+            });
+
         } catch (error) {
-            throw error
+            throw error;
         }
     },
     
     getAllRequests: async (userId) => {
         try {
-            const requests = await client.user_app_friendrequest.findMany({
+            const requests = await client.user_app_friendship.findMany({
                 where: {
-                    receiverId: userId,
-                    status: "Pending"
+                    to_user_id: userId,
+                    status: "pending"
                 },
+                take: 2,
                 include: {
-                    from_profile: {
+                    user_app_user_user_app_friendship_from_user_idTouser_app_user: {
                         include: {
-                            profile: true
+                            profile_app_profile: true
+                        }
+                    },
+
+                    user_app_user_user_app_friendship_to_user_idTouser_app_user: {
+                        include: {
+                            profile_app_profile: true
                         }
                     }
                 }
-            })
-            return requests
+            });
+
+            return requests.map((request) => {
+                const isCurrentUserSender =
+                    request.from_user_id === BigInt(userId);
+
+                const user = isCurrentUserSender
+                    ? request.user_app_user_user_app_friendship_to_user_idTouser_app_user
+                    : request.user_app_user_user_app_friendship_from_user_idTouser_app_user;
+
+                return {
+                    id: Number(request.id.toString()),
+                    user
+                };
+            });
+
         } catch (error) {
-            throw error
+            throw error;
         }
     },
 
     createFriendRequest: async (senderId, receiverId) => {
         try {
-            const request = await client.user_app_friendrequest.create({
+            const request = await client.user_app_friendship.create({
                 data : {
-                    senderId: Number(senderId),
-                    receiverId: receiverId,
-                    status: "Pending"
+                    from_user_id: senderId,
+                    to_user_id: receiverId,
+                    status: "pending",
+                    created_at: new Date(Date.now())
                 }
             })
             return request
@@ -66,12 +113,13 @@ export const friendsRepository: IFriendsRepositoryContract = {
     updateFriendRequestStatus: async (data) => {
         try {
             const { requestId, ...requestData} = data
-            const updatedRequest = await client.user_app_friendrequest.update({
+            const updatedRequest = await client.user_app_friendship.update({
                 where: {
                     id: requestId
                 },
                 data: requestData
             })
+            console.log(updatedRequest)
             return updatedRequest
         } catch (error) {
             throw error
@@ -81,7 +129,7 @@ export const friendsRepository: IFriendsRepositoryContract = {
     deleteFriendRequest: async (requestId) => {
         try {
             console.log(requestId)
-            const deletedRequest = await client.user_app_friendrequest.delete({
+            const deletedRequest = await client.user_app_friendship.delete({
                 where: {
                     id: requestId
                 }
@@ -91,40 +139,41 @@ export const friendsRepository: IFriendsRepositoryContract = {
             throw error
         }
     },
-    recommendedPeople: async (userId) =>{
+    recommendedPeople: async (userId) => {
+        const friendships = await client.user_app_friendship.findMany({
+            where: {
+                OR: [
+                    { from_user_id: BigInt(userId) },
+                    { to_user_id: BigInt(userId) },
+                ],
+            },
+            select: {
+                from_user_id: true,
+                to_user_id: true,
+            },
+        });
+
+        const excludedUserIds = new Set<number>();
+
+        friendships.forEach(f => {
+            const from = Number(f.from_user_id);
+            const to = Number(f.to_user_id);
+
+            if (from === userId) excludedUserIds.add(to);
+            else excludedUserIds.add(from);
+        });
+
         const users = await client.user_app_user.findMany({
             where: {
-                NOT: {
-                    OR: [
-                        // я отправил запрос
-                        {
-                            receivedFriendRequests: {
-                                some: {
-                                    senderId: userId
-                                }
-                            }
-                        },
-
-                        // мне отправили запрос
-                        {
-                            sentFriendRequests: {
-                                some: {
-                                    receiverId: userId
-                                }
-                            }
-                        }
-                    ]
-                },
                 id: {
-                    not: userId
-                }
+                    notIn: [userId, ...Array.from(excludedUserIds)],
+                },
             },
-
+            take: 2,
             include: {
-                profile: true
-            }
-        })
-
-        return users
+                profile_app_profile: true,
+            },
+        });
+        return users;
     }
 }

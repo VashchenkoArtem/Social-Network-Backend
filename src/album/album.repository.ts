@@ -1,7 +1,7 @@
 import { client } from "../client/client";
-import { IAlbumRepositoryContract } from "./album.types";
 import { Prisma } from "@prisma/client";
 import { NotFoundError, AppError } from "../errors";
+import { IAlbumRepositoryContract } from "./types/album.contracts";
 
 export const AlbumRepository: IAlbumRepositoryContract = {
 
@@ -10,7 +10,9 @@ export const AlbumRepository: IAlbumRepositoryContract = {
             const photo = await client.profile_app_albumimage.create({
                 data: {
                     image: data.image,
-                    album: {
+                    is_shown: true,
+                    created_at: new Date(Date.now()),
+                    profile_app_album: {
                         connect: { id: albumId },
                     }
                 }
@@ -22,12 +24,12 @@ export const AlbumRepository: IAlbumRepositoryContract = {
         }
     },
 
-    findAlbumById: async (id: number) => {
+    findAlbumById: async (id) => {
         try {
             const album = await client.profile_app_album.findUnique({
                 where: { id },
                 include: {
-                    photos: true,
+                    profile_app_albumimage: true,
                 },
             })
             return album
@@ -36,7 +38,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
         }
     },
 
-    albumVisibility: async (id: number, is_shown: boolean) => {
+    albumVisibility: async (id, is_shown) => {
         try {
             const album = await client.profile_app_album.update({
                 where: { id },
@@ -44,7 +46,7 @@ export const AlbumRepository: IAlbumRepositoryContract = {
                     is_shown,
                 },
                 include: {
-                    photos: true,
+                    profile_app_albumimage: true,
                 },
             })
             return album
@@ -53,17 +55,21 @@ export const AlbumRepository: IAlbumRepositoryContract = {
         }
     },
 
-    getUserAlbums: async (userId: number) => {
+    getUserAlbums: async (userId) => {
         try {
             return await client.profile_app_album.findMany({
                 where: {
-                    profileId: userId,
+                    profile_app_profile: {
+                        user_app_user: {
+                            id: userId
+                        }
+                    }
                 },
                 orderBy: {
                     created_at: "desc"
                 },
                 include: {
-                    photos: true
+                    profile_app_albumimage: true
                 },
             })
         } catch (error) {
@@ -77,13 +83,14 @@ export const AlbumRepository: IAlbumRepositoryContract = {
                 data: {
                     name: data.name,
                     is_shown: data.is_shown ?? true,
-                    profile: { connect: { id: userId } },
-                    theme: data.theme,
+                    profile_app_profile: { connect: { id: userId } },
+                    theme: data.theme ?? null,
                     is_default: false,
-                    year: Number(data.year)
+                    year: Number(data.year),
+                    created_at: new Date(Date.now())
                 },
                 include: {
-                    photos: true,
+                    profile_app_albumimage: true,
                 }
             });
             return album
@@ -94,21 +101,24 @@ export const AlbumRepository: IAlbumRepositoryContract = {
     },
     updateAlbum: async (albumId, data) => {
         try {
+            const updateData = { ...data };
+
+            if (data.year !== undefined) {
+                updateData.year = Number(data.year);
+            }
+
             return await client.profile_app_album.update({
-                where: { id: albumId },
-                data: {
-                    ...data,
-                    year: Number(data.year)
-                    },
+                where: { id: Number(albumId) },
+                data: updateData,
                 include: {
-                    photos: true
+                    profile_app_albumimage: true
                 }
             });
         } catch (error: unknown) {
             if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
                 throw new NotFoundError("Album");
             }
-            console.log(error)
+            console.error("Prisma Error:", error);
             throw new AppError("Could not update album", 500);
         }
     },
@@ -117,8 +127,8 @@ export const AlbumRepository: IAlbumRepositoryContract = {
             const deletedAlbum = await client.profile_app_album.delete({
                 where: { id: albumId },
                 include: {
-                    photos: true,
-                    profile: true
+                    profile_app_albumimage: true,
+                    profile_app_profile: true
                 }
             })
             return deletedAlbum

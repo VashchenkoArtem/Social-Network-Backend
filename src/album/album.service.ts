@@ -1,33 +1,47 @@
-import { client } from "../client/client";
-import { Multer } from "multer";
-import { IAlbumServiceContract } from "./album.types";
+
 import { AlbumRepository } from "./album.repository";
-import { ValidationError, AppError, BadRequestError, NotFoundError } from "../errors";
+import { BadRequestError, NotFoundError } from "../errors";
 import fs from "fs";
-import path, { join } from "path";
+import { join } from "path";
 import { thumbDir, originalDir } from "../config/path";
+import { UserRepository } from "../user/user.repository";
+import { IAlbumServiceContract } from "./types/album.contracts";
 
 
 export const AlbumService: IAlbumServiceContract = {
-    uploadPhoto: async (files,albumId, userId) => {
+    uploadPhoto: async (files, albumId, userId) => {
         if (!files || files.length === 0) {
             throw new Error("Файли є обов'язковими");
         }
+
+        const album = await AlbumRepository.findAlbumById(albumId);
+        if (!album) throw new Error("Альбом не знайдено");
 
         const photos = await Promise.all(
             files.map(async (file) => {
                 const imagePhoto = {
                     image: file.filename,
-                    userId,
                     is_shown: true,
+                    created_at: new Date(),
+
+                    profile_app_album: {
+                        connect: {
+                            id: BigInt(albumId)
+                        }
+                    }
                 };
 
-                return await AlbumRepository.addPhoto(
-                    imagePhoto,
-                    albumId
-                );
+                return await AlbumRepository.addPhoto(imagePhoto, albumId);
             })
         );
+
+        if (album.name === "Аватарки" || album.name === "Мої фото") {
+            const lastPhoto = photos[photos.length - 1];
+            
+            if (lastPhoto) {
+                await UserRepository.updateUserAvatar(BigInt(userId), lastPhoto.image);
+            }
+        }
 
         return photos;
     },
@@ -66,8 +80,8 @@ export const AlbumService: IAlbumServiceContract = {
         if (typeof deletedAlbum === "string") {
             throw new BadRequestError("Помилка при видаленні альбому");
         }
-        if (deletedAlbum.photos && deletedAlbum.photos.length > 0) {
-            deletedAlbum.photos.forEach(photo => {
+        if (deletedAlbum.profile_app_albumimage && deletedAlbum.profile_app_albumimage.length > 0) {
+            deletedAlbum.profile_app_albumimage.forEach(photo => {
                 try {
                     const thumbPath = join(thumbDir, photo.image);
                     const originalPath = join(originalDir, photo.image);

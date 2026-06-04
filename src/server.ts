@@ -1,4 +1,3 @@
-import os from "os";
 import cors from "cors";
 import express from "express";
 import type { Express } from "express";
@@ -10,36 +9,47 @@ import { postRouter } from "./post/post.router";
 import { friendRouter } from "./friends/friends.router";
 import { chatRouter } from "./chat";
 import { messageRouter } from "./message";
+import { startTunnel } from "./config/db.tunnel";
+import { getLocalIpAddress } from "./config/ip";
+import { createServer } from "http";
+import { SocketManager } from "./socket/socket.manager";
 
-const getLocalIpAddress = (): string => {
-    const interfaces = os.networkInterfaces();
-    for (const name of Object.keys(interfaces)) {
-        for (const iface of interfaces[name] || []) {
-            if (iface.family === 'IPv4' && !iface.internal) {
-                return iface.address;
-            }
-        }
-    }
-    return "localhost";
+(BigInt.prototype as any).toJSON = function () {
+    return Number(this.toString());
 };
 
-const HOST = getLocalIpAddress()
+
+
+const HOST = getLocalIpAddress();
 const PORT = 8000;
+
 const app: Express = express();
+export const httpServer = createServer(app)
+
+SocketManager.initSocketServer(httpServer) 
 
 app.use(cors());
 app.use("/media/", express.static(uploadDir));
 app.use(express.json());
+app.use(postRouter);
+app.use(friendRouter);
+app.use(chatRouter);
 app.use(userRouter);
 app.use(albumRouter);
 app.use(tagRouter);
-app.use(postRouter)
-app.use(friendRouter)
-app.use(chatRouter)
-app.use(messageRouter)
+app.use(messageRouter);
 
 
-app.listen(PORT, HOST, () => {
-    console.log(`Сервер запущено`);
-    console.log(`Локально: http://${HOST}:${PORT}`);
-});
+
+async function bootstrap(){
+    try {
+        await startTunnel();
+        httpServer.listen(PORT, HOST, () => {
+            console.log(`Сервер запущено`);
+            console.log(`http://${HOST}:${PORT}`);
+        });
+    }catch(error){
+        console.log(error)
+    }
+}
+bootstrap()
