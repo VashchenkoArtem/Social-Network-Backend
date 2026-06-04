@@ -74,7 +74,8 @@ export const ChatRepository: IChatRepositoryContract = {
                                 profile_app_profile: {
                                     select: {
                                         id: true,
-                                        avatar: true
+                                        avatar: true,
+                                        pseudonym: true
                                     }
                                 }
                             }

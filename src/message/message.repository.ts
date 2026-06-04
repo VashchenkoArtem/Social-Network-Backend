@@ -20,7 +20,8 @@ export const MessageRepository: IMessageRepositoryContract = {
                             profile_app_profile: {
                                 select: {
                                     id: true,
-                                    avatar: true
+                                    avatar: true,
+                                    pseudonym: true
                                 }
                             }
                         }
@@ -103,6 +104,7 @@ export const MessageRepository: IMessageRepositoryContract = {
         try {
             const unreadMessages = await client.chat_app_message.findMany({
                 where: {
+                    chat_id: chatId,
                     sender_id: {
                         not: userId
                     },
@@ -113,48 +115,54 @@ export const MessageRepository: IMessageRepositoryContract = {
                     }
                 }
             })
-            const readStatus = unreadMessages.map((message) => {
-                return client.chat_app_message_readers.create({
-                    data: {
-                        message_id: message.id,
-                        user_id: userId
-                    }
-                })
-            })
+            await Promise.all(
+                unreadMessages.map((message) =>
+                    client.chat_app_message_readers.create({
+                        data: {
+                            message_id: message.id,
+                            user_id: userId
+                        }
+                    })
+                )
+            )
             return 'Status was changed to read'
         } catch (error) {
             throw error
         }
     },
 
-    getAllUnreadChatMessages: async (chatId, userId) => {
+    getAllUnreadChatMessages: async (userId) => {
         try {
             console.log(userId)
-            const unreadChatMessages = await client.chat_app_message.count({
+            const unread = await client.chat_app_message.groupBy({
+                by: ["chat_id"],
                 where: {
                     sender_id: {
                         not: userId
                     },
+
                     chat_app_chat: {
-                        chat_app_message:{
-                            some: {
-                                chat_id: chatId
-                            }
-                        },
                         chat_app_chat_users: {
                             some: {
-                                user_id: Number(userId)
+                                user_id: userId
                             }
                         }
                     },
+
                     chat_app_message_readers: {
                         none: {
                             user_id: userId
                         }
                     }
+                },
+                _count: {
+                    _all: true
                 }
-            })
-            return unreadChatMessages
+            });
+            const unreadMap = Object.fromEntries(
+                unread.map(item => [item.chat_id, item._count._all])
+            );
+            return unreadMap
         } catch (error) {
             throw error
         }

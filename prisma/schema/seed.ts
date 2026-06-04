@@ -3,9 +3,12 @@ import { startTunnel } from "../../src/config/db.tunnel";
 
 async function main() {
     await startTunnel();
-    const photos = await client.user_app_friendship.deleteMany({
+    const photos = await client.profile_app_profile.update({
         where: {
-            status: "Pending"
+            id: BigInt(22)
+        },
+        data: {
+            pseudonym: "Vashchenko Artem"
         }
     });
     console.log(photos)

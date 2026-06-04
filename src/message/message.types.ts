@@ -68,7 +68,7 @@ export interface IMessageServiceContract {
     createMessage: (data: IMessageCreate) => Promise<IMessageWithAuthor>
     markAsRead: (chatId: number, userId: number) => Promise<string>
     getAllUnreadMessages: (userId: number) => Promise<number | string>
-    getAllUnreadChatMessages: (chatId: number, userId: number) => Promise<number | string>
+    getAllUnreadChatMessages: (userId: number) => Promise<number | string>
 }
 
 export interface IMessageRepositoryContract {
@@ -77,7 +77,7 @@ export interface IMessageRepositoryContract {
     createMessage: (data: IMessageCreate) => Promise<IMessageWithAuthor>
     getAllUnreadMessages: (userId: number) => Promise<number | string>
     markAsRead: (chatId: number, userId: number) => Promise<string>
-    getAllUnreadChatMessages: (chatId: number, userId: number) => Promise<number | string>
+    getAllUnreadChatMessages: (userId: number) => Promise<number | string>
 }
 
 
