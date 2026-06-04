@@ -11,6 +11,17 @@ export type Post = Prisma.post_app_postGetPayload<{
         post_app_postlink: true,
     }
 }>
+export interface PaginationDTO {
+    limit?: number;
+    cursor?: number;
+}
+export interface PaginatedPostsResponse {
+    data: Post[];
+    meta: {
+        nextCursor: number | null;
+        hasMore: boolean;
+    };
+}
 export type CreatePostDTO = {
     title: string;
     content: string;
@@ -18,6 +29,10 @@ export type CreatePostDTO = {
     tags: number[];
     urls: string[];
     author_id: number
+}
+export interface GetPostsQuery {
+    limit?: string;
+    cursor?: string;
 }
 export type CreatePost = Prisma.post_app_postUncheckedCreateInput
 export type UpdatePost = Prisma.post_app_postUncheckedUpdateInput
@@ -39,9 +54,14 @@ export interface PostParams extends ParamsDictionary {
 
 export interface IPostControllerContract {
     getAllPosts: (
-        req: Request<object, Post[] | string, object, {take?: string}>,
-        res: Response<Post[] | string>
-    ) => void
+        req: Request<
+            object,
+            PaginatedPostsResponse | string,
+            object,
+            GetPostsQuery
+        >,
+        res: Response<PaginatedPostsResponse | string>
+    ) => void;
     
     createPost: (
         req: Request<object, Post | string, CreatePostDTO, object>,
@@ -74,7 +94,9 @@ export interface IPostControllerContract {
 }
 
 export interface IPostServiceContract {
-    getAllPosts: (take?: number) => Promise<Post[] | string>
+    getAllPosts: (
+        paginationData: PaginationDTO
+    ) => Promise<PaginatedPostsResponse>;
 
     createPost: (data: CreatePostDTO, files?: Express.Multer.File[]) => Promise<Post | string>
     
@@ -88,7 +110,9 @@ export interface IPostServiceContract {
 }
 
 export interface IPostRepositoryContract {
-    getAllPosts: (take?: number) => Promise<Post[] | string>
+    getAllPosts: (
+        paginationData: PaginationDTO
+    ) => Promise<PaginatedPostsResponse>;
 
     createPost: (data: CreatePostDTO, files?: Express.Multer.File[]) => Promise<Post | string>
     
