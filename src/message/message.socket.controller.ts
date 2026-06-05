@@ -1,31 +1,16 @@
+import { MessageController } from "./message.controller";
 import { MessageService } from "./message.service";
 import { IMessageSocketControllerContract } from "./message.types";
 
 export const MessageSocketController: IMessageSocketControllerContract = {
     registerHandlers (socketServer, socket) {
         socket.on("sendMessage", (data) => {
-            console.log(data,' dndsad')
             this.sendMessage(socketServer, socket, data)
         })
     },
 
     async sendMessage(socketServer, socket, data) {
         try {
-    //         data: {
-    //     id: number;
-    //     created_at: Date;
-    //     text: string;
-    //     chat_id: number;
-    //     sender_id: number;
-    //     user_app_user: {
-    //         id: number;
-    //         username: string;
-    //         profile_app_profile: {
-    //             id: number;
-    //             avatar: string;
-    //         };
-    //     };
-    // };
             const tempMessage = {
                 id: BigInt(Number(new Date(Date.now()))),
                 created_at: new Date(Date.now()),
@@ -38,17 +23,29 @@ export const MessageSocketController: IMessageSocketControllerContract = {
                     profile_app_profile: {
                         id: BigInt(Number(new Date(Date.now()))),
                         avatar: data.avatar
+                    },
+                },
+                chat_app_messageimage: data.photos?.map((photo) => {
+                    return {
+                        id: new Date(Date.now()),
+                        image: photo
                     }
                 }
+            )
 
             }
+            console.log(tempMessage)
             this.newMessage(socketServer, tempMessage)
-            await MessageService.createMessage({
-                text: data.text,
-                chat_id: data.chat_id,
-                created_at: new Date(Date.now()),
-                sender_id: socket.data.userId
-            })
+            if (!data.photos){
+                console.log("Saved message without photos")
+                await MessageService.createMessage({
+                    text: data.text,
+                    chat_id: data.chat_id,
+                    created_at: new Date(Date.now()),
+                    sender_id: socket.data.userId
+                })
+            }
+            
         } catch (error) {
             throw error
         }

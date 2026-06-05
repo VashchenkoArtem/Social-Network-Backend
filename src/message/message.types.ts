@@ -23,22 +23,23 @@ export type IMessageWithAuthor = Prisma.chat_app_messageGetPayload<{
 }>
 export interface IMessageCreate {
     text: string | null
-    created_at: Date
     chat_id: number
-    sender_id: number
+    created_at: Date
+    sender_id: number;
+    photos?: string[]
 }
 export interface IMessageCreateDTO {
     text: string | null
     chat_id: number,
     username: string,
     avatar: string
+    photos?: string[]
 }
 
 export interface IMessageWithPagination {
     messages: IMessage[]
     pagination: PageNumberPagination & PageNumberCounters
 }
-
 
 export interface IMessageControllerContract {
     getMessages: (
@@ -47,7 +48,7 @@ export interface IMessageControllerContract {
     ) => void
 
     getAllUnreadMessages: (
-        req: Request<object, number | string, object>,
+        req: Request<object, number | string, object, {is_group?: string}>,
         res: Response<number | string>
     ) => void
     
@@ -60,6 +61,10 @@ export interface IMessageControllerContract {
         req: Request<{chatId: string}, number | string, { chatId: number}[]>,
         res: Response<number | string>
     ) => void
+    createMessage: (
+    req: Request<object, IMessageWithAuthor, IMessageCreateDTO>,
+    res: Response<IMessageWithAuthor | string>
+    ) => void;
 }
 
 export interface IMessageServiceContract {
@@ -67,7 +72,7 @@ export interface IMessageServiceContract {
     getAllMessagesByChatId: (chatId: number) => Promise<IMessage[]>
     createMessage: (data: IMessageCreate) => Promise<IMessageWithAuthor>
     markAsRead: (chatId: number, userId: number) => Promise<string>
-    getAllUnreadMessages: (userId: number) => Promise<number | string>
+    getAllUnreadMessages: (userId: number, is_group: boolean) => Promise<number | string>
     getAllUnreadChatMessages: (userId: number) => Promise<number | string>
 }
 
@@ -75,7 +80,7 @@ export interface IMessageRepositoryContract {
     getMessages: (chatId: number) => Promise<IMessage[]>
     getAllMessagesByChatId: (chatId: number) => Promise<IMessage[]>
     createMessage: (data: IMessageCreate) => Promise<IMessageWithAuthor>
-    getAllUnreadMessages: (userId: number) => Promise<number | string>
+    getAllUnreadMessages: (userId: number, is_group: boolean) => Promise<number | string>
     markAsRead: (chatId: number, userId: number) => Promise<string>
     getAllUnreadChatMessages: (userId: number) => Promise<number | string>
 }

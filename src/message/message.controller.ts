@@ -13,7 +13,8 @@ export const MessageController: IMessageControllerContract = {
 
     getAllUnreadMessages: async (req, res) => {
         const userId = res.locals.userId
-        const unreadMessages = await MessageService.getAllUnreadMessages(userId)
+        const is_group = req.query.is_group === "true"
+        const unreadMessages = await MessageService.getAllUnreadMessages(userId, is_group)
         res.status(200).json(unreadMessages)
     },
 
@@ -31,4 +32,17 @@ export const MessageController: IMessageControllerContract = {
         const unreadChatMessages = await MessageService.getAllUnreadChatMessages(userId)
         res.status(200).json(unreadChatMessages)
     },
+    createMessage: async (req, res) => {
+        const files = req.files as Express.Multer.File[];
+        const userId = res.locals.userId
+        const data = {
+            ...req.body,
+            photos: files.map((file) => file.filename),
+            created_at: new Date(Date.now()),
+            sender_id: Number(userId)
+        }
+        const message = await MessageService.createMessage(data);
+
+        res.json(message);
+}
 }       

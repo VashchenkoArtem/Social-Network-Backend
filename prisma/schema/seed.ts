@@ -3,14 +3,16 @@ import { startTunnel } from "../../src/config/db.tunnel";
 
 async function main() {
     await startTunnel();
-    const photos = await client.profile_app_profile.update({
+    await client.chat_app_chat_users.deleteMany({
         where: {
-            id: BigInt(22)
-        },
-        data: {
-            pseudonym: "Vashchenko Artem"
+            chat_id: 38
         }
-    });
+    })
+    const photos = await client.chat_app_chat.delete({
+        where: {
+            id: 38
+        }
+    })
     console.log(photos)
 }
 

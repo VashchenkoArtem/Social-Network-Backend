@@ -17,8 +17,8 @@ export const MessageService: IMessageServiceContract = {
         return newMessage
     },
 
-    getAllUnreadMessages: async(userId) => {
-        const unreadMessages = await MessageRepository.getAllUnreadMessages(userId)
+    getAllUnreadMessages: async(userId, is_group) => {
+        const unreadMessages = await MessageRepository.getAllUnreadMessages(userId, is_group)
         return unreadMessages
     },
 

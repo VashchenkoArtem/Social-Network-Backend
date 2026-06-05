@@ -112,7 +112,7 @@ export const ChatRepository: IChatRepositoryContract = {
         return await client.chat_app_chat.create({
             data: {
                 name: data.name,
-                is_group: data.isGroup || false,
+                is_group: data.is_group || false,
                 avatar: filename || "default-group-avatar.png",
                 admin_id: cleanAdminId,
                 chat_app_chat_users: {

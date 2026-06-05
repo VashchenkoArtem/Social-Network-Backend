@@ -25,6 +25,12 @@ export const MessageRepository: IMessageRepositoryContract = {
                                 }
                             }
                         }
+                    },
+                    chat_app_messageimage: {
+                        select: {
+                            id: true,
+                            image: true
+                        }
                     }
                 }
             })
@@ -49,31 +55,42 @@ export const MessageRepository: IMessageRepositoryContract = {
     },
 
     createMessage: async (data) => {
-        try {
-            const newMessage = await client.chat_app_message.create({
-                data,
-                include: {
-                    user_app_user: {
-                        select: {
-                            id: true,
-                            username: true,
-                            profile_app_profile: {
-                                select: {
-                                    id: true,
-                                    avatar: true
-                                }
-                            }
-                        } 
-                    }
-                }
-            })
-            return newMessage
-        } catch (error) {
-            throw error
+        const { photos, ...messageData } = data;
+        const createData: any = {
+            ...messageData,
+        };
+
+        if (photos?.length) {
+            createData.chat_app_messageimage = {
+                create: photos.map((photo: string) => ({
+                    image: photo,
+                }))
+            };
         }
+
+        return await client.chat_app_message.create({
+            data: createData,
+
+            include: {
+                user_app_user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profile_app_profile: {
+                            select: {
+                                id: true,
+                                avatar: true,
+                            },
+                        },
+                    },
+                },
+
+                
+            },
+        });
     },
     
-    getAllUnreadMessages: async (userId) => {
+    getAllUnreadMessages: async (userId, is_group) => {
         try {
             const unreadMessages = await client.chat_app_message.count({
                 where: {
@@ -81,6 +98,7 @@ export const MessageRepository: IMessageRepositoryContract = {
                         not: userId
                     },
                     chat_app_chat: {
+                        is_group: is_group,
                         chat_app_chat_users: {
                             some: {
                                 user_id: userId
