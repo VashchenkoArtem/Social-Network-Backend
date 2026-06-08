@@ -3,6 +3,7 @@ import { IPostServiceContract, Post, UpdatePostDto } from "./post.types";
 
 export const PostService: IPostServiceContract = {
     getAllPosts: async (take) => {
+        
         const posts = await postRepository.getAllPosts(take)
         if (!posts) {
             throw new Error('Posts was not found. Try again, please.')

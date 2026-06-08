@@ -28,7 +28,14 @@ export const postRepository: IPostRepositoryContract = {
                 include: {
                     user_app_user: {
                         include: {
-                            profile_app_profile: true,
+                            profile_app_profile: {
+                                select: {
+                                    id: true,
+                                    avatar: true,
+                                    pseudonym: true,
+                                    signature: true
+                                }
+                            },
                         },
                     },
                     post_app_postlink: true,
@@ -119,7 +126,6 @@ export const postRepository: IPostRepositoryContract = {
                         create: photos
                     },
                     post_app_post_tags: {
-                        // ВИПРАВЛЕНО: Переконуємось, що id є BigInt
                         create: tagIds.map(tagId => ({
                             post_app_tag: {
                                 connect: { id: BigInt(tagId) }
@@ -133,10 +139,25 @@ export const postRepository: IPostRepositoryContract = {
                     }
                 },
                 include: {
-                    user_app_user: true,
+                    user_app_user: {
+                        include: {
+                            profile_app_profile: {
+                                select: {
+                                    id: true,
+                                    avatar: true,
+                                    pseudonym: true,
+                                    signature: true
+                                }
+                            },
+                        },
+                    },
                     post_app_postlink: true,
                     post_app_postimage: true,
-                    post_app_post_tags: true,
+                    post_app_post_tags: {
+                        include: {
+                            post_app_tag: true,
+                        },
+                    },
                 },
             });
 
