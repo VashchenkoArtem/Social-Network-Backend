@@ -16,7 +16,6 @@ export const MessageRepository: IMessageRepositoryContract = {
                     user_app_user: {
                         select: {
                             id: true,
-                            username: true,
                             profile_app_profile: {
                                 select: {
                                     id: true,

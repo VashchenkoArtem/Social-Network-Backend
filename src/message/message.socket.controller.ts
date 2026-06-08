@@ -19,10 +19,10 @@ export const MessageSocketController: IMessageSocketControllerContract = {
                 sender_id: BigInt(socket.data.userId),
                 user_app_user: {
                     id: BigInt(Number(new Date(Date.now()))),
-                    username: data.username,
                     profile_app_profile: {
                         id: BigInt(Number(new Date(Date.now()))),
-                        avatar: data.avatar
+                        avatar: data.avatar,
+                        pseudonym: data.pseudonym
                     },
                 },
                 chat_app_messageimage: data.photos?.map((photo) => {
@@ -36,7 +36,7 @@ export const MessageSocketController: IMessageSocketControllerContract = {
             }
             console.log(tempMessage)
             this.newMessage(socketServer, tempMessage)
-            if (!data.photos){
+            if (!data.photos || data.photos.length === 0){
                 console.log("Saved message without photos")
                 await MessageService.createMessage({
                     text: data.text,

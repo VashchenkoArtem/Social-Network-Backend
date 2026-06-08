@@ -10,11 +10,11 @@ export type IMessageWithAuthor = Prisma.chat_app_messageGetPayload<{
         user_app_user: {
             select: {
                 id: true,
-                username: true,
                 profile_app_profile: {
                     select: {
                         id: true,
-                        avatar: true
+                        avatar: true,
+                        pseudonym: true
                     }
                 }
             } 
@@ -31,7 +31,7 @@ export interface IMessageCreate {
 export interface IMessageCreateDTO {
     text: string | null
     chat_id: number,
-    username: string,
+    pseudonym: string,
     avatar: string
     photos?: string[]
 }
