@@ -28,14 +28,19 @@ export interface IMessageCreate {
     sender_id: number;
     photos?: string[]
 }
+export interface IMessageCreateBody {
+    text: string;
+    photos: string[]
+}
 export interface IMessageCreateDTO {
     text: string | null
-    chat_id: number,
     pseudonym: string,
     avatar: string
     photos?: string[]
 }
-
+export interface IMessageSocketCreateDTO extends IMessageCreateDTO {
+    chat_id: number
+}
 export interface IMessageWithPagination {
     messages: IMessage[]
     pagination: PageNumberPagination & PageNumberCounters
@@ -62,7 +67,7 @@ export interface IMessageControllerContract {
         res: Response<number | string>
     ) => void
     createMessage: (
-    req: Request<object, IMessageWithAuthor, IMessageCreateDTO>,
+    req: Request<{chatId: string}, IMessageWithAuthor, IMessageCreateBody>,
     res: Response<IMessageWithAuthor | string>
     ) => void;
 }
@@ -88,6 +93,6 @@ export interface IMessageRepositoryContract {
 
 export interface IMessageSocketControllerContract {
     registerHandlers: (socketServer: ServerSocket, socket: AuthenticatedSocket) => void
-    sendMessage: (socketServer: ServerSocket, socket: AuthenticatedSocket, data: IMessageCreateDTO) => void
+    sendMessage: (socketServer: ServerSocket, socket: AuthenticatedSocket, data: IMessageSocketCreateDTO) => void
     newMessage: (socketServer: ServerSocket, message: IMessageWithAuthor) => void
 }

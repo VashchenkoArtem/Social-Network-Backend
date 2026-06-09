@@ -35,11 +35,14 @@ export const MessageController: IMessageControllerContract = {
     createMessage: async (req, res) => {
         const files = req.files as Express.Multer.File[];
         const userId = res.locals.userId
+        const chatId = req.params.chatId
+        const body = req.body
         const data = {
-            ...req.body,
+            ...body,
             photos: files.map((file) => file.filename),
             created_at: new Date(Date.now()),
-            sender_id: Number(userId)
+            sender_id: Number(userId),
+            chat_id: Number(chatId)
         }
         const message = await MessageService.createMessage(data);
 
