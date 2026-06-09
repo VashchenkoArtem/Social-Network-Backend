@@ -91,6 +91,10 @@ export interface IPostControllerContract {
         req: Request<{userId: string}, Post[] | string, object>,
         res: Response<Post[] | string>
     ) => void
+    viewPost: (
+        req: Request<{ id: string }, { message: string } | string, { userId: string }>,
+        res: Response<{ message: string } | string>
+    ) => void | Promise<void>
 }
 
 export interface IPostServiceContract {
@@ -107,6 +111,8 @@ export interface IPostServiceContract {
 
     deletePost: (postId: bigint) => Promise<{ message: string } | string>
     getPostsByUserId: (userId: bigint) => Promise<Post[]>
+
+    viewPost: (postId: bigint, userId: bigint) => Promise<{ message: string }>
 }
 
 export interface IPostRepositoryContract {
@@ -122,4 +128,6 @@ export interface IPostRepositoryContract {
 
     deletePost: (postId: bigint) => Promise<{ message: string } | string>
     getPostsByUserId: (userId: bigint) => Promise<Post[]>
+
+    viewPost: (postId: bigint, userId: bigint) => Promise<{ message: string }>
 }

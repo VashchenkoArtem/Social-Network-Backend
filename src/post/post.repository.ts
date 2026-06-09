@@ -45,6 +45,13 @@ export const postRepository: IPostRepositoryContract = {
                             post_app_tag: true,
                         },
                     },
+                    _count: {
+                        select: {
+                            post_app_postlike: true,
+                            post_app_postheart: true,
+                            post_app_postview: true,
+                        }
+                    }
                 },
             });
 
@@ -88,6 +95,13 @@ export const postRepository: IPostRepositoryContract = {
                     post_app_post_tags: {
                         include: {
                             post_app_tag: true
+                        }
+                    },
+                    _count: {
+                        select: {
+                            post_app_postlike: true,
+                            post_app_postheart: true,
+                            post_app_postview: true
                         }
                     }
                 }
@@ -294,8 +308,37 @@ export const postRepository: IPostRepositoryContract = {
                     include: {
                         post_app_tag: true
                     }
+                },
+                _count: {
+                    select: {
+                        post_app_postlike: true,
+                        post_app_postheart: true,
+                        post_app_postview: true
+                    }
                 }
             }
         })
-    }
+    },
+    viewPost: async (postId, userId) => {
+        try {
+            await client.post_app_postview.upsert({
+                where: {
+                    user_id_post_id: {
+                        user_id: userId,
+                        post_id: postId,
+                    },
+                },
+                update: {},
+                create: {
+                    post_id: postId,
+                    user_id: userId,
+                },
+            });
+
+            return { message: "View registered successfully" };
+        } catch (error) {
+            console.error("Repo Error (viewPost):", error);
+            throw error;
+        }
+    },
 }

@@ -12,3 +12,5 @@ postRouter.patch( "/posts/:id", authMiddleware, uploadMiddleware.array("images",
 
 postRouter.delete( "/posts/:id", authMiddleware, postsController.deletePost );
 postRouter.get("/users/:userId/posts", authMiddleware, postsController.getPostsByUserId)
+
+postRouter.post("/posts/:id/view", authMiddleware, postsController.viewPost);

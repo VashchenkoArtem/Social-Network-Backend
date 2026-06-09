@@ -34,8 +34,12 @@ export const PostService: IPostServiceContract = {
     getPostsByUserId: async (userId) => {
         const foundedPosts = await postRepository.getPostsByUserId(userId)
         return foundedPosts
-    }
+    },
     // deletePost: async (postId: number): Promise<{ message: string } | string> => {
     //     return await postRepository.deletePost(postId);
     // }
+
+    viewPost: async(postId, userId) => {
+        return await postRepository.viewPost(postId, userId)
+    },
 }

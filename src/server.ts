@@ -9,6 +9,8 @@ import { postRouter } from "./post/post.router";
 import { friendRouter } from "./friends/friends.router";
 import { chatRouter } from "./chat";
 import { messageRouter } from "./message";
+import { likesRouter } from './postLikes/postLikes.router'
+import { heartsRouter } from './postHearts/postHearts.router'
 import { startTunnel } from "./config/db.tunnel";
 import { getLocalIpAddress } from "./config/ip";
 import { createServer } from "http";
@@ -17,8 +19,6 @@ import { SocketManager } from "./socket/socket.manager";
 (BigInt.prototype as any).toJSON = function () {
     return Number(this.toString());
 };
-
-
 
 const HOST = getLocalIpAddress();
 const PORT = 8000;
@@ -38,8 +38,8 @@ app.use(userRouter);
 app.use(albumRouter);
 app.use(tagRouter);
 app.use(messageRouter);
-
-
+app.use(likesRouter)
+app.use(heartsRouter)
 
 async function bootstrap(){
     try {
