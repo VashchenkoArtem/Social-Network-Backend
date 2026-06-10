@@ -3,6 +3,8 @@ import type { Request, Response } from "express"
 import { PageNumberCounters, PageNumberPagination } from "prisma-extension-pagination/dist/types"
 import { AuthenticatedSocket, ServerSocket } from "../socket/socket.types"
 
+
+
 export type IMessage = Prisma.chat_app_messageGetPayload<{}>
 export type IMessageWithAuthor = Prisma.chat_app_messageGetPayload<{
     include: {
@@ -21,6 +23,8 @@ export type IMessageWithAuthor = Prisma.chat_app_messageGetPayload<{
         }
 }
 }>
+export type IMessageCreatePayload = IMessageWithAuthor
+
 export interface IMessageCreate {
     text: string | null
     chat_id: number
@@ -93,6 +97,6 @@ export interface IMessageRepositoryContract {
 
 export interface IMessageSocketControllerContract {
     registerHandlers: (socketServer: ServerSocket, socket: AuthenticatedSocket) => void
-    sendMessage: (socketServer: ServerSocket, socket: AuthenticatedSocket, data: IMessageSocketCreateDTO) => void
+    sendMessage: (socketServer: ServerSocket, socket: AuthenticatedSocket, data: IMessageSocketCreateDTO, ack?: IMessageCreatePayload) => void
     newMessage: (socketServer: ServerSocket, message: IMessageWithAuthor) => void
 }

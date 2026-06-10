@@ -34,7 +34,6 @@ export const MessageSocketController: IMessageSocketControllerContract = {
             )
 
             }
-            console.log(tempMessage)
             this.newMessage(socketServer, tempMessage)
             if (!data.photos || data.photos.length === 0){
                 console.log("Saved message without photos")
