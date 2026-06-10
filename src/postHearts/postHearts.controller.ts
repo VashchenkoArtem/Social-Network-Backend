@@ -2,8 +2,9 @@ import { IPostHeartsControllerContract } from './postHearts.types'
 import { HeartsService } from "./postHearts.service";
 
 export const HeartsController: IPostHeartsControllerContract = {
-    getAllHearts: async (req, res) => {
-        const hearts = await HeartsService.getAllHearts()    
+    getPostHearts: async (req, res) => {
+        const postId = Number(req.params.postId)
+        const hearts = await HeartsService.getPostHearts(postId)
         res.status(200).json(hearts)
     },
 

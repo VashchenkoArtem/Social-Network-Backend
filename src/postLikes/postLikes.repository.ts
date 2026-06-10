@@ -2,10 +2,14 @@ import { IPostLikesRepositoryContract } from './postLikes.types'
 import { client } from "../client/client";
 
 export const LikesRepository: IPostLikesRepositoryContract = {
-    getAllLikes: async () => {
+    getPostLikesCount: async (postId) => {
         try {
-            const likes = await client.post_app_postlike.findMany()
-            return likes
+            const likesCount = await client.post_app_postlike.count({
+                where: {
+                    post_id: postId
+                }
+            })
+            return likesCount
         } catch (error) {
             throw error
         }

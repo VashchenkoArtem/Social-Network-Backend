@@ -2,12 +2,9 @@ import { IPostLikesServiceContract } from './postLikes.types'
 import { LikesRepository } from "./postLikes.repository";
 
 export const LikesService: IPostLikesServiceContract = {
-    getAllLikes: async () => {
-        const likes = await LikesRepository.getAllLikes()
-        if (!likes) {
-            throw new Error('Likes was not found. Try again, please.')
-        }
-        return likes
+    getPostLikesCount: async (postId) => {
+        const likesCount = await LikesRepository.getPostLikesCount(postId)
+        return likesCount
     },
 
     createLike: async (postId, userId) => {

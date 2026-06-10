@@ -2,9 +2,10 @@ import { IPostLikesControllerContract } from './postLikes.types'
 import { LikesService } from "./postLikes.service";
 
 export const LikesController: IPostLikesControllerContract = {
-    getAllLikes: async (req, res) => {
-        const likes = await LikesService.getAllLikes()    
-        res.status(200).json(likes)
+    getPostLikesCount: async (req, res) => {
+        const postId = Number(req.params.postId)
+        const likesCount = await LikesService.getPostLikesCount(postId)
+        res.status(200).json(likesCount)
     },
 
     createLike: async (req, res) => {

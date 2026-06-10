@@ -4,9 +4,9 @@ import { Request, Response } from "express";
 export type Like = Prisma.post_app_postlikeGetPayload<{}>
 
 export interface IPostLikesControllerContract {
-    getAllLikes: (
-        req: Request<object, Like[] | string>,
-        res: Response<Like[] | string>
+    getPostLikesCount: (
+        req: Request<{ postId: string }, number | string>,
+        res: Response<number | string>
     ) => Promise<void>
 
     createLike: (
@@ -21,13 +21,13 @@ export interface IPostLikesControllerContract {
 }
 
 export interface IPostLikesServiceContract {
-    getAllLikes: () => Promise<Like[] | string>
+    getPostLikesCount: (postId: number) => Promise<number | string>
     createLike: (postId: number, userId: number) => Promise<Like | string>
     deleteLike: (postId: number, userId: number) => Promise<Like | string>
 }
 
 export interface IPostLikesRepositoryContract {
-    getAllLikes: () => Promise<Like[]>
+    getPostLikesCount: (postId: number) => Promise<number>
     createLike: (postId: number, userId: number) => Promise<Like>
     deleteLike: (postId: number, userId: number) => Promise<Like>
 }

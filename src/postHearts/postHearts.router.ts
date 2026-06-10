@@ -4,6 +4,6 @@ import { HeartsController } from "./postHearts.controller";
 
 export const heartsRouter = Router()
 
-heartsRouter.get('/hearts', HeartsController.getAllHearts)
+heartsRouter.get('/posts/:postId/hearts', HeartsController.getPostHearts)
 heartsRouter.post('/posts/:postId/heart', authMiddleware, HeartsController.createHeart)
 heartsRouter.delete('/posts/:postId/heart', authMiddleware, HeartsController.deleteHeart)

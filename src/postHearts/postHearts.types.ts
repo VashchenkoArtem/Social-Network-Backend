@@ -4,9 +4,9 @@ import { Request, Response } from "express";
 export type Heart = Prisma.post_app_postheartGetPayload<{}>
 
 export interface IPostHeartsControllerContract {
-    getAllHearts: (
-        req: Request<object, Heart[] | string>,
-        res: Response<Heart[] | string>
+    getPostHearts: (
+        req: Request<{ postId: string }, number | string>,
+        res: Response<number | string>
     ) => Promise<void>
 
     createHeart: (
@@ -21,13 +21,13 @@ export interface IPostHeartsControllerContract {
 }
 
 export interface IPostHeartsServiceContract {
-    getAllHearts: () => Promise<Heart[] | string>
+    getPostHearts: (postId: number) => Promise<number | string>
     createHeart: (postId: number, userId: number) => Promise<Heart | string>
     deleteHeart: (postId: number, userId: number) => Promise<Heart | string>
 }
 
 export interface IPostHeartsRepositoryContract {
-    getAllHearts: () => Promise<Heart[]>
+    getPostHearts: (postId: number) => Promise<number>
     createHeart: (postId: number, userId: number) => Promise<Heart>
     deleteHeart: (postId: number, userId: number) => Promise<Heart>
 }

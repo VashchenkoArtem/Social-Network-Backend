@@ -2,11 +2,8 @@ import { IPostHeartsServiceContract } from './postHearts.types'
 import { HeartsRepository } from "./postHearts.repository";
 
 export const HeartsService: IPostHeartsServiceContract = {
-    getAllHearts: async () => {
-        const hearts = await HeartsRepository.getAllHearts()
-        if (!hearts) {
-            throw new Error('Hearts was not found. Try again, please.')
-        }
+    getPostHearts: async (postId) => {
+        const hearts = await HeartsRepository.getPostHearts(postId)        
         return hearts
     },
 

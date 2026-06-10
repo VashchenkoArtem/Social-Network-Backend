@@ -2,9 +2,13 @@ import { IPostHeartsRepositoryContract } from './postHearts.types'
 import { client } from "../client/client";
 
 export const HeartsRepository: IPostHeartsRepositoryContract = {
-    getAllHearts: async () => {
+    getPostHearts: async (postId) => {
         try {
-            const hearts = await client.post_app_postheart.findMany()
+            const hearts = await client.post_app_postheart.count({
+                where: {
+                    post_id: postId
+                }
+            })
             return hearts
         } catch (error) {
             throw error

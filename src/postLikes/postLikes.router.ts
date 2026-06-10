@@ -4,6 +4,6 @@ import { authMiddleware } from "../middlewares/auth.middleware";
 
 export const likesRouter = Router()
 
-likesRouter.get('/likes', LikesController.getAllLikes)
+likesRouter.get('/posts/:postId/likes', LikesController.getPostLikesCount)
 likesRouter.post('/posts/:postId/like', authMiddleware, LikesController.createLike)
 likesRouter.delete('/posts/:postId/like', authMiddleware, LikesController.deleteLike)
