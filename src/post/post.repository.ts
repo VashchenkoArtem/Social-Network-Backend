@@ -141,9 +141,7 @@ export const postRepository: IPostRepositoryContract = {
                     },
                     post_app_post_tags: {
                         create: tagIds.map(tagId => ({
-                            post_app_tag: {
-                                connect: { id: BigInt(tagId) }
-                            }
+                            tag_id: BigInt(tagId)
                         }))
                     },
                     post_app_postlink: {
@@ -221,7 +219,7 @@ export const postRepository: IPostRepositoryContract = {
             if (data.authorId !== undefined) {
                 updateData.user_app_user = {
                     connect: {
-                        id: Number(data.authorId)
+                        id: BigInt(data.authorId)
                     }
                 };
             }

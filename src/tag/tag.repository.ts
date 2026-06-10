@@ -6,10 +6,16 @@ export const TagRepository: ITagRepositoryContract = {
         return await client.post_app_tag.findMany({ orderBy: { name: 'asc' } });
     },
     create: async (name: string) => {
-        return await client.post_app_tag.upsert({
-            where: { name } as any,
-            update: {},
-            create: { name }
+        const existingTag = await client.post_app_tag.findFirst({
+            where: { name: { equals: name, mode: 'insensitive' } } // регистронезависимо
+        });
+
+        if (existingTag) {
+            return existingTag;
+        }
+
+        return await client.post_app_tag.create({
+            data: { name }
         });
     }
 };

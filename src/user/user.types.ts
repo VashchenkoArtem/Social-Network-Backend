@@ -1,7 +1,10 @@
 import { Prisma } from "@prisma/client";
 import { Request, Response } from "express";
 import { Album, Photo } from "../album/types/album.types";
-
+import { AuthenticatedSocket, DataSocket, ServerSocket } from "../socket/socket.types";
+export interface UserPayload {
+    userIds: number[]
+}
 export type User = Prisma.user_app_userGetPayload<{}>
 export type UserWithoutPasswordDTO = {
     id: string;
@@ -26,7 +29,14 @@ export type UpdateUser = {
     signature?: string;
     pseudonym?: string;
     birth_date?: string | Date;
+    is_active?: boolean
 };
+export type UserCallback = (response: {
+    onlineUserIds: number[]
+} | {
+    status: "error";
+    message?: string;
+}) => void;
 export type UserWithProfile = Prisma.user_app_userGetPayload<{
     include: {
         profile_app_profile: true
@@ -124,6 +134,7 @@ export interface IUserServiceContract {
     // addPhotoToAlbum: (albumId: bigint, filename: string) => Promise<Photo>;
     getUserById: (id: bigint) => Promise<UserWithoutPassword | string>;
     findUserById: (userId: bigint) => Promise<UserWithProfile | string>
+    // updateLastSeenAt: (userId: bigint) => Promise<UserWithProfile | string>
 }
 export interface IUserRepositoryContract {
     login: (data: CreateUser) => Promise<User | string>
@@ -136,4 +147,11 @@ export interface IUserRepositoryContract {
     updateUserAvatar: (userId: bigint, filename: string | null) => Promise<Prisma.profile_app_profileGetPayload<{}>>;
     findProfileByUserId: (userId: bigint) => Promise<Prisma.profile_app_profileGetPayload<{}> | null>;
     findUserById: (userId: bigint) => Promise<UserWithProfile | string>
+    // updateLastSeenAt: (userId: bigint) => Promise<UserWithProfile | string>
+}
+
+export interface UserSocketControllerContract {
+    registerHandlers: (socket: AuthenticatedSocket, socketServer: ServerSocket | null) => void;
+    isUserOnline: (userId: number, socketServer: ServerSocket) => Promise<boolean>;
+    getUsersOnline: (socketServer: ServerSocket, data: UserPayload, ack?: UserCallback) => void
 }

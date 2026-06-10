@@ -81,6 +81,26 @@ export const UserRepository: IUserRepositoryContract = {
     },
     updateUser: async (data, userId, filename) => {
         console.log(data)
+        let parsedBirthDate: Date | undefined = undefined;
+        const birthDateData = data.birth_date;
+
+        console.log(birthDateData);
+        if (birthDateData && typeof birthDateData === 'string') {
+            const parts = birthDateData.split('.');
+            if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
+                const day = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10) - 1;
+                const year = parseInt(parts[2], 10);
+                
+                const date = new Date(year, month, day);
+                if (!isNaN(date.getTime())) {
+                    parsedBirthDate = date;
+                }
+            }
+        } else if (birthDateData instanceof Date) {
+            parsedBirthDate = birthDateData;
+        }
+        console.log("Итоговое значение для Prisma:", parsedBirthDate);
         return await client.user_app_user.update({
             where: { id: userId },
 
@@ -111,8 +131,8 @@ export const UserRepository: IUserRepositoryContract = {
                             pseudonym: data.pseudonym
                         }),
 
-                        ...(data.birth_date !== undefined && {
-                            birth_date: data.birth_date
+                        ...(parsedBirthDate !== undefined && { 
+                            birth_date: parsedBirthDate 
                         }),
 
                         ...(filename && {
