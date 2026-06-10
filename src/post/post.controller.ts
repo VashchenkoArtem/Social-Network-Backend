@@ -30,7 +30,6 @@ export const postsController: IPostControllerContract = {
     createPost: async (req, res) => {
         const userId = res.locals.userId;
         const data = req.body;
-        console.log(data)
         const files = req.files as Express.Multer.File[];
 
         const dataWithId = {
@@ -94,5 +93,29 @@ export const postsController: IPostControllerContract = {
         const userId = Number(req.params.userId)
         const foundedPosts = await PostService.getPostsByUserId(BigInt(userId))
         res.status(200).json(foundedPosts)
-    }
+    },
+
+    viewPost: async (req, res) => {
+        try {
+            const postId = Number(req.params.id);
+            const userId = res.locals.userId;
+
+            if (isNaN(postId)) {
+                res.status(400).json('Invalid Post ID');
+                return;
+            }
+
+            if (!userId) {
+                res.status(401).json('Unauthorized');
+                return;
+            }
+
+            const response = await PostService.viewPost(BigInt(postId), BigInt(userId));
+            
+            res.status(200).json(response);
+        } catch (error) {
+            console.error("Controller Error (viewPost):", error);
+            res.status(500).json("Internal Server Error");
+        }
+    },
 }

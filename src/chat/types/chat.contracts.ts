@@ -107,7 +107,7 @@ export interface IChatServiceContract {
 
     createChat: (
         adminId: number,
-        data: ICreateGroupChatDto,
+        data: {name: string, userIds: number[], is_group: boolean},
         filename: string | null
     ) => Promise<IChatWithUsers>;
 
@@ -156,7 +156,7 @@ export interface IChatRepositoryContract {
 
     createChat: (
         adminId: number,
-        data: ICreateGroupChatDto,
+        data: {name: string, userIds: number[], is_group: boolean},
         filename: string | null
     ) => Promise<IChatWithUsers>;
 

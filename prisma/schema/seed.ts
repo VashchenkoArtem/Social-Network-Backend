@@ -3,11 +3,16 @@ import { startTunnel } from "../../src/config/db.tunnel";
 
 async function main() {
     await startTunnel();
-    const photos = await client.user_app_friendship.deleteMany({
+    await client.chat_app_chat_users.deleteMany({
         where: {
-            status: "Pending"
+            chat_id: 38
         }
-    });
+    })
+    const photos = await client.chat_app_chat.delete({
+        where: {
+            id: 38
+        }
+    })
     console.log(photos)
 }
 

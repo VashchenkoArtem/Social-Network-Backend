@@ -16,13 +16,19 @@ export const MessageRepository: IMessageRepositoryContract = {
                     user_app_user: {
                         select: {
                             id: true,
-                            username: true,
                             profile_app_profile: {
                                 select: {
                                     id: true,
-                                    avatar: true
+                                    avatar: true,
+                                    pseudonym: true
                                 }
                             }
+                        }
+                    },
+                    chat_app_messageimage: {
+                        select: {
+                            id: true,
+                            image: true
                         }
                     }
                 }
@@ -48,31 +54,42 @@ export const MessageRepository: IMessageRepositoryContract = {
     },
 
     createMessage: async (data) => {
-        try {
-            const newMessage = await client.chat_app_message.create({
-                data,
-                include: {
-                    user_app_user: {
-                        select: {
-                            id: true,
-                            username: true,
-                            profile_app_profile: {
-                                select: {
-                                    id: true,
-                                    avatar: true
-                                }
-                            }
-                        } 
-                    }
-                }
-            })
-            return newMessage
-        } catch (error) {
-            throw error
+        const { photos, ...messageData } = data;
+        const createData: any = {
+            ...messageData,
+        };
+
+        if (photos?.length) {
+            createData.chat_app_messageimage = {
+                create: photos.map((photo: string) => ({
+                    image: photo,
+                }))
+            };
         }
+
+        return await client.chat_app_message.create({
+            data: createData,
+
+            include: {
+                user_app_user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        profile_app_profile: {
+                            select: {
+                                id: true,
+                                avatar: true,
+                            },
+                        },
+                    },
+                },
+
+                
+            },
+        });
     },
     
-    getAllUnreadMessages: async (userId) => {
+    getAllUnreadMessages: async (userId, is_group) => {
         try {
             const unreadMessages = await client.chat_app_message.count({
                 where: {
@@ -80,6 +97,7 @@ export const MessageRepository: IMessageRepositoryContract = {
                         not: userId
                     },
                     chat_app_chat: {
+                        is_group: is_group,
                         chat_app_chat_users: {
                             some: {
                                 user_id: userId
@@ -103,6 +121,7 @@ export const MessageRepository: IMessageRepositoryContract = {
         try {
             const unreadMessages = await client.chat_app_message.findMany({
                 where: {
+                    chat_id: chatId,
                     sender_id: {
                         not: userId
                     },
@@ -113,48 +132,54 @@ export const MessageRepository: IMessageRepositoryContract = {
                     }
                 }
             })
-            const readStatus = unreadMessages.map((message) => {
-                return client.chat_app_message_readers.create({
-                    data: {
-                        message_id: message.id,
-                        user_id: userId
-                    }
-                })
-            })
+            await Promise.all(
+                unreadMessages.map((message) =>
+                    client.chat_app_message_readers.create({
+                        data: {
+                            message_id: message.id,
+                            user_id: userId
+                        }
+                    })
+                )
+            )
             return 'Status was changed to read'
         } catch (error) {
             throw error
         }
     },
 
-    getAllUnreadChatMessages: async (chatId, userId) => {
+    getAllUnreadChatMessages: async (userId) => {
         try {
             console.log(userId)
-            const unreadChatMessages = await client.chat_app_message.count({
+            const unread = await client.chat_app_message.groupBy({
+                by: ["chat_id"],
                 where: {
                     sender_id: {
                         not: userId
                     },
+
                     chat_app_chat: {
-                        chat_app_message:{
-                            some: {
-                                chat_id: chatId
-                            }
-                        },
                         chat_app_chat_users: {
                             some: {
-                                user_id: Number(userId)
+                                user_id: userId
                             }
                         }
                     },
+
                     chat_app_message_readers: {
                         none: {
                             user_id: userId
                         }
                     }
+                },
+                _count: {
+                    _all: true
                 }
-            })
-            return unreadChatMessages
+            });
+            const unreadMap = Object.fromEntries(
+                unread.map(item => [item.chat_id, item._count._all])
+            );
+            return unreadMap
         } catch (error) {
             throw error
         }

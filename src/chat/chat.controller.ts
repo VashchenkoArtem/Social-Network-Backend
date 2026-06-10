@@ -25,8 +25,9 @@ export const ChatController: IChatControllerContract = {
     createChat: async (req, res) => {
         try {
             const adminId = Number(res.locals.userId);
-            const { name, userIds, isGroup } = req.body;
-
+            const { name, userIds, ...body } = req.body;
+            const is_group = req.body.is_group === "true";
+            console.log(is_group)
             let parsedUserIds: number[] = [];
 
             if (typeof userIds === "string") {
@@ -38,7 +39,7 @@ export const ChatController: IChatControllerContract = {
             } else if (Array.isArray(userIds)) {
                 parsedUserIds = userIds.map(Number);
             }
-            if (!isGroup && parsedUserIds.length === 1) {
+            if (!is_group && parsedUserIds.length === 1) {
                 const participantId = parsedUserIds[0]!;
 
                 const existingChat =
@@ -61,7 +62,7 @@ export const ChatController: IChatControllerContract = {
                 {
                     name,
                     userIds: parsedUserIds,
-                    isGroup: isGroup || false,
+                    is_group: is_group || false,
                 },
                 filename
             );
