@@ -7,6 +7,11 @@ export const LikesService: IPostLikesServiceContract = {
         return likesCount
     },
 
+    getPostLikeStatus: async (postId, userId) => {
+        const likeStatus = await LikesRepository.getPostLikeStatus(postId, userId)
+        return likeStatus
+    },
+
     createLike: async (postId, userId) => {
         const like = await LikesRepository.createLike(postId, userId)
         return like

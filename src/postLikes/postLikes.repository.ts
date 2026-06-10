@@ -15,6 +15,20 @@ export const LikesRepository: IPostLikesRepositoryContract = {
         }
     },
 
+    getPostLikeStatus: async (postId, userId) => {
+        try {
+            const like = await client.post_app_postlike.findFirst({
+                where: {
+                    post_id: postId,
+                    user_id: userId
+                }
+            })
+            return !!like 
+        } catch (error) {
+            throw error
+        }
+    },
+
     createLike: async (postId, userId) => {
         try {
             const newLike = await client.post_app_postlike.create({

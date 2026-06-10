@@ -9,6 +9,11 @@ export interface IPostHeartsControllerContract {
         res: Response<number | string>
     ) => Promise<void>
 
+    getPostHeartStatus: (
+        req: Request<{ postId: string }, {isHearted: boolean} | string, object>,
+        res: Response<{isHearted: boolean} | string>
+    ) => Promise<void>
+
     createHeart: (
         req: Request<{ postId: string }, Heart | string, object>,
         res: Response<Heart | string>
@@ -22,12 +27,14 @@ export interface IPostHeartsControllerContract {
 
 export interface IPostHeartsServiceContract {
     getPostHearts: (postId: number) => Promise<number | string>
+    getPostHeartStatus: (postId: number, userId: number) => Promise<boolean>
     createHeart: (postId: number, userId: number) => Promise<Heart | string>
     deleteHeart: (postId: number, userId: number) => Promise<Heart | string>
 }
 
 export interface IPostHeartsRepositoryContract {
     getPostHearts: (postId: number) => Promise<number>
+    getPostHeartStatus: (postId: number, userId: number) => Promise<boolean>
     createHeart: (postId: number, userId: number) => Promise<Heart>
     deleteHeart: (postId: number, userId: number) => Promise<Heart>
 }

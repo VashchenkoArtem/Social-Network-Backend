@@ -15,6 +15,20 @@ export const HeartsRepository: IPostHeartsRepositoryContract = {
         }
     },
 
+    getPostHeartStatus: async (postId, userId) => {
+        try {
+            const heart = await client.post_app_postheart.findFirst({
+                where: {
+                    post_id: postId,
+                    user_id: userId
+                }
+            })
+            return !!heart
+        } catch (error) {
+            throw error
+        }
+    },
+
     createHeart: async (postId, userId) => {
         try {
             const newHeart = await client.post_app_postheart.create({

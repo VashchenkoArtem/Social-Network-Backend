@@ -8,6 +8,14 @@ export const HeartsController: IPostHeartsControllerContract = {
         res.status(200).json(hearts)
     },
 
+    getPostHeartStatus: async (req, res) => {
+        const postId = Number(req.params.postId)
+        const userId = Number(res.locals.userId)
+        const isHearted = await HeartsService.getPostHeartStatus(postId, userId)
+
+        res.status(200).json({ isHearted })
+    },
+
     createHeart: async (req, res) => {
         try {
             const postId = Number(req.params.postId)

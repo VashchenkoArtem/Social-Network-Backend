@@ -7,6 +7,11 @@ export const HeartsService: IPostHeartsServiceContract = {
         return hearts
     },
 
+    getPostHeartStatus: async (postId, userId) => {
+        const heartStatus = await HeartsRepository.getPostHeartStatus(postId, userId)
+        return heartStatus
+    },
+
     createHeart: async (postId, userId) => {
         const heart = await HeartsRepository.createHeart(postId, userId)
         return heart
