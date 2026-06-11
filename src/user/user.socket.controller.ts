@@ -1,4 +1,3 @@
-import { UserService } from "./user.service"
 import { UserSocketControllerContract } from "./user.types"
 
 export const UserSocketController: UserSocketControllerContract = {
@@ -12,24 +11,27 @@ export const UserSocketController: UserSocketControllerContract = {
                 console.log("socket server is null")
             }
         })        
+
         socket.on('disconnect', () => {
             socket.leave(`user_${socket.data.userId}`)
         })
     },
     async getUsersOnline(socketServer, data, ack) {
-        const onlineUsersIds = data.userIds.filter((userId) => {
-            return this.isUserOnline(userId, socketServer)
-        })
-
-        if (ack){
-            ack({onlineUserIds: onlineUsersIds})
+        const checks = await Promise.all(
+            data.userIds.map(async (userId) => ({
+                userId,
+                isOnline: await this.isUserOnline(userId, socketServer)
+            }))
+        )
+        const onlineUsersIds = checks
+            .filter(item => item.isOnline)
+            .map(item => item.userId)
+        if (ack) {
+            ack({ onlineUserIds: onlineUsersIds })
         }
     },
     async isUserOnline(userId, socketServer){
-        const room = socketServer.sockets.adapter.rooms.get(`user_${userId}`)
-        if (!room){
-            return false
-        }
-        return room && room.size > 0
+        const room = socketServer.sockets.adapter.rooms.has(`user_${userId}`)
+        return room
     }
 }

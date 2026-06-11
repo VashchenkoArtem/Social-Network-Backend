@@ -8,6 +8,9 @@ export const client = new PrismaClient().$extends({
         },
         chat_app_message: {
             paginate
+        },
+        user_app_user: {
+            paginate
         }
     }
 })

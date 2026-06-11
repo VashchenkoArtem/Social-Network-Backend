@@ -71,8 +71,15 @@ export const friendController: IFriendsControllerContract = {
 
     recommendedPeople: async (req, res) => {
         try {
+            const limit = Number(req.query.limit)
+            const cursor = Number(req.query.cursor)
+            if (Number.isNaN(limit)) {
+                res.status(400).json('Query param take must be a number')
+                return
+            }
+
             const userId = res.locals.userId;
-            const recommendedPeople = await friendsService.recommendedPeople(userId);
+            const recommendedPeople = await friendsService.recommendedPeople(userId, {limit, cursor});
             res.status(200).json(recommendedPeople);
         } catch (error) {
             res.status(500).json("Internal Server Error");

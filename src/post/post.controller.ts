@@ -22,8 +22,16 @@ export const postsController: IPostControllerContract = {
     },
 
     getMyPosts: async (req, res) => {
+        const limit = Number(req.query.limit)
+        const cursor = Number(req.query.cursor)
+
+        if (Number.isNaN(limit)) {
+            res.status(400).json('Query param take must be a number')
+            return
+        }
+
         const userId = res.locals.userId;
-        const posts = await PostService.getMyPosts(userId)
+        const posts = await PostService.getMyPosts(userId, {limit, cursor})
         
         res.status(200).json(posts)
     },

@@ -17,7 +17,6 @@ export const ChatSocketController: ChatSocketControllerContract = {
 	},
 	async joinChat(socket, data, ack) {
 		try {
-			console.log(data)
 			const isSocketParticipant = await ChatService.isUserChatParticipant(
 				data.chatId,
 				socket.data.userId,

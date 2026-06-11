@@ -138,14 +138,15 @@ export const friendsRepository: IFriendsRepositoryContract = {
             throw error
         }
     },
-    recommendedPeople: async (userId) => {
+    recommendedPeople: async (userId, paginationData) => {
+        const limit = paginationData.limit ?? 3
         const friendships = await client.user_app_friendship.findMany({
             where: {
                 OR: [
                     { from_user_id: BigInt(userId) },
                     { to_user_id: BigInt(userId) },
                 ],
-            },
+            },            
             select: {
                 from_user_id: true,
                 to_user_id: true,
@@ -168,11 +169,36 @@ export const friendsRepository: IFriendsRepositoryContract = {
                     notIn: [userId, ...Array.from(excludedUserIds)],
                 },
             },
-            take: 2,
+            orderBy: [
+                // { created_at: "desc" },
+                { id: "desc" },
+            ],
+            take: limit + 1,
+            ...(paginationData.cursor
+                ? {
+                    cursor: {
+                        id: paginationData.cursor,
+                    },
+                    skip: 1,
+                }
+                : {}),
+            // take: 2,
             include: {
                 profile_app_profile: true,
             },
         });
-        return users;
+        const hasMore = users.length > limit;
+            const data = hasMore ? users.slice(0, limit) : users;
+
+            const nextCursor = hasMore
+                ? users[limit - 1]?.id ?? null
+                : null;
+            return {
+                data,
+                meta: {
+                    nextCursor: Number(nextCursor?.toString()),
+                    hasMore,
+                },
+            };
     }
 }

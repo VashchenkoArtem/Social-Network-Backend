@@ -61,7 +61,6 @@ export const postRepository: IPostRepositoryContract = {
             const nextCursor = hasMore
                 ? data[data.length - 1]?.id ?? null
                 : null;
-            console.log(posts)
             return {
                 data,
                 meta: {
@@ -74,16 +73,30 @@ export const postRepository: IPostRepositoryContract = {
         }
     },
     
-    getMyPosts: async (userId) => {
+    getMyPosts: async (userId, paginationData) => {
         try {
-            return await client.post_app_post.findMany({
+            const limit = paginationData.limit ?? 3
+            const userPosts = await client.post_app_post.findMany({
                 where: {
                     author_id: userId
                 },
-                orderBy: {
-                    created_at: "desc"
-                },
-                take: 3,
+
+                orderBy: [
+                    { created_at: "desc" },
+                    { id: "desc" },
+                ],
+                // orderBy: {
+                //     created_at: "desc"
+                // },
+                take: limit + 1,
+                ...(paginationData.cursor
+                    ? {
+                        cursor: {
+                            id: paginationData.cursor,
+                        },
+                        skip: 1,
+                    }
+                    : {}),
                 include: {
                     user_app_user: {
                         include:{
@@ -106,6 +119,20 @@ export const postRepository: IPostRepositoryContract = {
                     }
                 }
             })
+
+            const hasMore = userPosts.length > limit;
+            const data = hasMore ? userPosts.slice(0, limit) : userPosts;
+
+            const nextCursor = hasMore
+                ? data[data.length - 1]?.id ?? null
+                : null;
+            return {
+                data,
+                meta: {
+                    nextCursor: Number(nextCursor?.toString()),
+                    hasMore,
+                },
+            };
         } catch (error) {
             throw error
         }

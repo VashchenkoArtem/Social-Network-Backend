@@ -69,8 +69,8 @@ export interface IPostControllerContract {
     ) => void
     
     getMyPosts: (
-        req: Request<object, Post[] | string, object >,
-        res: Response<Post[] | string>
+        req: Request<object, PaginatedPostsResponse | string, object, GetPostsQuery >,
+        res: Response<PaginatedPostsResponse | string>
    ) => void
 
 //     deletePost: (
@@ -104,7 +104,8 @@ export interface IPostServiceContract {
 
     createPost: (data: CreatePostDTO, files?: Express.Multer.File[]) => Promise<Post | string>
     
-    getMyPosts: (userId: bigint) => Promise<Post[]>
+    // getMyPosts: (userId: bigint) => Promise<Post[]>
+    getMyPosts: (userId: bigint, paginationData: PaginationDTO) => Promise<PaginatedPostsResponse>
 
     // deletePost: (postId: number) => Promise<Post | string>
     updatePost: (postId: bigint, data: UpdatePostDto, files?: Express.Multer.File[]) => Promise<Post | string>
@@ -122,7 +123,7 @@ export interface IPostRepositoryContract {
 
     createPost: (data: CreatePostDTO, files?: Express.Multer.File[]) => Promise<Post | string>
     
-    getMyPosts: (userId: bigint) => Promise<Post[]>
+    getMyPosts: (userId: bigint, paginationData: PaginationDTO) => Promise<PaginatedPostsResponse>
 
     updatePost: (postId: bigint, data: UpdatePostDto, files?: Express.Multer.File[]) => Promise<Post | string>
 

@@ -43,7 +43,7 @@ app.use(heartsRouter)
 
 async function bootstrap(){
     try {
-        // await startTunnel();
+        await startTunnel();
         httpServer.listen(PORT, HOST, () => {
             console.log(`Сервер запущено`);
             console.log(`http://${HOST}:${PORT}`);

@@ -17,6 +17,24 @@ export type UserWithProfile = Prisma.user_app_userGetPayload<{
         profile_app_profile: true
     }
 }>
+
+export interface PaginationDTO {
+    limit?: number;
+    cursor?: number;
+}
+
+export interface PaginatedRecsResponse {
+    data: UserWithProfile[];
+    meta: {
+        nextCursor: number | null;
+        hasMore: boolean;
+    };
+}
+
+export interface PaginationQuery {
+    limit?: string;
+    cursor?: string;
+}
     
 export interface IFriendsControllerContract {
     getAllFriends: (
@@ -43,9 +61,10 @@ export interface IFriendsControllerContract {
         req: Request<{requestId: string}, FriendRequest | string, object, object>,
         res: Response<FriendRequest | string>
     ) => void,
+
     recommendedPeople: (
-        req: Request<object, UserWithProfile[] | string, object, object>,
-        res: Response<UserWithProfile[] | string>
+        req: Request<object, PaginatedRecsResponse | string, object, PaginationQuery>,
+        res: Response<PaginatedRecsResponse | string>
     ) => void
 }
 
@@ -55,7 +74,7 @@ export interface IFriendsServiceContract {
     createFriendRequest: (senderId: number, receiverId: number) => Promise<FriendRequest>
     updateFriendRequestStatus: (data: UpdateFriendRequestDTO) => Promise<FriendRequest>
     deleteFriendRequest: (requestId: number) => Promise<FriendRequest>
-    recommendedPeople: (userId: number) => Promise<UserWithProfile[]>
+    recommendedPeople: (userId: number, paginationData: PaginationDTO) => Promise<PaginatedRecsResponse>
 }
 
 
@@ -65,5 +84,5 @@ export interface IFriendsRepositoryContract {
     getAllRequests: (userId: number) => Promise<FriendRequestResponse[]>
     updateFriendRequestStatus: (data: UpdateFriendRequestDTO) => Promise<FriendRequest>
     deleteFriendRequest: (requestId: number) => Promise<FriendRequest>
-    recommendedPeople: (userId: number) => Promise<UserWithProfile[]>
+    recommendedPeople: (userId: number, paginationData: PaginationDTO) => Promise<PaginatedRecsResponse>
 }

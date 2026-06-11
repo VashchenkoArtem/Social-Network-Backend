@@ -11,8 +11,8 @@ export const PostService: IPostServiceContract = {
         return posts
     },
     
-    getMyPosts: async (userId) => {
-        const posts = await postRepository.getMyPosts(userId);
+    getMyPosts: async (userId, take) => {
+        const posts = await postRepository.getMyPosts(userId, take);
         return posts;
     },
     

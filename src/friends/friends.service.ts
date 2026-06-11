@@ -23,8 +23,8 @@ export const friendsService : IFriendsServiceContract = {
         const deletedRequest = await friendsRepository.deleteFriendRequest(requestId)
         return deletedRequest
     },
-    recommendedPeople: async(userId) => {
-        const recommendedPeople = await friendsRepository.recommendedPeople(userId)
+    recommendedPeople: async(userId, take) => {
+        const recommendedPeople = await friendsRepository.recommendedPeople(userId, take)
         return recommendedPeople
     }
 }

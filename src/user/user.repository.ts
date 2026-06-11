@@ -89,57 +89,47 @@ export const UserRepository: IUserRepositoryContract = {
             const parts = birthDateData.split('.');
             if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
                 const day = parseInt(parts[0], 10);
-                const month = parseInt(parts[1], 10) - 1;
+                const month = parseInt(parts[1], 10);
                 const year = parseInt(parts[2], 10);
                 
-                const date = new Date(year, month, day);
+                const utcTimestamp = Date.UTC(year, month - 1, day);
+                const date = new Date(utcTimestamp);
+
                 if (!isNaN(date.getTime())) {
                     parsedBirthDate = date;
                 }
             }
         } else if (birthDateData instanceof Date) {
-            parsedBirthDate = birthDateData;
+            const date = new Date(Date.UTC(
+                birthDateData.getFullYear(), 
+                birthDateData.getMonth(), 
+                birthDateData.getDate()
+            ));
+            parsedBirthDate = date;
         }
         console.log("Итоговое значение для Prisma:", parsedBirthDate);
+
+        const profileUpdate: any = {};
+        if (data.signature !== undefined) profileUpdate.signature = data.signature;
+        if (data.pseudonym !== undefined) profileUpdate.pseudonym = data.pseudonym;
+        if (parsedBirthDate !== undefined) profileUpdate.birth_date = parsedBirthDate;
+        if (filename !== undefined) profileUpdate.avatar = filename;
+
         return await client.user_app_user.update({
             where: { id: userId },
 
             data: {
-                ...(data.first_name !== undefined && {
-                    first_name: data.first_name
-                }),
+                ...(data.first_name !== undefined && { first_name: data.first_name }),
+                ...(data.last_name !== undefined && { last_name: data.last_name }),
+                ...(data.username !== undefined && { username: data.username }),
+                ...(data.email !== undefined && { email: data.email }),
+                ...(data.password !== undefined && { password: data.password }),
 
-                ...(data.last_name !== undefined && {
-                    last_name: data.last_name
-                }),
-
-                ...(data.username !== undefined && {
-                    username: data.username
-                }),
-
-                ...(data.email !== undefined && {
-                    email: data.email
-                }),
-
-                profile_app_profile: {
-                    update: {
-                        ...(data.signature !== undefined && {
-                            signature: data.signature
-                        }),
-
-                        ...(data.pseudonym !== undefined && {
-                            pseudonym: data.pseudonym
-                        }),
-
-                        ...(parsedBirthDate !== undefined && { 
-                            birth_date: parsedBirthDate 
-                        }),
-
-                        ...(filename && {
-                            avatar: filename
-                        })
+                ...(Object.keys(profileUpdate).length > 0 && {
+                    profile_app_profile: {
+                        update: profileUpdate
                     }
-                }
+                })
             },
 
             include: {
