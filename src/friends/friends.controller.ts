@@ -15,8 +15,15 @@ export const friendController: IFriendsControllerContract = {
 
     getAllRequests: async (req, res) => {
         try {
+            const limit = Number(req.query.limit)
+            const cursor = Number(req.query.cursor)
+            if (Number.isNaN(limit)) {
+                res.status(400).json('Query param take must be a number')
+                return
+            }
+
             const userId = res.locals.userId;
-            const requests = await friendsService.getAllRequests(userId);
+            const requests = await friendsService.getAllRequests(userId, { limit, cursor });
             res.status(200).json(requests);
         } catch (error) {
             console.log(error)

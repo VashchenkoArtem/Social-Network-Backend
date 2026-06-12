@@ -1,6 +1,5 @@
 import { Prisma } from "@prisma/client";
 
-
 export type IChatWithUsers = Prisma.chat_app_chatGetPayload<{
     include: {
         chat_app_chat_users: {
@@ -20,7 +19,8 @@ export type IChatWithUsers = Prisma.chat_app_chatGetPayload<{
             }
         }
     }
-}>;
+}>
+
 export type IChat = Prisma.chat_app_chatGetPayload<{}>
 export type IChatParticipant = Prisma.chat_app_chatGetPayload<{
     include: {
@@ -28,6 +28,22 @@ export type IChatParticipant = Prisma.chat_app_chatGetPayload<{
     }
 }>;
 
+export interface IChatWithPaginationResponse {
+    chats: IChatWithUsers[]
+    meta: {
+        nextCursor: number | null;
+        hasMore: boolean;
+    };
+}
+export interface IChatQuery {
+    limit?: string;
+    cursor?: string;
+}
+
+export interface PaginationDTO {
+    limit?: number;
+    cursor?: number;
+}
 export interface ICreateGroupChatDto {
     name: string;
     userIds: number[];

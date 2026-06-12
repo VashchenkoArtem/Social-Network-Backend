@@ -51,14 +51,26 @@ export const friendsRepository: IFriendsRepositoryContract = {
         }
     },
     
-    getAllRequests: async (userId) => {
+    getAllRequests: async (userId, paginationData) => {
         try {
+            const limit = paginationData.limit ?? 3
             const requests = await client.user_app_friendship.findMany({
                 where: {
                     to_user_id: userId,
                     status: "pending"
                 },
-                take: 2,
+                orderBy: [
+                    { id: "desc" },
+                ],                
+                take: limit + 1,
+                ...(paginationData.cursor
+                    ? {
+                        cursor: {
+                            id: paginationData.cursor,
+                        },
+                        skip: 1,
+                    }
+                    : {}),
                 include: {
                     user_app_user_user_app_friendship_from_user_idTouser_app_user: {
                         include: {
@@ -74,22 +86,31 @@ export const friendsRepository: IFriendsRepositoryContract = {
                 }
             });
 
-            return requests.map((request) => {
-                const isCurrentUserSender =
-                    request.from_user_id === BigInt(userId);
+            const hasMore = requests.length > limit
+            const data = hasMore ? requests.slice(0, limit) : requests
+            const nextCursor = hasMore ? requests[limit - 1]?.id ?? null : null
 
-                const user = isCurrentUserSender
-                    ? request.user_app_user_user_app_friendship_to_user_idTouser_app_user
-                    : request.user_app_user_user_app_friendship_from_user_idTouser_app_user;
-
-                return {
-                    id: Number(request.id.toString()),
-                    user
-                };
-            });
-
+            return {
+                data: data.map((request) => {
+                    const isCurrentUserSender =
+                        request.from_user_id === BigInt(userId);
+    
+                    const user = isCurrentUserSender
+                        ? request.user_app_user_user_app_friendship_to_user_idTouser_app_user
+                        : request.user_app_user_user_app_friendship_from_user_idTouser_app_user;
+    
+                    return {
+                        id: Number(request.id.toString()),
+                        user
+                    };
+                }),
+                meta: {
+                    nextCursor: Number(nextCursor?.toString()),
+                    hasMore
+                }
+            }
         } catch (error) {
-            throw error;
+            throw error
         }
     },
 
@@ -187,18 +208,17 @@ export const friendsRepository: IFriendsRepositoryContract = {
                 profile_app_profile: true,
             },
         });
-        const hasMore = users.length > limit;
-            const data = hasMore ? users.slice(0, limit) : users;
-
-            const nextCursor = hasMore
-                ? users[limit - 1]?.id ?? null
-                : null;
-            return {
-                data,
-                meta: {
-                    nextCursor: Number(nextCursor?.toString()),
-                    hasMore,
-                },
-            };
+        const hasMore = users.length > limit
+        const data = hasMore ? users.slice(0, limit) : users
+        const nextCursor = hasMore
+            ? users[limit - 1]?.id ?? null
+            : null
+        return {
+            data,
+            meta: {
+                nextCursor: Number(nextCursor?.toString()),
+                hasMore
+            }
+        }
     }
 }

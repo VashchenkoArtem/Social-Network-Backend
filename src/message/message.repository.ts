@@ -2,16 +2,24 @@ import { client } from "../client/client";
 import { IMessageRepositoryContract } from "./message.types";
 
 export const MessageRepository: IMessageRepositoryContract = {
-    getMessages: async (chatId) => {
+    getMessages: async (chatId, paginationData) => {
         try {
+            const limit = Math.min(Math.max(paginationData.limit ?? 20, 1), 50)
             const messages = await client.chat_app_message.findMany({
                 where: {
                     chat_id: chatId
                 },
                 orderBy: {
-                    created_at: 'desc'
-                }
-                ,
+                    created_at: 'desc',
+                    id: 'desc'
+                },
+                take: limit + 1,
+                ...(paginationData.cursor
+                    ? {
+                        cursor: { id: paginationData.cursor },
+                        skip: 1,
+                    }
+                    : {}),
                 include: {
                     user_app_user: {
                         select: {
@@ -33,7 +41,16 @@ export const MessageRepository: IMessageRepositoryContract = {
                     }
                 }
             })
-            return messages
+            const hasMore = messages.length > limit
+            const data = hasMore ? messages.slice(0, limit) : messages
+            const nextCursor = hasMore ? data[data.length - 1]?.id ?? null : null
+            return {
+                messages: data,
+                meta: {
+                    nextCursor: Number(nextCursor),
+                    hasMore
+                }
+            }
         } catch (error) {
             throw error
         }

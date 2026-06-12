@@ -2,8 +2,8 @@ import { MessageRepository } from "./message.repository"
 import { IMessageServiceContract } from "./message.types"
 
 export const MessageService: IMessageServiceContract = {
-    getMessages: async (chatId) => {
-        const messages = await MessageRepository.getMessages(chatId)
+    getMessages: async (chatId, take) => {
+        const messages = await MessageRepository.getMessages(chatId, take)
         return messages
     },
 

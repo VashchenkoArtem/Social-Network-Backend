@@ -35,6 +35,14 @@ export interface PaginationQuery {
     limit?: string;
     cursor?: string;
 }
+
+export interface PaginatedFriendRequestResponse {
+    data: FriendRequestResponse[];
+    meta: {
+        nextCursor: number | null;
+        hasMore: boolean;
+    };
+}
     
 export interface IFriendsControllerContract {
     getAllFriends: (
@@ -43,8 +51,8 @@ export interface IFriendsControllerContract {
     ) => void
     
     getAllRequests: (
-        req: Request<object,  FriendRequestResponse[] | string, object>,
-        res: Response<FriendRequestResponse[] | string>
+        req: Request<object,  PaginatedFriendRequestResponse | string, object, PaginationQuery>,
+        res: Response<PaginatedFriendRequestResponse | string>
     ) => void
 
     createFriendRequest: (
@@ -70,7 +78,7 @@ export interface IFriendsControllerContract {
 
 export interface IFriendsServiceContract {
     getAllFriends: (userId: number) => Promise<FriendRequestResponse[]>
-    getAllRequests: (userId: number) => Promise<FriendRequestResponse[]>
+    getAllRequests: (userId: number, paginationData: PaginationDTO) => Promise<PaginatedFriendRequestResponse>
     createFriendRequest: (senderId: number, receiverId: number) => Promise<FriendRequest>
     updateFriendRequestStatus: (data: UpdateFriendRequestDTO) => Promise<FriendRequest>
     deleteFriendRequest: (requestId: number) => Promise<FriendRequest>
@@ -81,7 +89,7 @@ export interface IFriendsServiceContract {
 export interface IFriendsRepositoryContract {
     getAllFriends: (userId: number) => Promise<FriendRequestResponse[]>
     createFriendRequest: (senderId: number, receiverId: number) => Promise<FriendRequest>
-    getAllRequests: (userId: number) => Promise<FriendRequestResponse[]>
+    getAllRequests: (userId: number, paginationData: PaginationDTO) => Promise<PaginatedFriendRequestResponse>
     updateFriendRequestStatus: (data: UpdateFriendRequestDTO) => Promise<FriendRequest>
     deleteFriendRequest: (requestId: number) => Promise<FriendRequest>
     recommendedPeople: (userId: number, paginationData: PaginationDTO) => Promise<PaginatedRecsResponse>
