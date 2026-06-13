@@ -45,15 +45,28 @@ export interface IMessageCreateDTO {
 export interface IMessageSocketCreateDTO extends IMessageCreateDTO {
     chat_id: number
 }
-export interface IMessageWithPagination {
+export interface IMessageWithPaginationResponse {
     messages: IMessage[]
-    pagination: PageNumberPagination & PageNumberCounters
+    meta: {
+        nextCursor: number | null;
+        hasMore: boolean;
+    };
+}
+
+export interface IMessageQuery {
+    limit?: string;
+    cursor?: string;
+}
+
+export interface PaginationDTO {
+    limit?: number;
+    cursor?: number;
 }
 
 export interface IMessageControllerContract {
     getMessages: (
-        req: Request<{chatId: string}, IMessage[] | string, object>,
-        res: Response<IMessage[] | string>
+        req: Request<{chatId: string}, IMessageWithPaginationResponse | string, object, IMessageQuery>,
+        res: Response<IMessageWithPaginationResponse | string>
     ) => void
 
     getAllUnreadMessages: (
@@ -77,7 +90,7 @@ export interface IMessageControllerContract {
 }
 
 export interface IMessageServiceContract {
-    getMessages: (chatId: number) => Promise<IMessage[]>
+    getMessages: (chatId: number, paginationData: PaginationDTO) => Promise<IMessageWithPaginationResponse>
     getAllMessagesByChatId: (chatId: number) => Promise<IMessage[]>
     createMessage: (data: IMessageCreate) => Promise<IMessageWithAuthor>
     markAsRead: (chatId: number, userId: number) => Promise<string>
@@ -86,7 +99,7 @@ export interface IMessageServiceContract {
 }
 
 export interface IMessageRepositoryContract {
-    getMessages: (chatId: number) => Promise<IMessage[]>
+    getMessages: (chatId: number, paginationData: PaginationDTO) => Promise<IMessageWithPaginationResponse>
     getAllMessagesByChatId: (chatId: number) => Promise<IMessage[]>
     createMessage: (data: IMessageCreate) => Promise<IMessageWithAuthor>
     getAllUnreadMessages: (userId: number, is_group: boolean) => Promise<number | string>

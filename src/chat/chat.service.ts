@@ -3,11 +3,11 @@ import { ChatRepository } from "./chat.repository";
 import { IChatServiceContract } from "./types/chat.contracts";
 
 export const ChatService: IChatServiceContract = {
-    getGroupChats: async (userId) => {
-        return await ChatRepository.getGroupChats(userId);
+    getGroupChats: async (userId, take) => {
+        return await ChatRepository.getGroupChats(userId, take);
     },
-    getPersonalChats: async (userId) => {
-        return await ChatRepository.getPersonalChats(userId);
+    getPersonalChats: async (userId, take) => {
+        return await ChatRepository.getPersonalChats(userId, take);
     },
     createChat: async (adminId, data, filename) => {
         return await ChatRepository.createChat(adminId, data, filename);

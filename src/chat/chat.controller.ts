@@ -1,3 +1,4 @@
+import { BadRequestError } from "../errors";
 import { ChatService } from "./chat.service";
 import { IChatControllerContract } from "./types/chat.contracts";
 
@@ -5,7 +6,23 @@ export const ChatController: IChatControllerContract = {
     getGroupChats: async (req, res) => {
         try {
             const userId = res.locals.userId;
-            const chats = await ChatService.getGroupChats(userId);
+            const limit = Number(req.query.limit)
+            const cursor = Number(req.query.cursor)
+            if (cursor !== undefined && Number.isNaN(cursor)) {
+                    throw new BadRequestError("Cursor must be an integer");
+                }
+                
+            if (limit !== undefined && Number.isNaN(limit)) {
+                throw new BadRequestError("Limit must be an integer");
+            }
+
+            const paginationData: {
+                cursor?: number;
+                limit?: number;
+            } = {};
+            if (cursor !== undefined) paginationData.cursor = cursor
+            if (limit !== undefined) paginationData.limit = limit
+            const chats = await ChatService.getGroupChats(userId, paginationData);
             res.status(200).json(chats);
         } catch (error) {
             res.status(500).json("Internal Server Error");
@@ -15,7 +32,23 @@ export const ChatController: IChatControllerContract = {
     getPersonalChats: async (req, res) => {
         try {
             const userId = res.locals.userId;
-            const chats = await ChatService.getPersonalChats(userId);
+            const limit = Number(req.query.limit)
+            const cursor = Number(req.query.cursor)
+            if (cursor !== undefined && Number.isNaN(cursor)) {
+                    throw new BadRequestError("Cursor must be an integer");
+                }
+                
+            if (limit !== undefined && Number.isNaN(limit)) {
+                throw new BadRequestError("Limit must be an integer");
+            }
+
+            const paginationData: {
+                cursor?: number;
+                limit?: number;
+            } = {};
+            if (cursor !== undefined) paginationData.cursor = cursor
+            if (limit !== undefined) paginationData.limit = limit
+            const chats = await ChatService.getPersonalChats(userId, paginationData);
             res.status(200).json(chats);
         } catch (error) {
             res.status(500).json("Internal Server Error");

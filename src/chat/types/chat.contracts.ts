@@ -1,27 +1,29 @@
 import type { NextFunction, Request, Response } from "express";
-import { CreateChat, IChat, IChatParticipant, IChatWithUsers, ICreateGroupChatDto, IUpdateChat, JoinChatCallback, JoinChatPayload, LeaveChatPayload } from "./chat.types";
+import { CreateChat, IChat, IChatParticipant, IChatQuery, IChatWithPaginationResponse, IChatWithUsers, ICreateGroupChatDto, IUpdateChat, JoinChatCallback, JoinChatPayload, LeaveChatPayload, PaginationDTO } from "./chat.types";
 import { AuthenticatedSocket } from "../../socket/socket.types";
 
 export interface IChatControllerContract {
     getGroupChats: (
         req: Request<
             object,
-            IChatWithUsers[] | string,
-            object
+            IChatWithPaginationResponse | string,
+            object,
+            IChatQuery
         >,
         res: Response<
-            IChatWithUsers[] | string
+            IChatWithPaginationResponse | string
         >
     ) => Promise<void>;
 
     getPersonalChats: (
         req: Request<
             object,
-            IChatWithUsers[] | string,
-            object
+            IChatWithPaginationResponse | string,
+            object,
+            IChatQuery
         >,
         res: Response<
-            IChatWithUsers[] | string
+            IChatWithPaginationResponse | string
         >
     ) => Promise<void>;
 
@@ -98,12 +100,14 @@ export interface IChatControllerContract {
 
 export interface IChatServiceContract {
     getGroupChats: (
-        userId: number
-    ) => Promise<IChatWithUsers[]>;
+        userId: number,
+        paginationData: PaginationDTO
+    ) => Promise<IChatWithPaginationResponse>;
 
     getPersonalChats: (
-        userId: number
-    ) => Promise<IChatWithUsers[]>;
+        userId: number,
+        paginationData: PaginationDTO
+    ) => Promise<IChatWithPaginationResponse>;
 
     createChat: (
         adminId: number,
@@ -147,12 +151,14 @@ export interface IChatServiceContract {
 
 export interface IChatRepositoryContract {
     getGroupChats: (
-        userId: number
-    ) => Promise<IChatWithUsers[]>;
+        userId: number,
+        paginationData: PaginationDTO
+    ) => Promise<IChatWithPaginationResponse>;
 
     getPersonalChats: (
-        userId: number
-    ) => Promise<IChatWithUsers[]>;
+        userId: number,
+        paginationData: PaginationDTO
+    ) => Promise<IChatWithPaginationResponse>;
 
     createChat: (
         adminId: number,

@@ -98,9 +98,7 @@ export interface IPostControllerContract {
 }
 
 export interface IPostServiceContract {
-    getAllPosts: (
-        paginationData: PaginationDTO
-    ) => Promise<PaginatedPostsResponse>;
+    getAllPosts: (paginationData: PaginationDTO) => Promise<PaginatedPostsResponse>;
 
     createPost: (data: CreatePostDTO, files?: Express.Multer.File[]) => Promise<Post | string>
     

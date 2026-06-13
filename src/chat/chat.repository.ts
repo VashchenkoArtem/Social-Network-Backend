@@ -2,8 +2,9 @@ import { client } from "../client/client";
 import { IChatRepositoryContract } from "./types/chat.contracts";
 
 export const ChatRepository: IChatRepositoryContract = {
-    getGroupChats: async (userId) => {
-        return await client.chat_app_chat.findMany({
+    getGroupChats: async (userId, paginationData) => {
+        const limit = Math.min(Math.max(paginationData.limit ?? 20, 1), 50)
+        const groupChat = await client.chat_app_chat.findMany({
             where: {
                 chat_app_chat_users: {
                     some: {
@@ -12,6 +13,16 @@ export const ChatRepository: IChatRepositoryContract = {
                 },
                 is_group: true
             },
+            orderBy: {
+                id: 'desc'
+            },
+            take: limit + 1,
+            ...(paginationData.cursor
+                ? {
+                    cursor: { id: paginationData.cursor },
+                    skip: 1,
+                }
+                : {}),
             include: {
                 chat_app_chat_users: {
                     where: {
@@ -41,10 +52,22 @@ export const ChatRepository: IChatRepositoryContract = {
                 }
             }
         });
+
+        const hasMore = groupChat.length > limit
+        const data = hasMore ? groupChat.slice(0, limit) : groupChat
+        const nextCursor = hasMore ? data[data.length - 1]?.id ?? null : null
+        return {
+            chats: data,
+            meta: {
+                nextCursor: Number(nextCursor),
+                hasMore
+            }
+        }
     },
 
-    getPersonalChats: async (userId) => {
-        return await client.chat_app_chat.findMany({
+    getPersonalChats: async (userId, paginationData) => {
+        const limit = Math.min(Math.max(paginationData.limit ?? 20, 1), 50)
+        const personalChats = await client.chat_app_chat.findMany({
             where: {
                 chat_app_chat_users: {
                     some: {
@@ -53,8 +76,16 @@ export const ChatRepository: IChatRepositoryContract = {
                 },
                 is_group: false
             },
-            take: 2,
-
+            orderBy: {
+                id: 'desc',
+            },
+            take: limit + 1,
+            ...(paginationData.cursor
+                ? {
+                    cursor: { id: paginationData.cursor },
+                    skip: 1,
+                }
+                : {}),
             include: {
                 chat_app_chat_users: {
                     where: {
@@ -100,6 +131,17 @@ export const ChatRepository: IChatRepositoryContract = {
                 }
             }
         });
+
+        const hasMore = personalChats.length > limit
+        const data = hasMore ? personalChats.slice(0, limit) : personalChats
+        const nextCursor = hasMore ? data[data.length - 1]?.id ?? null : null
+        return {
+            chats: data,
+            meta: {
+                nextCursor: Number(nextCursor),
+                hasMore
+            }
+        }
     },
 
     createChat: async (adminId, data, filename) => {

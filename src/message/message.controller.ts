@@ -1,4 +1,4 @@
-import { NotFoundError } from "../errors";
+import { BadRequestError, NotFoundError } from "../errors";
 import { MessageService } from "./message.service";
 import { IMessageControllerContract } from "./message.types";
 
@@ -6,8 +6,24 @@ import { IMessageControllerContract } from "./message.types";
 export const MessageController: IMessageControllerContract = {
     getMessages: async (req, res) => {
         const chatId = Number(req.params.chatId)
-        const messages = await MessageService.getMessages(chatId)
-        
+        const limit = Number(req.query.limit)
+        const cursor = Number(req.query.cursor)
+        if (cursor !== undefined && Number.isNaN(cursor)) {
+				throw new BadRequestError("Cursor must be an integer");
+			}
+            
+		if (limit !== undefined && Number.isNaN(limit)) {
+			throw new BadRequestError("Limit must be an integer");
+		}
+
+        const paginationData: {
+			cursor?: number;
+			limit?: number;
+		} = {};
+		if (cursor !== undefined) paginationData.cursor = cursor
+		if (limit !== undefined) paginationData.limit = limit
+
+        const messages = await MessageService.getMessages(chatId, paginationData)
         res.status(200).json(messages)
     },
 

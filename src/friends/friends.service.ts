@@ -6,8 +6,8 @@ export const friendsService : IFriendsServiceContract = {
         const friends = await friendsRepository.getAllFriends(userId)
         return friends
     },
-    getAllRequests: async(userId) => {
-        const requests = await friendsRepository.getAllRequests(userId)
+    getAllRequests: async(userId, take) => {
+        const requests = await friendsRepository.getAllRequests(userId, take)
         return requests
     },
     createFriendRequest: async(senderId, receiverId) => {
