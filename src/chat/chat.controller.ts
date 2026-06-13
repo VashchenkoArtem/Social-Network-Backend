@@ -49,6 +49,7 @@ export const ChatController: IChatControllerContract = {
             if (cursor !== undefined) paginationData.cursor = cursor
             if (limit !== undefined) paginationData.limit = limit
             const chats = await ChatService.getPersonalChats(userId, paginationData);
+            console.log(chats)
             res.status(200).json(chats);
         } catch (error) {
             res.status(500).json("Internal Server Error");
@@ -60,7 +61,6 @@ export const ChatController: IChatControllerContract = {
             const adminId = Number(res.locals.userId);
             const { name, userIds, ...body } = req.body;
             const is_group = req.body.is_group === "true";
-            console.log(is_group)
             let parsedUserIds: number[] = [];
 
             if (typeof userIds === "string") {

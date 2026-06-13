@@ -80,11 +80,9 @@ export const UserRepository: IUserRepositoryContract = {
         }
     },
     updateUser: async (data, userId, filename) => {
-        console.log(data)
         let parsedBirthDate: Date | undefined = undefined;
         const birthDateData = data.birth_date;
 
-        console.log(birthDateData);
         if (birthDateData && typeof birthDateData === 'string') {
             const parts = birthDateData.split('.');
             if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {

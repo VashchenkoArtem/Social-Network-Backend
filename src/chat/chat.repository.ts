@@ -131,7 +131,7 @@ export const ChatRepository: IChatRepositoryContract = {
                 }
             }
         });
-
+        console.log(personalChats)
         const hasMore = personalChats.length > limit
         const data = hasMore ? personalChats.slice(0, limit) : personalChats
         const nextCursor = hasMore ? data[data.length - 1]?.id ?? null : null
