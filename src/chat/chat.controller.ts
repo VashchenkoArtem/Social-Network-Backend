@@ -77,6 +77,7 @@ export const ChatController: IChatControllerContract = {
         const chatId = Number(req.params.id)
         const body = req.body
         const chat = await ChatService.updateChat(chatId, body)
+        console.log(chat)
         res.status(200).json(chat)
     },
     deleteChat: async (req, res) => {

@@ -77,9 +77,9 @@ export const friendController: IFriendsControllerContract = {
                 res.status(400).json('Query param take must be a number')
                 return
             }
-
             const userId = res.locals.userId;
             const recommendedPeople = await friendsService.recommendedPeople(userId, {limit, cursor});
+            console.log(recommendedPeople, "recommended people")
             res.status(200).json(recommendedPeople);
         } catch (error) {
             res.status(500).json("Internal Server Error");

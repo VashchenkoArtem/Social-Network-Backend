@@ -15,7 +15,7 @@ chatRouter.post(
     procImgMiddleware(300, 100), 
     ChatController.createChat
 );
-chatRouter.patch("/chat/:id", authMiddleware, ChatController.updateChat)
+chatRouter.patch("/chat/:id", authMiddleware, uploadMiddleware.array("avatar", 1), procImgMiddleware(300, 100),  ChatController.updateChat)
 chatRouter.delete("/:id", authMiddleware, ChatController.deleteChat)
 chatRouter.delete("/leave", authMiddleware, ChatController.leaveChat) 
 chatRouter.get('/chat/:chatId', authMiddleware, ChatController.findChatById)
