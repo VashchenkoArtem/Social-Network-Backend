@@ -6,24 +6,42 @@ import { IMessageControllerContract } from "./message.types";
 export const MessageController: IMessageControllerContract = {
     getMessages: async (req, res) => {
         const chatId = Number(req.params.chatId)
+
+        if (Number.isNaN(chatId)) {
+            res.status(400).json("Chat id must be a number")
+            return
+        }
+
         const limit = Number(req.query.limit)
-        const cursor = Number(req.query.cursor)
-        if (cursor !== undefined && Number.isNaN(cursor)) {
-				throw new BadRequestError("Cursor must be an integer");
-			}
-            
-		if (limit !== undefined && Number.isNaN(limit)) {
-			throw new BadRequestError("Limit must be an integer");
-		}
+
+        if (Number.isNaN(limit)) {
+            res.status(400).json("Query param limit must be a number")
+            return
+        }
 
         const paginationData: {
-			cursor?: number;
-			limit?: number;
-		} = {};
-		if (cursor !== undefined) paginationData.cursor = cursor
-		if (limit !== undefined) paginationData.limit = limit
+            limit: number;
+            cursor?: number;
+        } = {
+            limit
+        }
 
-        const messages = await MessageService.getMessages(chatId, paginationData)
+        if (req.query.cursor !== undefined) {
+            const cursor = Number(req.query.cursor)
+
+            if (Number.isNaN(cursor)) {
+                res.status(400).json("Query param cursor must be a number")
+                return
+            }
+
+            paginationData.cursor = cursor
+        }
+
+        const messages = await MessageService.getMessages(
+            chatId,
+            paginationData
+        )
+
         res.status(200).json(messages)
     },
 

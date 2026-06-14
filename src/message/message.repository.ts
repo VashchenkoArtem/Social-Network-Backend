@@ -9,10 +9,14 @@ export const MessageRepository: IMessageRepositoryContract = {
                 where: {
                     chat_id: chatId
                 },
-                orderBy: {
-                    created_at: 'desc',
-                    id: 'desc'
-                },
+                orderBy: [
+                    {
+                        created_at: "desc",
+                    },
+                    {
+                        id: "desc",
+                    },
+                ],
                 take: limit + 1,
                 ...(paginationData.cursor
                     ? {
