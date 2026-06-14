@@ -29,7 +29,6 @@ export const friendsRepository: IFriendsRepositoryContract = {
                     }
                 }
             });
-            console.log(friends)
             return friends.map((friendship) => {
                 const isCurrentUserSender =
                     friendship
@@ -139,7 +138,6 @@ export const friendsRepository: IFriendsRepositoryContract = {
                 },
                 data: requestData
             })
-            console.log(updatedRequest)
             return updatedRequest
         } catch (error) {
             throw error
@@ -148,7 +146,6 @@ export const friendsRepository: IFriendsRepositoryContract = {
 
     deleteFriendRequest: async (requestId) => {
         try {
-            console.log(requestId)
             const deletedRequest = await client.user_app_friendship.delete({
                 where: {
                     id: requestId

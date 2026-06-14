@@ -4,55 +4,41 @@ import { IChatControllerContract } from "./types/chat.contracts";
 
 export const ChatController: IChatControllerContract = {
     getGroupChats: async (req, res) => {
-        try {
-            const userId = res.locals.userId;
-            const limit = Number(req.query.limit)
-            const cursor = Number(req.query.cursor)
-            if (cursor !== undefined && Number.isNaN(cursor)) {
-                    throw new BadRequestError("Cursor must be an integer");
-                }
-                
-            if (limit !== undefined && Number.isNaN(limit)) {
-                throw new BadRequestError("Limit must be an integer");
-            }
+        const limit = Number(req.query.limit)
+        const cursor = Number(req.query.cursor)
 
-            const paginationData: {
-                cursor?: number;
-                limit?: number;
-            } = {};
-            if (cursor !== undefined) paginationData.cursor = cursor
-            if (limit !== undefined) paginationData.limit = limit
-            const chats = await ChatService.getGroupChats(userId, paginationData);
-            res.status(200).json(chats);
-        } catch (error) {
-            res.status(500).json("Internal Server Error");
+        if (Number.isNaN(limit)) {
+            res.status(400).json('Query param limit must be a number')
+            return
         }
+
+        const userId = res.locals.userId
+
+        const response = await ChatService.getGroupChats(userId, {
+            limit,
+            cursor
+        })
+
+        res.status(200).json(response)
     },
 
     getPersonalChats: async (req, res) => {
-        try {
-            const userId = res.locals.userId;
-            const limit = Number(req.query.limit)
-            const cursor = Number(req.query.cursor)
-            if (cursor !== undefined && Number.isNaN(cursor)) {
-                    throw new BadRequestError("Cursor must be an integer");
-                }
-                
-            if (limit !== undefined && Number.isNaN(limit)) {
-                throw new BadRequestError("Limit must be an integer");
-            }
+        const limit = Number(req.query.limit)
+        const cursor = Number(req.query.cursor)
 
-            const paginationData: {
-                cursor?: number;
-                limit?: number;
-            } = {};
-            if (cursor !== undefined) paginationData.cursor = cursor
-            if (limit !== undefined) paginationData.limit = limit
-            const chats = await ChatService.getPersonalChats(userId, paginationData);
-            res.status(200).json(chats);
-        } catch (error) {
-            res.status(500).json("Internal Server Error");
+        if (Number.isNaN(limit)) {
+            res.status(400).json('Query param limit must be a number')
+            return
         }
+
+        const userId = res.locals.userId
+
+        const response = await ChatService.getPersonalChats(userId, {
+            limit,
+            cursor
+        })
+
+        res.status(200).json(response)
     },
 
     createChat: async (req, res) => {
@@ -60,7 +46,6 @@ export const ChatController: IChatControllerContract = {
             const adminId = Number(res.locals.userId);
             const { name, userIds, ...body } = req.body;
             const is_group = req.body.is_group === "true";
-            console.log(is_group)
             let parsedUserIds: number[] = [];
 
             if (typeof userIds === "string") {

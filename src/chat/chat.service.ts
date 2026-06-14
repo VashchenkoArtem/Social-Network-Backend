@@ -36,7 +36,6 @@ export const ChatService: IChatServiceContract = {
 		const isUserInChat = chat.chat_app_chat_users.some((participant) => {
 			return participant.user_id === BigInt(userId);
 		});
-        console.log(isUserInChat)
 		return isUserInChat;
 	},
     getChatByParticipants: async (userId, participantId) => {

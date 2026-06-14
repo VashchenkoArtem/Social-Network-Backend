@@ -9,7 +9,7 @@ export const chatRouter = Router()
 chatRouter.get("/personal-chats", authMiddleware, ChatController.getPersonalChats)
 chatRouter.get("/group-chats", authMiddleware, ChatController.getGroupChats)
 chatRouter.post(
-    "/chats", 
+    "/chat", 
     authMiddleware, 
     uploadMiddleware.array("avatar", 1), 
     procImgMiddleware(300, 100), 
