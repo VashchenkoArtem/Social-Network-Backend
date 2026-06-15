@@ -117,7 +117,8 @@ export interface IChatServiceContract {
 
     updateChat: (
         chatId: number,
-        data: IUpdateChat
+        data: IUpdateChat,
+        filename: string | null
     ) => Promise<IChatWithUsers>;
 
     deleteChat: (
@@ -168,7 +169,8 @@ export interface IChatRepositoryContract {
 
     updateChat: (
         chatId: number,
-        data: IUpdateChat
+        data: IUpdateChat,
+        filename: string | null
     ) => Promise<IChatWithUsers>;
 
     deleteChat: (

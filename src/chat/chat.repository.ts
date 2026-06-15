@@ -170,31 +170,34 @@ export const ChatRepository: IChatRepositoryContract = {
                                 profile_app_profile: true
             }}}}}})
     },
-updateChat: async (chatId, data) => {
-    try {
-        const { userIds, ...safeData } = data;
+    updateChat: async (chatId, data, filename) => {
+        try {
+            const { userIds, ...safeData } = data;
 
-        const chat = await client.chat_app_chat.update({
-            where: { id: chatId },
-            data: safeData,
-            include: {
-                chat_app_chat_users: {
-                    include: {
-                        user_app_user: {
-                            include: {
-                                profile_app_profile: true
+            const chat = await client.chat_app_chat.update({
+                where: { id: chatId },
+                data: {
+                    name: safeData.name,
+                    ...(filename !== undefined ? { avatar: filename } : {}),
+                },
+                include: {
+                    chat_app_chat_users: {
+                        include: {
+                            user_app_user: {
+                                include: {
+                                    profile_app_profile: true
+                                }
                             }
                         }
                     }
                 }
-            }
-        });
+            });
 
-        return chat;
-    } catch (error) {
-        throw error;
-    }
-},
+            return chat;
+        } catch (error) {
+            throw error;
+        }
+    },
 
     deleteChat: async (chatId) => {
         try {

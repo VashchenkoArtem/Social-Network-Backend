@@ -52,8 +52,8 @@ export interface ICreateGroupChatDto {
 }
 
 export type IUpdateChat = {
-    name?: string;
-    userIds?: number[];
+    name: string;
+    userIds: number[];
 };
 export interface JoinChatPayload {
     chatId: number

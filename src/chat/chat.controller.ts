@@ -94,8 +94,13 @@ export const ChatController: IChatControllerContract = {
     updateChat: async (req, res) => {
         const chatId = Number(req.params.id)
         const body = req.body
-        const chat = await ChatService.updateChat(chatId, body)
-        console.log(chat)
+        const data = { 
+            name: body.name,
+            userIds: body.userIds
+        }
+        const files = req.files as Express.Multer.File[];
+        const filename = files?.[0]?.filename || null;
+        const chat = await ChatService.updateChat(chatId, data, filename)
         res.status(200).json(chat)
     },
     deleteChat: async (req, res) => {

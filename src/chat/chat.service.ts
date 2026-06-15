@@ -13,8 +13,8 @@ export const ChatService: IChatServiceContract = {
         return await ChatRepository.createChat(adminId, data, filename);
     },
 
-    updateChat: async (chatId, data) => {
-        return await ChatRepository.updateChat(chatId, data)
+    updateChat: async (chatId, data, filename) => {
+        return await ChatRepository.updateChat(chatId, data, filename)
     },
     
     deleteChat: async (chatId) => {
