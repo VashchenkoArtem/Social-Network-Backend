@@ -6,6 +6,7 @@ import {
 } from "./post.types";
 import { Prisma } from "@prisma/client";
 import { client } from "../client/client";
+import cloudinary from "../config/cloudinary";
 
 export const postRepository: IPostRepositoryContract = {
     getAllPosts: async (paginationData) => {
@@ -141,8 +142,8 @@ export const postRepository: IPostRepositoryContract = {
     createPost: async (data, files) => {
         try {
             const photos = files?.map(file => ({
-                original_image: file.filename,
-                compressed_image: file.filename
+                original_image: cloudinary.url(file.filename),
+                compressed_image: cloudinary.url(file.filename)
             })) ?? [];
 
             const tags = data.tags ?? [];

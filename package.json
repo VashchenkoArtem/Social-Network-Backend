@@ -32,6 +32,7 @@
     "sharp": "^0.34.5",
     "socket.io": "^4.8.3",
     "ssh-tunnel": "^2.3.23",
+    "streamifier": "^0.1.1",
     "tunnel-ssh": "^5.2.0",
     "typescript": "^6.0.2"
   },
@@ -40,6 +41,7 @@
     "@types/cors": "^2.8.19",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.1.0",
-    "@types/nodemailer": "^7.0.11"
+    "@types/nodemailer": "^7.0.11",
+    "@types/streamifier": "^0.1.2"
   }
 }

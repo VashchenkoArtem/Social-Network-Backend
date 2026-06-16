@@ -24,6 +24,8 @@ const filePath = path.resolve(
 
 console.log(filePath);
 (async function(){
-    const results = await cloudinary.uploader.upload(filePath)
+    const results = await cloudinary.uploader.upload(filePath, {
+        
+    })
     console.log(results)
 })()

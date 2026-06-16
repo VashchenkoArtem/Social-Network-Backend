@@ -1,14 +1,30 @@
-import { ValidationError } from "../errors/app-errors";
-import { join } from "node:path";
 import multer, { memoryStorage } from "multer";
 import sharp from "sharp";
-
 import type { NextFunction, Request, Response } from "express";
-import { originalDir, thumbDir } from "../config/path";
-
+import cloudinary from "../config/cloudinary";
+import streamifier from "streamifier";
+import { UploadApiResponse } from "cloudinary";
 
 export const uploadMiddleware = multer({ storage: memoryStorage() })
+function uploadBuffer(buffer: Buffer): Promise<UploadApiResponse> {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            (error, result) => {
+                if (error) {
+                    return reject(error);
+                }
 
+                if (!result) {
+                    return reject(new Error("Cloudinary returned no result"));
+                }
+
+                resolve(result);
+            }
+        );
+
+        streamifier.createReadStream(buffer).pipe(stream);
+    });
+}
 export function procImgMiddleware(width: number, quality: number) {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -16,34 +32,23 @@ export function procImgMiddleware(width: number, quality: number) {
                 return next();
             }
 
-            const processedFiles = [];
+            await Promise.all(
+                req.files.map(async (file) => {
+                    const originalBuffer = await sharp(file.buffer)
+                        .flatten({ background: "#ffffff" })
+                        .jpeg({ quality })
+                        .toBuffer();
 
-            for (const file of req.files) {
-                const fileName = `${Date.now()}.jpg`;
+                    const result = await uploadBuffer(originalBuffer);
 
-                const filePathOriginal = join(originalDir, fileName);
-                const filePathThumb = join(thumbDir, fileName);
+                    file.filename = result.public_id;
 
-                await sharp(file.buffer)
-                    .flatten({ background: "#ffffff" })
-                    .jpeg({ quality })
-                    .toFile(filePathOriginal);
-
-                await sharp(file.buffer)
-                    .resize({ width })
-                    .flatten({ background: "#ffffff" })
-                    .jpeg({ quality })
-                    .toFile(filePathThumb);
-
-                file.filename = fileName;
-
-                processedFiles.push({
-                    filename: fileName,
-                    original: filePathOriginal,
-                    thumb: filePathThumb
-                });
-            }
-
+                    return {
+                        publicId: result.public_id,
+                        url: result.secure_url
+                    };
+                })
+            )
             next();
         } catch (error) {
             next(error);
