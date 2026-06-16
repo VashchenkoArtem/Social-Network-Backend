@@ -42,6 +42,11 @@ export const MessageRepository: IMessageRepositoryContract = {
                             id: true,
                             image: true
                         }
+                    },
+                    chat_app_message_readers: {
+                        select: {
+                            user_id: true
+                        }
                     }
                 }
             })

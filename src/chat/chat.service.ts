@@ -21,8 +21,8 @@ export const ChatService: IChatServiceContract = {
         await ChatRepository.deleteChat(chatId)
     },
     
-    leaveChat: async (userId) => {
-        await ChatRepository.leaveChat(userId)
+    leaveChat: async (userId, chatId) => {
+        await ChatRepository.leaveChat(userId, chatId)
     },
 
     findChatById: async (chatId) => {

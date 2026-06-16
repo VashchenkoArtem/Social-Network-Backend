@@ -51,7 +51,7 @@ export interface IChatControllerContract {
 
     leaveChat: (
         req: Request<
-            object,
+            {id: string},
             string,
             object
         >,
@@ -126,7 +126,8 @@ export interface IChatServiceContract {
     ) => Promise<void>;
 
     leaveChat: (
-        userId: number
+        userId: number,
+        chatId: number
     ) => Promise<void>;
 
     findChatById: (
@@ -178,7 +179,8 @@ export interface IChatRepositoryContract {
     ) => Promise<void>;
 
     leaveChat: (
-        userId: number
+        userId: number,
+        chatId: number
     ) => Promise<void>;
 
     findChatById: (

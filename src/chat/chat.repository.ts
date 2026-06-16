@@ -16,7 +16,7 @@ export const ChatRepository: IChatRepositoryContract = {
             orderBy: {
                 id: 'desc'
             },
-            take: limit + 1,
+            take: 10,
             ...(paginationData.cursor
                 ? {
                     cursor: { id: paginationData.cursor },
@@ -79,7 +79,7 @@ export const ChatRepository: IChatRepositoryContract = {
             orderBy: {
                 id: 'desc',
             },
-            take: limit + 1,
+            take: 10,
             ...(paginationData.cursor
                 ? {
                     cursor: { id: paginationData.cursor },
@@ -209,14 +209,13 @@ export const ChatRepository: IChatRepositoryContract = {
         }
     },
 
-    leaveChat: async (userId) => {
-        try {
-            await client.chat_app_chat_users.deleteMany({
-                where: { user_id: userId }
-            })
-        } catch (error) {
-            throw error
-        }
+    leaveChat: async (userId, chatId) => {
+        await client.chat_app_chat_users.deleteMany({
+            where: { 
+                user_id: BigInt(userId),
+                chat_id: chatId
+            }
+        });
     },
 
     findChatById: async (chatId) => {

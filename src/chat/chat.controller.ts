@@ -109,9 +109,16 @@ export const ChatController: IChatControllerContract = {
         res.status(200).json("Chat deleted")
     },
     leaveChat: async (req, res) => {
-        const userId = res.locals.userId
-        await ChatService.leaveChat(userId)
-        res.status(200).json("Left chat")
+        const userId = Number(res.locals.userId);
+        const chatId = Number(req.params.id);
+        
+        if (Number.isNaN(chatId)) {
+            res.status(400).json("Invalid chat id");
+            return;
+        }
+
+        await ChatService.leaveChat(userId, chatId);
+        res.status(200).json("Left chat");
     },
     findChatById: async (req, res) => {
         const chatId = Number(req.params.chatId)
