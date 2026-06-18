@@ -110,6 +110,11 @@ export interface IMessageRepositoryContract {
 
 export interface IMessageSocketControllerContract {
     registerHandlers: (socketServer: ServerSocket, socket: AuthenticatedSocket) => void
-    sendMessage: (socketServer: ServerSocket, socket: AuthenticatedSocket, data: IMessageSocketCreateDTO, ack?: IMessageCreatePayload) => void
+    sendMessage: (
+        socketServer: ServerSocket,
+        socket: AuthenticatedSocket, 
+        data: IMessageSocketCreateDTO, 
+        ack?: IMessageCreatePayload
+    ) => void
     newMessage: (socketServer: ServerSocket, message: IMessageWithAuthor) => void
 }

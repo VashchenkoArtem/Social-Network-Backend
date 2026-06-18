@@ -12,7 +12,9 @@ export const SocketManager: SocketManagerContract = {
     initSocketServer(httpServer) {
         this.socketServer = new SocketServer<ServerSocket>(httpServer, {
             cors: {
-                origin: "*"
+                origin: "*",
+                methods: ['POST', 'GET'],
+                credentials: true
             }
         })
         this.socketServer.use(authSocketMiddleware)

@@ -6,18 +6,15 @@ import streamifier from "streamifier";
 import { UploadApiResponse } from "cloudinary";
 
 export const uploadMiddleware = multer({ storage: memoryStorage() })
-function uploadBuffer(buffer: Buffer): Promise<UploadApiResponse> {
+
+
+function uploadBuffer(buffer: Buffer, folder: string): Promise<UploadApiResponse> {
     return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
+            { folder: folder },
             (error, result) => {
-                if (error) {
-                    return reject(error);
-                }
-
-                if (!result) {
-                    return reject(new Error("Cloudinary returned no result"));
-                }
-
+                if (error) return reject(error);
+                if (!result) return reject(new Error("Cloudinary returned no result"));
                 resolve(result);
             }
         );
@@ -25,30 +22,33 @@ function uploadBuffer(buffer: Buffer): Promise<UploadApiResponse> {
         streamifier.createReadStream(buffer).pipe(stream);
     });
 }
-export function procImgMiddleware(width: number, quality: number) {
+
+interface CloudinaryFile extends Express.Multer.File {
+    secure_url?: string;
+}
+
+export function procImgMiddleware(width: number, quality: number, folder?: string) {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
             if (!req.files || !Array.isArray(req.files)) {
                 return next();
             }
 
+            const files = req.files as CloudinaryFile[];
+
             await Promise.all(
-                req.files.map(async (file) => {
+                files.map(async (file) => {
                     const originalBuffer = await sharp(file.buffer)
+                        .resize({ width: width, withoutEnlargement: true })
                         .flatten({ background: "#ffffff" })
                         .jpeg({ quality })
                         .toBuffer();
-
-                    const result = await uploadBuffer(originalBuffer);
-
+                    const result = await uploadBuffer(originalBuffer, "folder");
                     file.filename = result.public_id;
-
-                    return {
-                        publicId: result.public_id,
-                        url: result.secure_url
-                    };
+                    file.secure_url = result.secure_url;
                 })
-            )
+            );
+            
             next();
         } catch (error) {
             next(error);

@@ -13,7 +13,7 @@ export const friendsRepository: IFriendsRepositoryContract = {
                     ],
                     status: "accepted"
                 },
-                take: 2,
+                // take: 2,
                 select: {
                     id: true,
 

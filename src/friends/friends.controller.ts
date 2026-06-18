@@ -85,8 +85,7 @@ export const friendController: IFriendsControllerContract = {
                 return
             }
             const userId = res.locals.userId;
-            const recommendedPeople = await friendsService.recommendedPeople(userId, {limit, cursor});
-            console.log(recommendedPeople, "recommended people")
+            const recommendedPeople = await friendsService.recommendedPeople(userId, {limit, cursor})
             res.status(200).json(recommendedPeople);
         } catch (error) {
             res.status(500).json("Internal Server Error");

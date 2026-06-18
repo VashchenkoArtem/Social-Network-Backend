@@ -24,7 +24,6 @@ export const albumController: IAlbumControllerContract = {
                 res.status(400).json("Файл є обов'язковим");
                 return;
             }
-
             const result = await AlbumService.uploadPhoto(
                 files,
                 Number(albumId),

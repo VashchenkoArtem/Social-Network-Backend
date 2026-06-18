@@ -21,6 +21,7 @@ import { SocketManager } from "./socket/socket.manager";
 };
 
 const HOST = getLocalIpAddress();
+// const HOST = "localhost"
 const PORT = 8000;
 
 const app: Express = express();
@@ -44,7 +45,7 @@ app.use(heartsRouter)
 async function bootstrap(){
     try {
         await startTunnel();
-        httpServer.listen(PORT, HOST, () => {
+        httpServer.listen(PORT, "0.0.0.0" , () => {
             console.log(`Сервер запущено`);
             console.log(`http://${HOST}:${PORT}`);
         });
