@@ -2,6 +2,7 @@ import { compare } from "bcrypt";
 import { client } from "../client/client";
 import { IUserRepositoryContract } from "./user.types";
 import { Album, Photo } from "../album/types/album.types";
+import cloudinary from "../config/cloudinary";
 
 
 export const UserRepository: IUserRepositoryContract = {
@@ -105,13 +106,12 @@ export const UserRepository: IUserRepositoryContract = {
             ));
             parsedBirthDate = date;
         }
-        console.log("Итоговое значение для Prisma:", parsedBirthDate);
 
         const profileUpdate: any = {};
         if (data.signature !== undefined) profileUpdate.signature = data.signature;
         if (data.pseudonym !== undefined) profileUpdate.pseudonym = data.pseudonym;
         if (parsedBirthDate !== undefined) profileUpdate.birth_date = parsedBirthDate;
-        if (filename !== undefined) profileUpdate.avatar = filename;
+        if (filename !== undefined) profileUpdate.avatar = cloudinary.url(filename);
 
         return await client.user_app_user.update({
             where: { id: userId },

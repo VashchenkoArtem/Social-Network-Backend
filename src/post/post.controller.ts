@@ -20,7 +20,6 @@ export const postsController: IPostControllerContract = {
         const response = await PostService.getAllPosts({ limit, cursor})
         res.status(200).json(response)
     },
-
     getMyPosts: async (req, res) => {
         const limit = Number(req.query.limit)
         const cursor = Number(req.query.cursor)

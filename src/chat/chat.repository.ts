@@ -1,4 +1,5 @@
 import { client } from "../client/client";
+import cloudinary from "../config/cloudinary";
 import { IChatRepositoryContract } from "./types/chat.contracts";
 
 export const ChatRepository: IChatRepositoryContract = {
@@ -151,12 +152,12 @@ export const ChatRepository: IChatRepositoryContract = {
         const pureUserIds = cleanUserIds.filter((id) => id !== cleanAdminId);
 
         const allUniqueUserIds = Array.from(new Set([cleanAdminId, ...pureUserIds]));
-
+        const avatar = filename ? cloudinary.url(filename) : "default-group-avatar.png";
         return await client.chat_app_chat.create({
             data: {
                 name: data.name,
                 is_group: data.is_group || false,
-                avatar: filename || "default-group-avatar.png",
+                avatar: avatar,
                 admin_id: cleanAdminId,
                 chat_app_chat_users: {
                     create: allUniqueUserIds.map((id) => ({ user_id: BigInt(id) }))
@@ -178,7 +179,7 @@ export const ChatRepository: IChatRepositoryContract = {
                 where: { id: chatId },
                 data: {
                     name: safeData.name,
-                    ...(filename !== undefined ? { avatar: filename } : {}),
+                    ...(filename !== null ? { avatar: cloudinary.url(filename) } : {}),
                 },
                 include: {
                     chat_app_chat_users: {

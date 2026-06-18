@@ -8,7 +8,7 @@ if (!apiKey || !apiSecret) {
 }
 
 cloudinary.config({
-    cloud_name: "depqshccq",
+    cloud_name: "dan2j6jtn",
     api_key: apiKey,
     api_secret: apiSecret,
 });

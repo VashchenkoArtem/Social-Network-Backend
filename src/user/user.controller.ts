@@ -24,7 +24,6 @@ export const userController: IUserControllerContract = {
         const authUser = await UserService.login(data)
 
         if (typeof authUser === "string"){
-            console.log("asdasdadasd")
             res.status(400).json(authUser)
             return
         }
