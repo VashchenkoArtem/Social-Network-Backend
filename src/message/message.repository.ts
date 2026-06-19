@@ -93,7 +93,7 @@ export const MessageRepository: IMessageRepositoryContract = {
             };
         }
 
-        return await client.chat_app_message.create({
+        const message = await client.chat_app_message.create({
             data: createData,
 
             include: {
@@ -113,6 +113,7 @@ export const MessageRepository: IMessageRepositoryContract = {
                 
             },
         });
+        return message
     },
     
     getAllUnreadMessages: async (userId, is_group) => {

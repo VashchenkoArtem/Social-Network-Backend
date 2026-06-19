@@ -9,7 +9,7 @@ albumRouter.post(
     "/upload/:albumId", 
     authMiddleware, 
     uploadMiddleware.array("images", 10), 
-    procImgMiddleware(1200, 80, "media/profile_app/albums"),
+    procImgMiddleware(1200, 80, "profile_app", "albums"),
     albumController.uploadPhoto
 )
 

@@ -14,7 +14,7 @@ userRouter.patch(
     "/update-user", 
     authMiddleware, 
     uploadMiddleware.array("avatars", 1), 
-    procImgMiddleware(400, 85, "media/profile_app/avatars"),
+    procImgMiddleware(400, 85, "profile_app", "avatars"),
     userController.updateUser
 );
 
@@ -25,7 +25,7 @@ userRouter.patch(
     "/signature", 
     authMiddleware, 
     uploadMiddleware.array("signature", 1), 
-    procImgMiddleware(500, 90, "media/profile_app/signatures"),
+    procImgMiddleware(500, 90, "profile_app", "signatures"),
     userController.updateSignature
 )
 

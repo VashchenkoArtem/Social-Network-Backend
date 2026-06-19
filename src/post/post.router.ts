@@ -12,7 +12,7 @@ postRouter.post(
     "/posts", 
     authMiddleware, 
     uploadMiddleware.array("images", 7), 
-    procImgMiddleware(1080, 80, "media/post_app/compressed_images"),
+    procImgMiddleware(1080, 80, "post_app", "compressed_images"),
     postsController.createPost
 )
 
@@ -20,7 +20,7 @@ postRouter.patch(
     "/posts/:id", 
     authMiddleware, 
     uploadMiddleware.array("images", 7), 
-    procImgMiddleware(1080, 80, "media/post_app/compressed_images"),
+    procImgMiddleware(1080, 80, "post_app", "compressed_images"),
     postsController.updatePost 
 );
 

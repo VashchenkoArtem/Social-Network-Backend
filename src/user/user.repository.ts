@@ -111,7 +111,7 @@ export const UserRepository: IUserRepositoryContract = {
         if (data.signature !== undefined) profileUpdate.signature = data.signature;
         if (data.pseudonym !== undefined) profileUpdate.pseudonym = data.pseudonym;
         if (parsedBirthDate !== undefined) profileUpdate.birth_date = parsedBirthDate;
-        if (filename !== undefined) profileUpdate.avatar = cloudinary.url(filename);
+        if (filename !== undefined) profileUpdate.avatar = filename;
 
         return await client.user_app_user.update({
             where: { id: userId },

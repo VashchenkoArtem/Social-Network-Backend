@@ -8,10 +8,16 @@ import { UploadApiResponse } from "cloudinary";
 export const uploadMiddleware = multer({ storage: memoryStorage() })
 
 
-function uploadBuffer(buffer: Buffer, folder: string): Promise<UploadApiResponse> {
+function uploadBuffer(
+    buffer: Buffer,
+    moduleName: string,
+    folderName: string
+): Promise<UploadApiResponse> {
     return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
-            { folder: folder },
+            {
+                folder: `${moduleName}/${folderName}`,
+            },
             (error, result) => {
                 if (error) return reject(error);
                 if (!result) return reject(new Error("Cloudinary returned no result"));
@@ -27,7 +33,12 @@ interface CloudinaryFile extends Express.Multer.File {
     secure_url?: string;
 }
 
-export function procImgMiddleware(width: number, quality: number, folder?: string) {
+export function procImgMiddleware(
+    width: number,
+    quality: number,
+    moduleName: string,
+    folderName: string
+) {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
             if (!req.files || !Array.isArray(req.files)) {
@@ -38,17 +49,24 @@ export function procImgMiddleware(width: number, quality: number, folder?: strin
 
             await Promise.all(
                 files.map(async (file) => {
-                    const originalBuffer = await sharp(file.buffer)
-                        .resize({ width: width, withoutEnlargement: true })
+                    const buffer = await sharp(file.buffer)
+                        .resize({ width, withoutEnlargement: true })
                         .flatten({ background: "#ffffff" })
                         .jpeg({ quality })
                         .toBuffer();
-                    const result = await uploadBuffer(originalBuffer, "folder");
-                    file.filename = result.public_id;
+
+                    const result = await uploadBuffer(
+                        buffer,
+                        moduleName,
+                        folderName
+                    );
+                    const fullPublicId = result.public_id
+
+                    file.filename = fullPublicId;
                     file.secure_url = result.secure_url;
                 })
             );
-            
+
             next();
         } catch (error) {
             next(error);

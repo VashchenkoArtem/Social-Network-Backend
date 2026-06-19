@@ -12,7 +12,7 @@ chatRouter.post(
     "/chat", 
     authMiddleware, 
     uploadMiddleware.array("avatar", 1), 
-    procImgMiddleware(400, 85, "media/chat_app/group_avatars"),
+    procImgMiddleware(400, 85, "chat_app", "group_avatars"),
     ChatController.createChat
 );
 
@@ -20,7 +20,7 @@ chatRouter.patch(
     "/chat/:id", 
     authMiddleware, 
     uploadMiddleware.array("avatar", 1), 
-    procImgMiddleware(400, 85, "media/chat_app/group_avatars"),
+    procImgMiddleware(400, 85, "chat_app", "group_avatars"),
     ChatController.updateChat
 )
 

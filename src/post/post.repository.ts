@@ -141,11 +141,13 @@ export const postRepository: IPostRepositoryContract = {
     
     createPost: async (data, files) => {
         try {
-            const photos = files?.map(file => ({
-                original_image: cloudinary.url(file.filename),
-                compressed_image: cloudinary.url(file.filename)
-            })) ?? [];
-
+            const photos = files?.map(file => {
+                console.log(file.filename)
+                return {
+                    original_image: file.filename,
+                    compressed_image: file.filename
+                }
+            }) ?? [];
             const tags = data.tags ?? [];
 
             const tagIds = Array.isArray(tags)
