@@ -10,7 +10,6 @@ export const ChatSocketController: ChatSocketControllerContract = {
 			console.log("join chat")
 			ChatSocketController.joinChat(socket, data, ack)
 		})
-
 		socket.on("leaveChat", (data) => {
 			ChatSocketController.leaveChat(socket, data)
 		})

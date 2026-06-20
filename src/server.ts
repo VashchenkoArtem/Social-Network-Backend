@@ -20,8 +20,8 @@ import { SocketManager } from "./socket/socket.manager";
     return Number(this.toString());
 };
 
-// const HOST = getLocalIpAddress();
-const HOST = "localhost"
+const HOST = getLocalIpAddress();
+// const HOST = "localhost"
 const PORT = 8000;
 
 const app: Express = express();

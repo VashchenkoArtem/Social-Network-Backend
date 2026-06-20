@@ -57,7 +57,7 @@ export function procImgMiddleware(
 
                     const result = await uploadBuffer(
                         buffer,
-                        moduleName,
+                        `media/${moduleName}`,
                         folderName
                     );
                     const fullPublicId = result.public_id
