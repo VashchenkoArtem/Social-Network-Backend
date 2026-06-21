@@ -4,6 +4,7 @@ import { IMessageSocketControllerContract } from "./message.types";
 import cloudinary from "../config/cloudinary";
 import { UploadApiResponse } from "cloudinary";
 import { MessageService } from "./message.service";
+import { ChatService } from "../chat/chat.service";
 
 export const MessageSocketController: IMessageSocketControllerContract = {
     registerHandlers (socketServer, socket) {
@@ -76,6 +77,12 @@ export const MessageSocketController: IMessageSocketControllerContract = {
                 })),
             };
             this.newMessage(socketServer, tempMessage);
+            const members = await ChatService.getChatParticipants(data.chat_id)
+            members?.chat_app_chat_users.forEach((participant) => {
+                if (Number(participant.user_app_user.id.toString()) !== socket.data.userId){
+                                          
+                }
+            })
             await MessageService.createMessage({
                 text: data.text,
                 chat_id: data.chat_id,

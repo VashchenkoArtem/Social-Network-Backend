@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { CreateChat, IChat, IChatParticipant, IChatQuery, IChatWithPaginationResponse, IChatWithUsers, ICreateGroupChatDto, IUpdateChat, JoinChatCallback, JoinChatPayload, LeaveChatPayload, PaginationDTO } from "./chat.types";
+import { ChatParticipants, CreateChat, IChat, IChatParticipant, IChatQuery, IChatWithPaginationResponse, IChatWithUsers, ICreateGroupChatDto, IUpdateChat, JoinChatCallback, JoinChatPayload, LeaveChatPayload, PaginationDTO } from "./chat.types";
 import { AuthenticatedSocket } from "../../socket/socket.types";
 
 export interface IChatControllerContract {
@@ -142,7 +142,10 @@ export interface IChatServiceContract {
         userId: number,
         participantId: number,
     ) => Promise<IChatWithUsers | null>;
-
+    getChatParticipants: (
+        chatId: number,
+    ) => Promise<ChatParticipants | null>
+    
 
 
 
@@ -186,15 +189,13 @@ export interface IChatRepositoryContract {
     findChatById: (
         chatId: number
     ) => Promise<IChatWithUsers | null>;
-
-    getChatParticipants: (
-        chatId: number
-    ) => Promise<IChatParticipant | null>;
-
     getChatByParticipants: (
         userId: number,
         participantId: number,
     ) => Promise<IChatWithUsers | null>;
+    getChatParticipants: (
+        chatId: number
+    ) => Promise<ChatParticipants | null>
 }
 
 

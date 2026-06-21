@@ -68,3 +68,14 @@ export type JoinChatCallback = (
 ) => void
 
 export type CreateChat = Prisma.chat_app_chatUncheckedCreateInput
+
+export type ChatParticipants = Prisma.chat_app_chatGetPayload<{
+    select: {
+       chat_app_chat_users: {
+           select: {
+            id: true,
+            user_app_user: true
+        }
+       }
+    }
+}>

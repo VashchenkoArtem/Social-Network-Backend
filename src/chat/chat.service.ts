@@ -34,11 +34,15 @@ export const ChatService: IChatServiceContract = {
 			throw new NotFoundError("Chat");
 		}
 		const isUserInChat = chat.chat_app_chat_users.some((participant) => {
-			return participant.user_id === BigInt(userId);
+			return participant.user_app_user.id === BigInt(userId);
 		});
 		return isUserInChat;
 	},
     getChatByParticipants: async (userId, participantId) => {
         return await ChatRepository.getChatByParticipants(userId, participantId)
     },
+    getChatParticipants: async (chatId) => {
+        return await ChatRepository.getChatParticipants(chatId)
+    }
+    
 }

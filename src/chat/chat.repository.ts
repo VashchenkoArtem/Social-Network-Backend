@@ -245,8 +245,13 @@ export const ChatRepository: IChatRepositoryContract = {
 			where: {
 				id: chatId,
 			},
-			include: {
-				chat_app_chat_users: true,
+			select: {
+				chat_app_chat_users: {
+                    select: {
+                        id: true,
+                        user_app_user: true
+                    }
+                },
 			},
 		});
 		return participants;
