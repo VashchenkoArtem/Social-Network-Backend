@@ -60,8 +60,9 @@ export function procImgMiddleware(
                         `media/${moduleName}`,
                         folderName
                     );
+                    console.log(result)
                     const fullPublicId = result.public_id
-
+                    console.log(fullPublicId)
                     file.filename = fullPublicId;
                     file.secure_url = result.secure_url;
                 })

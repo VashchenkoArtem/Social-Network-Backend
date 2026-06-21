@@ -40,7 +40,7 @@ export const MessageSocketController: IMessageSocketControllerContract = {
                     const result = await new Promise<UploadApiResponse>((resolve, reject) => {
                         const stream = cloudinary.uploader.upload_stream(
                             {
-                                folder: "chat_app/message_images",
+                                folder: "media/chat_app/message_images",
                             },
                             (error, result) => {
                                 if (error) return reject(error);
