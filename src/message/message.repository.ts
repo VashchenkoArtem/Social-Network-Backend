@@ -175,9 +175,50 @@ export const MessageRepository: IMessageRepositoryContract = {
         }
     },
 
+    getUnreadSummary: async (userId) => {
+        try {
+            const [personal, group] = await Promise.all([
+                client.chat_app_message.count({
+                    where: {
+                        sender_id: { not: userId },
+                        chat_app_chat: {
+                            is_group: false,
+                            chat_app_chat_users: {
+                                some: { user_id: userId }
+                            }
+                        },
+                        chat_app_message_readers: {
+                            none: { user_id: userId }
+                        }
+                    }
+                }),
+                client.chat_app_message.count({
+                    where: {
+                        sender_id: { not: userId },
+                        chat_app_chat: {
+                            is_group: true,
+                            chat_app_chat_users: {
+                                some: { user_id: userId }
+                            }
+                        },
+                        chat_app_message_readers: {
+                            none: { user_id: userId }
+                        }
+                    }
+                })
+            ])
+            return {
+                personal,
+                group,
+                total: personal + group
+            }
+        } catch (error) {
+            throw error
+        }
+    },
+
     getAllUnreadChatMessages: async (userId) => {
         try {
-            console.log(userId)
             const unread = await client.chat_app_message.groupBy({
                 by: ["chat_id"],
                 where: {

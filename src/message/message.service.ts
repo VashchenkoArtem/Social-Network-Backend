@@ -22,13 +22,17 @@ export const MessageService: IMessageServiceContract = {
         return unreadMessages
     },
 
+    getUnreadSummary: async(userId) => {
+        const summary = await MessageRepository.getUnreadSummary(userId)
+        return summary
+    },
+
     markAsRead: async(chatId, userId) => {
         const readStatus = await MessageRepository.markAsRead(chatId, userId)
         return readStatus
     },
 
     getAllUnreadChatMessages: async(userId) => {
-        console.log(userId)
         const unreadChatMessages = await MessageRepository.getAllUnreadChatMessages(userId)
         return unreadChatMessages
     },

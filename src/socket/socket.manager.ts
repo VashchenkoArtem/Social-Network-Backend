@@ -24,9 +24,9 @@ export const SocketManager: SocketManagerContract = {
             console.log("Connected", userId);
             
             UserSocketController.registerHandlers(socket, this.socketServer)
-            ChatSocketController.registerHandlers(socket);
 
             if (this.socketServer) {
+                ChatSocketController.registerHandlers(socket, this.socketServer);
                 MessageSocketController.registerHandlers(this.socketServer, socket);
             }
 

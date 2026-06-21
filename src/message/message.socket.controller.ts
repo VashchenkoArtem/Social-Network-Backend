@@ -77,12 +77,7 @@ export const MessageSocketController: IMessageSocketControllerContract = {
                 })),
             };
             this.newMessage(socketServer, tempMessage);
-            const members = await ChatService.getChatParticipants(data.chat_id)
-            members?.chat_app_chat_users.forEach((participant) => {
-                if (Number(participant.user_app_user.id.toString()) !== socket.data.userId){
-                                          
-                }
-            })
+
             await MessageService.createMessage({
                 text: data.text,
                 chat_id: data.chat_id,
@@ -90,6 +85,31 @@ export const MessageSocketController: IMessageSocketControllerContract = {
                 sender_id: socket.data.userId,
                 photos: uploadedPhotos
             })
+
+            const members = await ChatService.getChatParticipants(data.chat_id)
+            const recipientIds = (members?.chat_app_chat_users ?? [])
+                .map((participant: { user_app_user: { id: bigint | number } }) =>
+                    Number(participant.user_app_user.id.toString())
+                )
+                .filter((participantId: number) => participantId !== socket.data.userId)
+
+            await Promise.all(
+                recipientIds.map(async (recipientId: number) => {
+                    const isViewingChat = this.isUserInChatRoom(
+                        socketServer,
+                        recipientId,
+                        data.chat_id
+                    )
+
+                    if (isViewingChat) {
+                        // Отримувач зараз дивиться саме цей чат — одразу позначаємо
+                        // повідомлення прочитаним замість того, щоб збільшувати лічильник.
+                        await MessageService.markAsRead(data.chat_id, recipientId)
+                    }
+
+                    await this.notifyUnreadUpdate(socketServer, recipientId)
+                })
+            )
         } catch (error) {
             throw error;
         }
@@ -107,5 +127,35 @@ export const MessageSocketController: IMessageSocketControllerContract = {
         } catch (error) {
             throw error
         }
+    },
+
+    notifyUnreadUpdate: async (socketServer, userId) => {
+        try {
+            const [summary, byChat] = await Promise.all([
+                MessageService.getUnreadSummary(userId),
+                MessageService.getAllUnreadChatMessages(userId)
+            ])
+
+            socketServer.to(`user_${userId}`).emit('unreadCountUpdate', {
+                summary,
+                byChat
+            })
+        } catch (error) {
+            throw error
+        }
+    },
+
+    isUserInChatRoom: (socketServer, userId, chatId) => {
+        const room = socketServer.sockets.adapter.rooms.get(`chat-${chatId}`)
+        if (!room) return false
+
+        for (const socketId of room) {
+            const memberSocket = socketServer.sockets.sockets.get(socketId)
+            if (memberSocket?.data.userId === userId) {
+                return true
+            }
+        }
+
+        return false
     }
 }

@@ -63,6 +63,12 @@ export interface PaginationDTO {
     cursor?: number;
 }
 
+export interface IUnreadSummary {
+    personal: number;
+    group: number;
+    total: number;
+}
+
 export interface IMessageControllerContract {
     getMessages: (
         req: Request<{chatId: string}, IMessageWithPaginationResponse | string, object, IMessageQuery>,
@@ -72,6 +78,11 @@ export interface IMessageControllerContract {
     getAllUnreadMessages: (
         req: Request<object, number | string, object, {is_group?: string}>,
         res: Response<number | string>
+    ) => void
+
+    getUnreadSummary: (
+        req: Request<object, IUnreadSummary | string, object, object>,
+        res: Response<IUnreadSummary | string>
     ) => void
     
     markAsRead: (
@@ -95,6 +106,7 @@ export interface IMessageServiceContract {
     createMessage: (data: IMessageCreate) => Promise<IMessageWithAuthor>
     markAsRead: (chatId: number, userId: number) => Promise<string>
     getAllUnreadMessages: (userId: number, is_group: boolean) => Promise<number | string>
+    getUnreadSummary: (userId: number) => Promise<IUnreadSummary>
     getAllUnreadChatMessages: (userId: number) => Promise<number | string>
 }
 
@@ -103,6 +115,7 @@ export interface IMessageRepositoryContract {
     getAllMessagesByChatId: (chatId: number) => Promise<IMessage[]>
     createMessage: (data: IMessageCreate) => Promise<IMessageWithAuthor>
     getAllUnreadMessages: (userId: number, is_group: boolean) => Promise<number | string>
+    getUnreadSummary: (userId: number) => Promise<IUnreadSummary>
     markAsRead: (chatId: number, userId: number) => Promise<string>
     getAllUnreadChatMessages: (userId: number) => Promise<number | string>
 }
@@ -117,4 +130,6 @@ export interface IMessageSocketControllerContract {
         ack?: IMessageCreatePayload
     ) => void
     newMessage: (socketServer: ServerSocket, message: IMessageWithAuthor) => void
+    notifyUnreadUpdate: (socketServer: ServerSocket, userId: number) => Promise<void>
+    isUserInChatRoom: (socketServer: ServerSocket, userId: number, chatId: number) => boolean
 }

@@ -1,6 +1,8 @@
 import { BadRequestError, NotFoundError } from "../errors";
 import { MessageService } from "./message.service";
 import { IMessageControllerContract } from "./message.types";
+import { SocketManager } from "../socket/socket.manager";
+import { MessageSocketController } from "./message.socket.controller";
 
 
 export const MessageController: IMessageControllerContract = {
@@ -52,17 +54,26 @@ export const MessageController: IMessageControllerContract = {
         res.status(200).json(unreadMessages)
     },
 
+    getUnreadSummary: async (req, res) => {
+        const userId = res.locals.userId
+        const summary = await MessageService.getUnreadSummary(userId)
+        res.status(200).json(summary)
+    },
+
     markAsRead: async (req, res) => {
         const chatId = Number(req.params.chatId)
         const userId = res.locals.userId
         const markedMessage = await MessageService.markAsRead(chatId, userId)
-        console.log(markedMessage)
+
+        if (SocketManager.socketServer) {
+            await MessageSocketController.notifyUnreadUpdate(SocketManager.socketServer, userId)
+        }
+
         res.status(200).json(markedMessage)
     },
 
     getAllUnreadChatMessages: async(req, res) => {
         const userId = Number(res.locals.userId)
-        console.log(userId)
         const unreadChatMessages = await MessageService.getAllUnreadChatMessages(userId)
         res.status(200).json(unreadChatMessages)
     },
@@ -82,4 +93,4 @@ export const MessageController: IMessageControllerContract = {
 
         res.json(message);
 }
-}       
+}
