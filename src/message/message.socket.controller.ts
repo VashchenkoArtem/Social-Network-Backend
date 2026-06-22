@@ -102,9 +102,12 @@ export const MessageSocketController: IMessageSocketControllerContract = {
                     )
 
                     if (isViewingChat) {
-                        // Отримувач зараз дивиться саме цей чат — одразу позначаємо
-                        // повідомлення прочитаним замість того, щоб збільшувати лічильник.
                         await MessageService.markAsRead(data.chat_id, recipientId)
+
+                        socketServer.to(`chat-${data.chat_id}`).emit("messagesRead", {
+                            chatId: data.chat_id,
+                            readerId: recipientId,
+                        })
                     }
 
                     await this.notifyUnreadUpdate(socketServer, recipientId)

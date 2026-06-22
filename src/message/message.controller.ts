@@ -66,6 +66,10 @@ export const MessageController: IMessageControllerContract = {
         const markedMessage = await MessageService.markAsRead(chatId, userId)
 
         if (SocketManager.socketServer) {
+            SocketManager.socketServer.to(`chat-${chatId}`).emit('messagesRead', {
+                chatId,
+                readerId: userId
+            })
             await MessageSocketController.notifyUnreadUpdate(SocketManager.socketServer, userId)
         }
 

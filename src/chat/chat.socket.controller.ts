@@ -25,6 +25,11 @@ export const ChatSocketController: ChatSocketControllerContract = {
 				await socket.join(`chat-${data.chatId}`);
 				await MessageService.markAsRead(data.chatId, socket.data.userId)
 
+				socketServer.to(`chat-${data.chatId}`).emit('messagesRead', {
+					chatId: data.chatId,
+					readerId: socket.data.userId
+				})
+
 				await MessageSocketController.notifyUnreadUpdate(socketServer, socket.data.userId)
 
 				if (ack) {
