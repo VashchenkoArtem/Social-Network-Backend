@@ -4,6 +4,5 @@ node_modules/
 
 src/generated/prisma/
 src/prisma/schema/databases
-media/
 package-lock.json
 prisma/database.db
