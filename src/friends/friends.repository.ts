@@ -192,7 +192,6 @@ export const friendsRepository: IFriendsRepositoryContract = {
                 // { created_at: "desc" },
                 { id: "desc" },
             ],
-            take: limit + 1,
             ...(paginationData.cursor
                 ? {
                     cursor: {

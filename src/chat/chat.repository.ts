@@ -152,7 +152,7 @@ export const ChatRepository: IChatRepositoryContract = {
         const pureUserIds = cleanUserIds.filter((id) => id !== cleanAdminId);
 
         const allUniqueUserIds = Array.from(new Set([cleanAdminId, ...pureUserIds]));
-        const avatar = filename ? cloudinary.url(filename) : "default-group-avatar.png";
+        const avatar = filename ? filename : "default-group-avatar.png";
         return await client.chat_app_chat.create({
             data: {
                 name: data.name,

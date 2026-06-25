@@ -6,7 +6,7 @@ import { UserSocketController } from "../user/user.socket.controller";
 import { AuthenticatedSocket, ServerSocket, SocketManagerContract } from "./socket.types";
 import { Server as SocketServer } from "socket.io"
 
-const onlineUsers = new Set<number>();
+
 export const SocketManager: SocketManagerContract = {
     socketServer: null,
     initSocketServer(httpServer) {
@@ -14,8 +14,9 @@ export const SocketManager: SocketManagerContract = {
             cors: {
                 origin: "*",
                 methods: ['POST', 'GET'],
-                credentials: true
-            }
+                credentials: true,
+            },
+            maxHttpBufferSize: 100 * 1024 * 1024
         })
         this.socketServer.use(authSocketMiddleware)
         this.socketServer.on("connection", async (socket: AuthenticatedSocket) => {
