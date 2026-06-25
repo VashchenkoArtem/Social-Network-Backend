@@ -21,8 +21,8 @@ import { SocketManager } from "./socket/socket.manager";
 };
 
 // const HOST = getLocalIpAddress();
-const HOST = "localhost"
-const PORT = 8000;
+const HOST = "0.0.0.0"
+const PORT = 3000;
 
 const app: Express = express();
 export const httpServer = createServer(app)
