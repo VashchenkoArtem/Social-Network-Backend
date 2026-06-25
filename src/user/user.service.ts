@@ -33,14 +33,21 @@ export const UserService: IUserServiceContract = {
         const code = Math.floor(100000 + Math.random() * 900000).toString();
 
         verificationCodes.set(data.email, code);
-        console.log("Sending email to:", data.email);
-        const result = await transporter.sendMail({
-            from: 'mobileteamsocial@gmail.com',
-            to: data.email,
-            subject: data.message,
-            html: `<h1>Ваш код: ${code}</h1>`
-        });
-        console.log("Email sent:", result);
+        console.log(verificationCodes);
+try {
+    const result = await transporter.sendMail({
+        from: ENV.MAIL_USER,
+        to: data.email,
+        subject: data.message,
+        html: `<h1>Ваш код: ${code}</h1>`
+    });
+
+    console.log("Email sent:", result);
+} catch (error) {
+    console.error("EMAIL ERROR:", error);
+    throw error;
+}
+
         return { message: "Verification code sent to email" };
     },
     registration: async (data) => {
