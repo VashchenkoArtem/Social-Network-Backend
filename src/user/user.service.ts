@@ -4,47 +4,60 @@ import nodemailer, { createTransport } from "nodemailer";
 import { IUserServiceContract, AuthToken, CreateUser, VerifyPayload } from "./user.types";
 import { cleanEnv, str } from "envalid";
 import { UserRepository } from "./user.repository";
-import { Album, Photo } from "../album/types/album.types";
+import { Brevo } from "@getbrevo/brevo";
 
-
-
-type VerificationRecord = {
-    code: string;
-    expiresAt: number;
-};
 const verificationCodes = new Map<string, string>();
 const ENV = cleanEnv(process.env, {
     MAIL_USER: str(),
     MAIL_PASS: str(),
-    JWT_SECRET: str()
+    JWT_SECRET: str(),
+    BREVO_API_KEY: str()
 })
 
-
-export const transporter = createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-        user: ENV.MAIL_USER,
-        pass: ENV.MAIL_PASS,
-    },
-});
-
 export const UserService: IUserServiceContract = {
-    sendCode: async (data) => {
-        const code = Math.floor(100000 + Math.random() * 900000).toString();
+sendCode: async (data) => {
+    const code = Math.floor(
+        100000 + Math.random() * 900000
+    ).toString();
 
-        verificationCodes.set(data.email, code);
-        console.log(verificationCodes);
-        await transporter.sendMail({
-            from: 'mobileteamsocial@gmail.com',
-            to: data.email,
-            subject: data.message,
-            html: `<h1>Ваш код: ${code}</h1>`
-        });
+    verificationCodes.set(data.email, code);
 
-        return { message: "Verification code sent to email" };
-    },
+    const response = await fetch(
+        "https://api.brevo.com/v3/smtp/email",
+        {
+            method: "POST",
+            headers: {
+                "accept": "application/json",
+                "api-key": ENV.BREVO_API_KEY,
+                "content-type": "application/json"
+            },
+            body: JSON.stringify({
+                sender: {
+                    name: "Team Social",
+                    email: "test.python.1488@gmail.com"
+                },
+                to: [
+                    {
+                        email: data.email
+                    }
+                ],
+                subject: "Код підтвердження",
+                htmlContent: `<h1>Ваш код: ${code}</h1>`
+            })
+        }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        console.error(result);
+        throw new Error("Failed to send email");
+    }
+
+    return {
+        message: "Verification code sent to email"
+    };
+},
     registration: async (data) => {
         const savedCode = verificationCodes.get(data.email);
 
