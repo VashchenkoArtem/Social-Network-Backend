@@ -15,9 +15,14 @@ export const userController: IUserControllerContract = {
         res.status(200).json(response);
     },
     sendCode: async (req, res) => {
-        const body = req.body;
-        const response = await UserService.sendCode(body);
-        res.status(200).json(response);
+        try {
+            const body = req.body;
+            const response = await UserService.sendCode(body);
+            res.status(200).json(response);
+        } catch (error: any) {
+            console.error("sendCode error:", error);
+            res.status(500).json({ message: error?.message || "Не вдалося надіслати код" });
+        }
     },
     login: async (req, res) => {
         const data = req.body
