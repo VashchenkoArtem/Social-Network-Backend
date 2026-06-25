@@ -21,7 +21,10 @@ const ENV = cleanEnv(process.env, {
 
 
 const transporter = nodemailer.createTransport({
-    service: "gmail",
+    service: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    requireTLS: true,
     auth: {
         user: ENV.MAIL_USER,
         pass: ENV.MAIL_PASS,
