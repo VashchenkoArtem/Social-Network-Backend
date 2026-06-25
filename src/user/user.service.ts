@@ -21,11 +21,14 @@ const ENV = cleanEnv(process.env, {
 
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: "gmail",
     auth: {
         user: ENV.MAIL_USER,
-        pass: ENV.MAIL_PASS
-    }
+        pass: ENV.MAIL_PASS,
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
 });
 
 export const UserService: IUserServiceContract = {
@@ -35,17 +38,19 @@ export const UserService: IUserServiceContract = {
         verificationCodes.set(data.email, code);
         console.log(verificationCodes);
 try {
-    const result = await transporter.sendMail({
+    console.log("Before sendMail");
+
+    const info = await transporter.sendMail({
         from: ENV.MAIL_USER,
         to: data.email,
         subject: data.message,
         html: `<h1>Ваш код: ${code}</h1>`
     });
 
-    console.log("Email sent:", result);
-} catch (error) {
-    console.error("EMAIL ERROR:", error);
-    throw error;
+    console.log("After sendMail");
+    console.log(info);
+} catch (err) {
+    console.error("SendMail error:", err);
 }
 
         return { message: "Verification code sent to email" };
